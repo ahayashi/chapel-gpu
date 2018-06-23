@@ -55,7 +55,7 @@ proc printResults(execTimes) {
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
 proc main() {
-    writeln("Vector Copy: Baseline");
+    writeln("BlackScholes: CPU/GPU Execution (using GPUIterator)");
     writeln("Size: ", n);
     writeln("nTrials: ", numTrials);
     writeln("output: ", output);

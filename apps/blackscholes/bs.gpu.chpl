@@ -40,7 +40,7 @@ proc printResults(execTimes) {
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
 proc main() {
-    writeln("Vector Copy: Baseline");
+    writeln("BlackScholes: GPU Only");
     writeln("Size: ", n);
     writeln("nTrials: ", numTrials);
     writeln("output: ", output);
