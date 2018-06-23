@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <assert.h>
 #define CUDA_ERROR_CHECK
 #define CudaSafeCall( err ) __cudaSafeCall( err, __FILE__, __LINE__ )
 
@@ -29,8 +30,8 @@ extern "C" {
     void vcCUDA(float* A, float *B, int start, int end, int GPUN) {
 	float *dA, *dB;
 	if (GPUN > 0) {
-	    int GPUN = end - start + 1;
-#if 1
+	    assert(end - start + 1 == GPUN);
+#ifdef VERBOSE
 	    printf("In vcCUDA\n");
 	    printf("\t GPUN: %d\n", GPUN);
 	    printf("\t range: %d..%d\n", start, end);
