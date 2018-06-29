@@ -56,6 +56,17 @@ proc printResults(execTimes) {
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
 proc main() {
+    // Assuming there is one locale
+    // having CPU and GPU sublocales (CHPL_LOCAL_MODEL=gpu)
+    const numSublocs = Locales[0].getChildCount();
+    writeln("Locales[0] info: ");
+    for sublocID in 0..#numSublocs {
+	const subloc = Locales[0].getChild(sublocID);
+	writeln("\t Subloc: ", sublocID);
+	writeln("\t Name: ", subloc);
+	writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+    }
+    
     writeln("Matrix Multiplication: CPU/GPU Execution (using GPUIterator)");
     writeln("Size: ", n, "x", n);
     writeln("CPU ratio: ", CPUratio);
