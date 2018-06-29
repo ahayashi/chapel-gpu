@@ -45,8 +45,8 @@ proc main() {
     var execTimes: [1..numTrials] real;
     for trial in 1..numTrials {	
 	for i in 1..n {
-	    B(i) = 1: real(32);
-	    C(i) = 2: real(32);
+	    B(i) = i: real(32);
+	    C(i) = 2*i: real(32);
 	}
 	
 	const startTime = getCurrentTime();

@@ -40,8 +40,8 @@ extern "C" {
 	    CudaSafeCall(cudaMalloc(&dB, sizeof(float) * GPUN));
 	    CudaSafeCall(cudaMalloc(&dC, sizeof(float) * GPUN));
 	    
-	    CudaSafeCall(cudaMemcpy(dB, B, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
-	    CudaSafeCall(cudaMemcpy(dC, C, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
+	    CudaSafeCall(cudaMemcpy(dB, B + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
+	    CudaSafeCall(cudaMemcpy(dC, C + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
 	    
 	    stream<<<ceil(((float)GPUN)/1024), 1024>>>(dA, dB, dC, alpha, GPUN);
 	    
