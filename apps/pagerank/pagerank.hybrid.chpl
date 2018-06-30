@@ -27,8 +27,7 @@ var link_counts: [1..nDocs] int(32);
 var links: [1..nDocs, 1..2] int(32);
 var ranks: [1..nDocs] real(32);
 var nLinks = 0: int(64);
-// TODO
-var link_weights: [1..500] real(32);
+var link_weights: [1..0] real(32);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
@@ -97,10 +96,10 @@ proc main() {
 	    links(l, 2) = (random.getNext() * nDocs + 1): int(32);
 
 	    used_links += 1;
+	    link_weights.push_back(0);
 	}
-	if (link_weights.size < nLinks) {
-	    writeln("nLinks: ", nLinks);
-	    writeln("Error: nLink must be less than ", link_weights.size);
+	if (link_weights.size != nLinks) {
+	    writeln("Error: link_weights.size must be equal to nLinks: nLinks = ", nLinks, " link_weights.size = ", link_weights.size);
 	    exit();
 	}
 	
