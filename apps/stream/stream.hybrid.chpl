@@ -82,7 +82,7 @@ proc main() {
 	}
 	
 	const startTime = getCurrentTime();
-	forall i in GPU(1, n, CUDAWrapper, CPUratio) {
+	forall i in GPU(1..n, CUDAWrapper, CPUratio) {
 	    A(i) = B(i) + alpha * C(i);
 	}
 	execTimes(trial) = getCurrentTime() - startTime;

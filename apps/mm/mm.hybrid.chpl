@@ -86,7 +86,7 @@ proc main() {
 	
 	const startTime = getCurrentTime();
 	// TODO: Consider using a 2D iterator
-	forall e in GPU(1, n*n, CUDAWrapper, CPUratio) {
+	forall e in GPU(1..n*n, CUDAWrapper, CPUratio) {
 	    var i: int = (e - 1) / n + 1;
 	    var j: int = (e - 1) % n + 1;
 	    var sum: real(32) = C(i, j);

@@ -64,7 +64,7 @@ proc main() {
 	writeln("\t Name: ", subloc);
 	writeln("\t maxTaskPar: ", subloc.maxTaskPar);
     }
-    
+
     writeln("Vector Copy: CPU/GPU Execution (using GPUIterator)");
     writeln("Size: ", n);
     writeln("CPU ratio: ", CPUratio);
@@ -79,7 +79,7 @@ proc main() {
 	}
 	
 	const startTime = getCurrentTime();
-	forall i in GPU(1, n, CUDAWrapper, CPUratio) {
+	forall i in GPU(1..n, CUDAWrapper, CPUratio) {
 	    A(i) = B(i);
 	}
 	execTimes(trial) = getCurrentTime() - startTime;

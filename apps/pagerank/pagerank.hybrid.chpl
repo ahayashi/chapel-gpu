@@ -105,10 +105,10 @@ proc main() {
 	
 	const startTime = getCurrentTime();
 	for ite in 1..nIters {
-	    forall i in GPU(1, nLinks, CUDAWrapper1, CPUratio1) {
+	    forall i in GPU(1..nLinks, CUDAWrapper1, CPUratio1) {
 		link_weights(i) = (ranks(links(i, 1)) / link_counts(links(i, 1))): real(32);
 	    }
-	    forall i in GPU(1, nDocs, CUDAWrapper2, CPUratio2) {
+	    forall i in GPU(1..nDocs, CUDAWrapper2, CPUratio2) {
 		var new_rank = 0: real(32);
 		for l in 1..nLinks {
 		    if (links(l, 2) == i) {

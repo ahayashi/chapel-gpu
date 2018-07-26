@@ -2,23 +2,23 @@ module GPUIterator {
     param debugGPUIterator = true;
 
     iter GPU(param tag: iterKind,
-	      lo: int, hi: int,
-	      CUDAWrapper: func(int, int, int, void),
-	      CPUratio: int = 0)
+	     r: range(?),
+	     CUDAWrapper: func(int, int, int, void),
+	     CPUratio: int = 0
+	)
 	where tag == iterKind.standalone {
 	const numSublocs = here.getChildCount();
 	
 	if (debugGPUIterator) then
 	    writeln("In GPUIterator, creating ", numSublocs, " parallel iterators (CPU/GPU)");
+
 	
-	const range = lo..hi;
+	const CPUnumElements = (r.length * (CPUratio*1.0/100.0)): int;
 	
-	const CPUnumElements = (range.length * (CPUratio*1.0/100.0)): int;
-	
-	const CPUhi = (lo + CPUnumElements - 1);
-	const CPUrange = lo..CPUhi;    
+	const CPUhi = (r.low + CPUnumElements - 1);
+	const CPUrange = r.low..CPUhi;
 	const GPUlo = CPUhi + 1;
-	const GPUrange = GPUlo..hi;
+	const GPUrange = GPUlo..r.high;
 	
 	coforall locs in 0..1 {
 	    if (locs == 0) {
@@ -34,14 +34,13 @@ module GPUIterator {
 		    for i in myIters do
 			yield i;
 		}
-		
 	    } else {
 		// GPU parallel iterator
 		const myIters = GPUrange;
 		if (debugGPUIterator) then
 		    writeln("Subloc ", locs, " owns ", myIters);
 		/* Current Version: importing hand-coded version */
-		CUDAWrapper(myIters.translate(-lo).first, myIters.translate(-lo).last, GPUrange.length);
+		CUDAWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
 		/* Future Version: compiler's GPU code generation */
 //	        for i in myIters do
 //		  yield i;
@@ -49,10 +48,10 @@ module GPUIterator {
 	}
     }
     
-    iter GPU(lo: int, hi: int,
+    iter GPU(r: range(?),
 	     CUDAWrapper: func(int, int, int, void),
 	     CPUratio: int=100) {
-	for i in lo..hi do
+	for i in r.low..r.high do
 	    yield i;
     }
     

@@ -102,10 +102,10 @@ proc main() {
 	
 	const startTime = getCurrentTime();
 	for ite in 1..nIters {
-	    forall i in GPU(1, nFeatures, CUDAWrapper1, CPUratio1) {
+	    forall i in GPU(1..nFeatures, CUDAWrapper1, CPUratio1) {
 		Wcurr(i) = W(i);
 	    }
-	    forall i in GPU(1, nFeatures, CUDAWrapper2, CPUratio2) {
+	    forall i in GPU(1..nFeatures, CUDAWrapper2, CPUratio2) {
 		var err = 0: real(32);
 		for s in 1..nSamples {
 		    var arg = 0: real(32);

@@ -89,7 +89,7 @@ proc main() {
 	}
 	
 	const startTime = getCurrentTime();
-	forall i in GPU(1, n, CUDAWrapper, CPUratio)  {
+	forall i in GPU(1..n, CUDAWrapper, CPUratio)  {
 	    var c1 = 0.319381530: real(32);
 	    var c2 = -0.356563782: real(32);
 	    var c3 = 1.781477937: real(32);
