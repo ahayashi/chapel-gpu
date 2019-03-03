@@ -197,7 +197,7 @@ module GPUIterator {
 
     // standalone (block distributed domains)
     iter GPU(param tag: iterKind,
-             D,
+             D: domain,
              GPUWrapper: func(int, int, int, void),
              CPUratio: int = 0
              )
