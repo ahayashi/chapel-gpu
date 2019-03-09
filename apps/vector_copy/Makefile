@@ -3,7 +3,7 @@ CHPLFLAGS=--fast -sverbose
 LIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda 
 NVCCFLAGS=-O3 -arch sm_60
 
-all: baseline gpu hybrid
+all: baseline gpu hybrid hybrid.dist
 
 $(TARGET).o: $(TARGET).cu
 	nvcc $(NVCCFLAGS) -c $^
@@ -23,6 +23,11 @@ hybrid: $(TARGET).o $(TARGET).hybrid.chpl
 	export CHPL_LOCALE_MODEL=gpu
 	chpl -M ../../modules $(CHPLFLAGS) $(TARGET).o $(TARGET).hybrid.chpl $(LIBSFLAGS)
 
+.PHONY: hybrid.dist
+hybrid.dist: $(TARGET).o $(TARGET).hybrid.dist.chpl
+	export CHPL_LOCALE_MODEL=gpu
+	chpl -M ../../modules $(CHPLFLAGS) $(TARGET).o $(TARGET).hybrid.dist.chpl $(LIBSFLAGS)
+
 .PHONY: clean
 clean:
-	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).o
+	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).hybrid.dist $(TARGET).o *_real
