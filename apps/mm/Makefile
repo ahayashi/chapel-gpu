@@ -1,7 +1,7 @@
 TARGET=mm
 CHPLFLAGS=--fast -sverbose
-LIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda 
-NVCCFLAGS=-O3 -arch sm_60
+LIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda  -lcublas
+NVCCFLAGS=-O3 -arch sm_60 -std=c++11
 
 all: baseline gpu hybrid
 

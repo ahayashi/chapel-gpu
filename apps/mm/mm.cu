@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <assert.h>
+#include <cublas_v2.h>
+
 #define VERBOSE
 #define CUDA_ERROR_CHECK
 #define CudaSafeCall( err ) __cudaSafeCall( err, __FILE__, __LINE__ )
@@ -84,11 +86,18 @@ extern "C" {
 	    
 	    if (!tiled) {
 		mm<<<ceil(((float)N)/1024), 1024>>>(dA, dB, dC, ceil(sqrt(N)), N, GPUN);
-	    } else {
+	    } else if (tiled == 1){
 		dim3 block(32,32);
 		dim3 grid(ceil(sqrt(N)/32), ceil(sqrt(N)/32));
 		mm_tiled<<<grid, block>>>(dA, dB, dC, ceil(sqrt(N)), N, GPUN);
-	    }
+	    } else {
+	        cublasHandle_t handle;
+		cublasCreate(&handle);           
+	        float alpha = 1.0F;
+		float beta = 0.0F;
+	        int lda = N, ldb = N, ldc = N;
+		cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, N, N, N, &alpha, dA, lda, dB, ldb, &beta, dC, ldc);
+	    }	    
 	    
 	    CudaSafeCall(cudaDeviceSynchronize());
 	    CudaSafeCall(cudaMemcpy(C + start, dC + start, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
