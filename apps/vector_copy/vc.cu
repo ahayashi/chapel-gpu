@@ -38,7 +38,7 @@ extern "C" {
 #endif	
 	    CudaSafeCall(cudaMalloc(&dA, sizeof(float) * GPUN));
 	    CudaSafeCall(cudaMalloc(&dB, sizeof(float) * GPUN));
-	    CudaSafeCall(cudaMemcpy(dA, A + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
+//	    CudaSafeCall(cudaMemcpy(dA, A + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
 	    CudaSafeCall(cudaMemcpy(dB, B + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
 	    
 	    vc<<<ceil(((float)GPUN)/1024), 1024>>>(dA, dB, GPUN);
