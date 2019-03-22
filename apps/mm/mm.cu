@@ -101,9 +101,9 @@ extern "C" {
 	    
 	    CudaSafeCall(cudaDeviceSynchronize());
 	    CudaSafeCall(cudaMemcpy(C + start, dC + start, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
-	    for (int i = 0; i < GPUN; i++) {
-		printf("C[%d] = %lf\n", start+i, C[start+i]);
-	    }
+	    //for (int i = 0; i < GPUN; i++) {
+	    //	printf("C[%d] = %lf\n", start+i, C[start+i]);
+	    //}
 	    
 	    CudaSafeCall(cudaFree(dA));
 	    CudaSafeCall(cudaFree(dB));
