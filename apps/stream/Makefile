@@ -23,6 +23,11 @@ hybrid: $(TARGET).o $(TARGET).hybrid.chpl
 	export CHPL_LOCALE_MODEL=gpu
 	chpl -M ../../modules $(CHPLFLAGS) $(TARGET).o $(TARGET).hybrid.chpl $(LIBSFLAGS)
 
+.PHONY: hybrid.dist
+hybrid.dist: $(TARGET).o $(TARGET).hybrid.dist.chpl
+	export CHPL_LOCALE_MODEL=gpu
+	chpl -M ../../modules $(CHPLFLAGS) $(TARGET).o $(TARGET).hybrid.dist.chpl $(LIBSFLAGS)
+
 .PHONY: clean
 clean:
-	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).o
+	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).hybrid.dist $(TARGET).o *_real
