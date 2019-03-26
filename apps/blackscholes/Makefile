@@ -16,7 +16,7 @@ $(TARGET).opencl.o: $(TARGET).opencl.c
 	gcc -O3 -Wall $(OCLFLAGS) -c $^
 
 .PHONY: baseline
-baseline: $(TARGET).o $(TARGET).baseline.chpl
+baseline: $(TARGET).baseline.chpl
 	export CHPL_LOCALE_MODEL=flat
 	chpl $(CHPLFLAGS) $(TARGET).baseline.chpl
 
