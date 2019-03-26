@@ -2,21 +2,23 @@
 #SBATCH --job-name=bs
 #SBATCH --partition=commons
 #SBATCH -N 1
-#SBATCH --time=00:15:00
+#SBATCH --cpus-per-task=24
+#SBATCH --threads-per-core=1
+#SBATCH --time=03:00:00
 #SBATCH --gres=gpu
-#SBATCH --output=slurm.out
-#SBATCH --error=slurm.error
 #SBATCH --mail-user=ahayashi@rice.edu
 #SBATCH --mail-type=ALL
 
 cd $SLURM_SUBMIT_DIR
 export CHPL_LAUNCHER=slurm-gasnetrun_ibv
 export GASNET_PHYSMEM_MAX=1G
-export CHPL_LAUNCHER_WALLTIME=00:15:00
+export CHPL_LAUNCHER_WALLTIME=03:00:00
 
-./bs.baseline -nl 1 --n=536870912 --numTrials=10
-./bs.gpu -nl 1 --n=536870912 --numTrials=10
+N=536870912
+
+./bs.baseline -nl 1 --n=$N --numTrials=10
+./bs.gpu -nl 1 --n=$N --numTrials=10
 for ratio in 0 25 50 75 100;
 do
-    ./bs.hybrid -nl 1 --n=536870912 --numTrials=10 --CPUratio=$ratio
+    ./bs.hybrid -nl 1 --n=$N --numTrials=10 --CPUratio=$ratio
 done

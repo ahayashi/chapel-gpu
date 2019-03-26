@@ -3,9 +3,9 @@
 #SBATCH --partition=commons
 #SBATCH -N 1
 #SBATCH --time=02:00:00
+#SBATCH --cpus-per-task=24
+#SBATCH --threads-per-core=1
 #SBATCH --gres=gpu
-#SBATCH --output=slurm.out
-#SBATCH --error=slurm.error
 #SBATCH --mail-user=ahayashi@rice.edu
 #SBATCH --mail-type=ALL
 

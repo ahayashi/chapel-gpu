@@ -2,10 +2,10 @@
 #SBATCH --job-name=stream
 #SBATCH --partition=commons
 #SBATCH -N 1
+#SBATCH --cpus-per-task=24
+#SBATCH --threads-per-core=1
 #SBATCH --time=00:15:00
 #SBATCH --gres=gpu
-#SBATCH --output=slurm.out
-#SBATCH --error=slurm.error
 #SBATCH --mail-user=ahayashi@rice.edu
 #SBATCH --mail-type=ALL
 
@@ -14,9 +14,11 @@ export CHPL_LAUNCHER=slurm-gasnetrun_ibv
 export GASNET_PHYSMEM_MAX=1G
 export CHPL_LAUNCHER_WALLTIME=00:15:00
 
-./stream.baseline -nl 1 --n=536870912 --numTrials=10
-./stream.gpu -nl 1 --n=536870912 --numTrials=10
+N=536870912
+
+./stream.baseline -nl 1 --n=$N --numTrials=10
+./stream.gpu -nl 1 --n=$N --numTrials=10
 for ratio in 0 25 50 75 100;
 do
-    ./stream.hybrid -nl 1 --n=536870912 --numTrials=10 --CPUratio=$ratio
+    ./stream.hybrid -nl 1 --n=$N --numTrials=10 --CPUratio=$ratio
 done
