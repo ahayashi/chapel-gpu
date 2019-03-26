@@ -27,63 +27,68 @@ extern proc bsCUDA(rand: [] real(32), put: [] real(32), call: [] real(32), lo: i
 /// Utility Functions
 ////////////////////////////////////////////////////////////////////////////////
 proc printResults(execTimes) {
-    const totalTime = + reduce execTimes,
+  const totalTime = + reduce execTimes,
 	avgTime = totalTime / numTrials,
 	minTime = min reduce execTimes;
-    writeln("Execution time:");
-    writeln("  tot = ", totalTime);
-    writeln("  avg = ", avgTime);
-    writeln("  min = ", minTime);
+  writeln("Execution time:");
+  writeln("  tot = ", totalTime);
+  writeln("  avg = ", avgTime);
+  writeln("  min = ", minTime);
 }
 
 proc printLocaleInfo() {
-    for loc in Locales {
-        const numSublocs = loc.getChildCount();
-        writeln(loc, " info: ");
-        for sublocID in 0..#numSublocs {
-            const subloc = loc.getChild(sublocID);
-            writeln("\t Subloc: ", sublocID);
-            writeln("\t Name: ", subloc);
-            writeln("\t maxTaskPar: ", subloc.maxTaskPar);
-        }
+  for loc in Locales {
+    writeln(loc, " info: ");
+    const numSublocs = loc.getChildCount();
+    if (numSublocs != 0) {
+      for sublocID in 0..#numSublocs {
+        const subloc = loc.getChild(sublocID);
+        writeln("\t Subloc: ", sublocID);
+        writeln("\t Name: ", subloc);
+        writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+      }
+    } else {
+      writeln("\t Name: ", loc);
+      writeln("\t maxTaskPar: ", loc.maxTaskPar);
     }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
 proc main() {
-    writeln("BlackScholes: GPU Only");
-    writeln("Size: ", n);
-    writeln("nTrials: ", numTrials);
-    writeln("output: ", output);
+  writeln("BlackScholes: GPU Only");
+  writeln("Size: ", n);
+  writeln("nTrials: ", numTrials);
+  writeln("output: ", output);
 
-    printLocaleInfo();
+  printLocaleInfo();
 
-    const S_LOWER_LIMIT = 10.0: real(32);
-    const S_UPPER_LIMIT = 100.0: real(32);
-    const K_LOWER_LIMIT = 10.0: real(32);
-    const K_UPPER_LIMIT = 100.0: real(32);
-    const T_LOWER_LIMIT = 1.0: real(32);
-    const T_UPPER_LIMIT = 10.0: real(32);
-    const R_LOWER_LIMIT = 0.01: real(32);
-    const R_UPPER_LIMIT = 0.05: real(32);
-    const SIGMA_LOWER_LIMIT = 0.01: real(32);
-    const SIGMA_UPPER_LIMIT = 0.10: real(32);
+  const S_LOWER_LIMIT = 10.0: real(32);
+  const S_UPPER_LIMIT = 100.0: real(32);
+  const K_LOWER_LIMIT = 10.0: real(32);
+  const K_UPPER_LIMIT = 100.0: real(32);
+  const T_LOWER_LIMIT = 1.0: real(32);
+  const T_UPPER_LIMIT = 10.0: real(32);
+  const R_LOWER_LIMIT = 0.01: real(32);
+  const R_UPPER_LIMIT = 0.05: real(32);
+  const SIGMA_LOWER_LIMIT = 0.01: real(32);
+  const SIGMA_UPPER_LIMIT = 0.10: real(32);
 
-    var execTimes: [1..numTrials] real;
-    for trial in 1..numTrials {
+  var execTimes: [1..numTrials] real;
+  for trial in 1..numTrials {
 	for i in 1..n {
-	    rand(i) = (i: real(32) / n): real(32);
+      rand(i) = (i: real(32) / n): real(32);
 	}
 
 	const startTime = getCurrentTime();
 	bsCUDA(rand, put, call, 0, n-1, n);
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
-	    writeln(call);
-	    writeln(put);
+      writeln(call);
+      writeln(put);
 	}
-    }
-    printResults(execTimes);
+  }
+  printResults(execTimes);
 }

@@ -131,8 +131,14 @@ extern "C" {
         }
 
         ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_GPU, 2, device_ids, &ret_num_devices);
-        printf("device ID: %d, # of devices: %d\n", ret, ret_num_devices);
-        cl_device_id device_id = device_ids[0];
+        //printf("device ID: %d, # of devices: %d\n", ret, ret_num_devices);
+        int did = 0;
+        char *env = getenv("OCL_DEVICE_NO");
+        if (env) {
+            did = atoi(env);
+        }
+
+        cl_device_id device_id = device_ids[did];
         clGetDeviceInfo(device_id, CL_DEVICE_NAME, sizeof(str), str, &ret);
 		printf("GPU %s\n", str);
 

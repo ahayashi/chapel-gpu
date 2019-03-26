@@ -28,56 +28,61 @@ extern proc mmCUDA(A: [] real(32), B: [] real(32), C: [] real(32), N: int, lo: i
 /// Utility Functions
 ////////////////////////////////////////////////////////////////////////////////
 proc printResults(execTimes) {
-    const totalTime = + reduce execTimes,
+  const totalTime = + reduce execTimes,
 	avgTime = totalTime / numTrials,
 	minTime = min reduce execTimes;
-    writeln("Execution time:");
-    writeln("  tot = ", totalTime);
-    writeln("  avg = ", avgTime);
-    writeln("  min = ", minTime);
+  writeln("Execution time:");
+  writeln("  tot = ", totalTime);
+  writeln("  avg = ", avgTime);
+  writeln("  min = ", minTime);
 }
 
 proc printLocaleInfo() {
-    for loc in Locales {
-        const numSublocs = loc.getChildCount();
-        writeln(loc, " info: ");
-        for sublocID in 0..#numSublocs {
-            const subloc = loc.getChild(sublocID);
-            writeln("\t Subloc: ", sublocID);
-            writeln("\t Name: ", subloc);
-            writeln("\t maxTaskPar: ", subloc.maxTaskPar);
-        }
+  for loc in Locales {
+    writeln(loc, " info: ");
+    const numSublocs = loc.getChildCount();
+    if (numSublocs != 0) {
+      for sublocID in 0..#numSublocs {
+        const subloc = loc.getChild(sublocID);
+        writeln("\t Subloc: ", sublocID);
+        writeln("\t Name: ", subloc);
+        writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+      }
+    } else {
+      writeln("\t Name: ", loc);
+      writeln("\t maxTaskPar: ", loc.maxTaskPar);
     }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
 proc main() {
-    writeln("Matrix Multiplication: GPU Only");
-    writeln("Size: ", n, "x", n);
-    writeln("nTrials: ", numTrials);
-    writeln("tiled: ", tiled);
-    writeln("output: ", output);
+  writeln("Matrix Multiplication: GPU Only");
+  writeln("Size: ", n, "x", n);
+  writeln("nTrials: ", numTrials);
+  writeln("tiled: ", tiled);
+  writeln("output: ", output);
 
-    printLocaleInfo();
+  printLocaleInfo();
 
-    var execTimes: [1..numTrials] real;
-    for trial in 1..numTrials {
+  var execTimes: [1..numTrials] real;
+  for trial in 1..numTrials {
 	for i in 1..n {
-	    for j in 1..n {
+      for j in 1..n {
 		A(i, j) = i: real(32);
 		B(i, j) = i: real(32);
 		C(i, j) = 0: real(32);
-	    }
+      }
 	}
 
 	const startTime = getCurrentTime();
 	mmCUDA(A, B, C, n*n, 0, n*n-1, n*n, tiled);
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
-	    writeln(C);
+      writeln(C);
 	}
-    }
-    printResults(execTimes);
+  }
+  printResults(execTimes);
 }

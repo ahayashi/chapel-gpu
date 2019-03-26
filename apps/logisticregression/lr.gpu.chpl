@@ -32,64 +32,69 @@ extern proc lrCUDA2(X: [] real(32), Y: [] real(32), W: [] real(32), Wcurr: [] re
 /// Utility Functions
 ////////////////////////////////////////////////////////////////////////////////
 proc printResults(execTimes) {
-    const totalTime = + reduce execTimes,
+  const totalTime = + reduce execTimes,
 	avgTime = totalTime / numTrials,
 	minTime = min reduce execTimes;
-    writeln("Execution time:");
-    writeln("  tot = ", totalTime);
-    writeln("  avg = ", avgTime);
-    writeln("  min = ", minTime);
+  writeln("Execution time:");
+  writeln("  tot = ", totalTime);
+  writeln("  avg = ", avgTime);
+  writeln("  min = ", minTime);
 }
 
 proc printLocaleInfo() {
-    for loc in Locales {
-        const numSublocs = loc.getChildCount();
-        writeln(loc, " info: ");
-        for sublocID in 0..#numSublocs {
-            const subloc = loc.getChild(sublocID);
-            writeln("\t Subloc: ", sublocID);
-            writeln("\t Name: ", subloc);
-            writeln("\t maxTaskPar: ", subloc.maxTaskPar);
-        }
+  for loc in Locales {
+    writeln(loc, " info: ");
+    const numSublocs = loc.getChildCount();
+    if (numSublocs != 0) {
+      for sublocID in 0..#numSublocs {
+        const subloc = loc.getChild(sublocID);
+        writeln("\t Subloc: ", sublocID);
+        writeln("\t Name: ", subloc);
+        writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+      }
+    } else {
+      writeln("\t Name: ", loc);
+      writeln("\t maxTaskPar: ", loc.maxTaskPar);
     }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
 proc main() {
-    writeln("Logistic Regression: GPU Only");
-    writeln("nSamples :", nSamples, " nFeatures :",  nFeatures);
-    writeln("nTrials: ", numTrials);
-    writeln("output: ", output);
+  writeln("Logistic Regression: GPU Only");
+  writeln("nSamples :", nSamples, " nFeatures :",  nFeatures);
+  writeln("nTrials: ", numTrials);
+  writeln("output: ", output);
 
-    printLocaleInfo();
+  printLocaleInfo();
 
-    var execTimes: [1..numTrials] real;
-    for trial in 1..numTrials {
+  var execTimes: [1..numTrials] real;
+  for trial in 1..numTrials {
 	for i in 1..nFeatures {
-	    W(i) = 0: real(32);
+      W(i) = 0: real(32);
 	}
 	for i in 1..nSamples {
-	    Y(i) = (i % 2): real(32);
-	    for j in 1..nFeatures {
+      Y(i) = (i % 2): real(32);
+      for j in 1..nFeatures {
 		if (j != 0) {
-		    X(i, j) = (i % 2): real(32);
+          X(i, j) = (i % 2): real(32);
 		} else {
-		    X(i, j) = 1;
+          X(i, j) = 1;
 		}
-	    }
+      }
 	}
 
 	const startTime = getCurrentTime();
 	for ite in 1..nIters {
-	    lrCUDA1(W, Wcurr, 0, nFeatures-1, nFeatures);
-	    lrCUDA2(X, Y, W, Wcurr, alpha, nSamples, nFeatures, 0, nFeatures-1, nFeatures);
+      lrCUDA1(W, Wcurr, 0, nFeatures-1, nFeatures);
+      lrCUDA2(X, Y, W, Wcurr, alpha, nSamples, nFeatures, 0, nFeatures-1, nFeatures);
 	}
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
-	    writeln(W);
+      writeln(W);
 	}
-    }
-    printResults(execTimes);
+  }
+  printResults(execTimes);
 }

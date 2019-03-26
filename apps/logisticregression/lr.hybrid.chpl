@@ -38,90 +38,99 @@ extern proc lrCUDA2(X: [] real(32), Y: [] real(32), W: [] real(32), Wcurr: [] re
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
 proc CUDAWrapper1(lo: int, hi: int, N: int) {
-    if (verbose) {
+  if (verbose) {
 	writeln("In CUDAWrapper1(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
-    }
-    lrCUDA1(W, Wcurr, lo, hi, N);
+  }
+  lrCUDA1(W, Wcurr, lo, hi, N);
 }
 
 proc CUDAWrapper2(lo: int, hi: int, N: int) {
-    if (verbose) {
+  if (verbose) {
 	writeln("In CUDAWrapper2(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
-    }
-    lrCUDA2(X, Y, W, Wcurr, alpha, nSamples, nFeatures, lo, hi, N);
+  }
+  lrCUDA2(X, Y, W, Wcurr, alpha, nSamples, nFeatures, lo, hi, N);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Utility Functions
 ////////////////////////////////////////////////////////////////////////////////
 proc printResults(execTimes) {
-    const totalTime = + reduce execTimes,
+  const totalTime = + reduce execTimes,
 	avgTime = totalTime / numTrials,
 	minTime = min reduce execTimes;
-    writeln("Execution time:");
-    writeln("  tot = ", totalTime);
-    writeln("  avg = ", avgTime);
-    writeln("  min = ", minTime);
+  writeln("Execution time:");
+  writeln("  tot = ", totalTime);
+  writeln("  avg = ", avgTime);
+  writeln("  min = ", minTime);
+}
+
+proc printLocaleInfo() {
+  for loc in Locales {
+    writeln(loc, " info: ");
+    const numSublocs = loc.getChildCount();
+    if (numSublocs != 0) {
+      for sublocID in 0..#numSublocs {
+        const subloc = loc.getChild(sublocID);
+        writeln("\t Subloc: ", sublocID);
+        writeln("\t Name: ", subloc);
+        writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+      }
+    } else {
+      writeln("\t Name: ", loc);
+      writeln("\t maxTaskPar: ", loc.maxTaskPar);
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
 proc main() {
-    // Assuming there is one locale
-    // having CPU and GPU sublocales (CHPL_LOCAL_MODEL=gpu)
-    const numSublocs = Locales[0].getChildCount();
-    writeln("Locales[0] info: ");
-    for sublocID in 0..#numSublocs {
-	const subloc = Locales[0].getChild(sublocID);
-	writeln("\t Subloc: ", sublocID);
-	writeln("\t Name: ", subloc);
-	writeln("\t maxTaskPar: ", subloc.maxTaskPar);
-    }
+  writeln("Logistic Regression: CPU/GPU Execution (using GPUIterator)");
+  writeln("nSamples :", nSamples, " nFeatures :",  nFeatures);
+  writeln("nTrials: ", numTrials);
+  writeln("output: ", output);
 
-    writeln("Logistic Regression: CPU/GPU Execution (using GPUIterator)");
-    writeln("nSamples :", nSamples, " nFeatures :",  nFeatures);
-    writeln("nTrials: ", numTrials);
-    writeln("output: ", output);
+  printLocaleInfo();
 
-    var execTimes: [1..numTrials] real;
-    for trial in 1..numTrials {	
+  var execTimes: [1..numTrials] real;
+  for trial in 1..numTrials {
 	for i in 1..nFeatures {
-	    W(i) = 0: real(32);
+      W(i) = 0: real(32);
 	}
 	for i in 1..nSamples {
-	    Y(i) = (i % 2): real(32);
-	    for j in 1..nFeatures {
+      Y(i) = (i % 2): real(32);
+      for j in 1..nFeatures {
 		if (j != 0) {
-		    X(i, j) = (i % 2): real(32);
+          X(i, j) = (i % 2): real(32);
 		} else {
-		    X(i, j) = 1;
-		}		    
-	    }
+          X(i, j) = 1;
+		}
+      }
 	}
-	
+
 	const startTime = getCurrentTime();
 	for ite in 1..nIters {
-	    forall i in GPU(1..nFeatures, CUDAWrapper1, CPUratio1) {
+      forall i in GPU(1..nFeatures, CUDAWrapper1, CPUratio1) {
 		Wcurr(i) = W(i);
-	    }
-	    forall i in GPU(1..nFeatures, CUDAWrapper2, CPUratio2) {
+      }
+      forall i in GPU(1..nFeatures, CUDAWrapper2, CPUratio2) {
 		var err = 0: real(32);
 		for s in 1..nSamples {
-		    var arg = 0: real(32);
-		    for f in 1..nFeatures {
+          var arg = 0: real(32);
+          for f in 1..nFeatures {
 			arg += Wcurr(f) * X(s, f);
-		    }
-		    var hypo = 1 / (1 + exp(-arg));
-		    err += (hypo - Y(s)) * X(s, i);
+          }
+          var hypo = 1 / (1 + exp(-arg));
+          err += (hypo - Y(s)) * X(s, i);
 		}
 		W(i) = Wcurr(i) - alpha * err;
-	    }
+      }
 	}
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
-	    writeln(W);
+      writeln(W);
 	}
-    }
-    printResults(execTimes);
+  }
+  printResults(execTimes);
 }

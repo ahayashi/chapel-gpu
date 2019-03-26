@@ -33,75 +33,81 @@ extern proc mmCUDA(A: [] real(32), B: [] real(32), C: [] real(32), N:int, lo: in
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
 proc CUDAWrapper(lo: int, hi: int, N: int) {
-    if (verbose) {
+  if (verbose) {
 	writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
-    }
-    mmCUDA(A, B, C, n*n, lo, hi, N, tiled);
+  }
+  mmCUDA(A, B, C, n*n, lo, hi, N, tiled);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Utility Functions
 ////////////////////////////////////////////////////////////////////////////////
 proc printResults(execTimes) {
-    const totalTime = + reduce execTimes,
+  const totalTime = + reduce execTimes,
 	avgTime = totalTime / numTrials,
 	minTime = min reduce execTimes;
-    writeln("Execution time:");
-    writeln("  tot = ", totalTime);
-    writeln("  avg = ", avgTime);
-    writeln("  min = ", minTime);
+  writeln("Execution time:");
+  writeln("  tot = ", totalTime);
+  writeln("  avg = ", avgTime);
+  writeln("  min = ", minTime);
 }
 
 proc printLocaleInfo() {
-    for loc in Locales {
-        const numSublocs = loc.getChildCount();
-        writeln(loc, " info: ");
-        for sublocID in 0..#numSublocs {
-            const subloc = loc.getChild(sublocID);
-            writeln("\t Subloc: ", sublocID);
-            writeln("\t Name: ", subloc);
-            writeln("\t maxTaskPar: ", subloc.maxTaskPar);
-        }
+  for loc in Locales {
+    writeln(loc, " info: ");
+    const numSublocs = loc.getChildCount();
+    if (numSublocs != 0) {
+      for sublocID in 0..#numSublocs {
+        const subloc = loc.getChild(sublocID);
+        writeln("\t Subloc: ", sublocID);
+        writeln("\t Name: ", subloc);
+        writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+      }
+    } else {
+      writeln("\t Name: ", loc);
+      writeln("\t maxTaskPar: ", loc.maxTaskPar);
     }
+  }
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
 proc main() {
-    writeln("Matrix Multiplication: CPU/GPU Execution (using GPUIterator)");
-    writeln("Size: ", n, "x", n);
-    writeln("CPU ratio: ", CPUratio);
-    writeln("nTrials: ", numTrials);
-    writeln("tiled: ", tiled);
-    writeln("output: ", output);
+  writeln("Matrix Multiplication: CPU/GPU Execution (using GPUIterator)");
+  writeln("Size: ", n, "x", n);
+  writeln("CPU ratio: ", CPUratio);
+  writeln("nTrials: ", numTrials);
+  writeln("tiled: ", tiled);
+  writeln("output: ", output);
 
-    printLocaleInfo();
+  printLocaleInfo();
 
-    var execTimes: [1..numTrials] real;
-    for trial in 1..numTrials {
+  var execTimes: [1..numTrials] real;
+  for trial in 1..numTrials {
 	for i in 1..n {
-	    for j in 1..n {
+      for j in 1..n {
 		A(i, j) = i: real(32);
 		B(i, j) = i: real(32);
 		C(i, j) = 0: real(32);
-	    }
+      }
 	}
 
 	const startTime = getCurrentTime();
 	// TODO: Consider using a 2D iterator
 	forall e in GPU(1..n*n, CUDAWrapper, CPUratio) {
-	    var i: int = (e - 1) / n + 1;
-	    var j: int = (e - 1) % n + 1;
-	    var sum: real(32) = C(i, j);
-	    for k in 1..n {
+      var i: int = (e - 1) / n + 1;
+      var j: int = (e - 1) % n + 1;
+      var sum: real(32) = C(i, j);
+      for k in 1..n {
 		sum += A(i, k) * B(k, j);
-	    }
-	    C(i, j) = sum;
+      }
+      C(i, j) = sum;
 	}
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
-	    writeln(C);
+      writeln(C);
 	}
-    }
-    printResults(execTimes);
+  }
+  printResults(execTimes);
 }
