@@ -36,6 +36,19 @@ proc printResults(execTimes) {
     writeln("  min = ", minTime);
 }
 
+proc printLocaleInfo() {
+    for loc in Locales {
+        const numSublocs = loc.getChildCount();
+        writeln(loc, " info: ");
+        for sublocID in 0..#numSublocs {
+            const subloc = loc.getChild(sublocID);
+            writeln("\t Subloc: ", sublocID);
+            writeln("\t Name: ", subloc);
+            writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+        }
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,16 +58,7 @@ proc main() {
     writeln("nTrials: ", numTrials);
     writeln("output: ", output);
 
-    for loc in Locales {
-      const numSublocs = loc.getChildCount();
-      writeln(loc, " info: ");
-      for sublocID in 0..#numSublocs {
-        const subloc = loc.getChild(sublocID);
-        writeln("\t Subloc: ", sublocID);
-        writeln("\t Name: ", subloc);
-        writeln("\t maxTaskPar: ", subloc.maxTaskPar);
-      }
-    }
+    printLocaleInfo();
 
     const S_LOWER_LIMIT = 10.0: real(32);
     const S_UPPER_LIMIT = 100.0: real(32);

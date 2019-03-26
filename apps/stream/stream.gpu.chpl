@@ -37,6 +37,19 @@ proc printResults(execTimes) {
     writeln("  min = ", minTime);
 }
 
+proc printLocaleInfo() {
+    for loc in Locales {
+        const numSublocs = loc.getChildCount();
+        writeln(loc, " info: ");
+        for sublocID in 0..#numSublocs {
+            const subloc = loc.getChild(sublocID);
+            writeln("\t Subloc: ", sublocID);
+            writeln("\t Name: ", subloc);
+            writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+        }
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,13 +60,15 @@ proc main() {
     writeln("nTrials: ", numTrials);
     writeln("output: ", output);
 
+    printLocaleInfo();
+
     var execTimes: [1..numTrials] real;
-    for trial in 1..numTrials {	
+    for trial in 1..numTrials {
 	for i in 1..n {
 	    B(i) = i: real(32);
 	    C(i) = 2*i: real(32);
 	}
-	
+
 	const startTime = getCurrentTime();
 	streamCUDA(A, B, C, alpha, 0, n-1, n);
 	execTimes(trial) = getCurrentTime() - startTime;
