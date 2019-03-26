@@ -310,7 +310,9 @@ module GPUIterator {
                     const myIters = computeChunk(CPUrange, tid, numTasks);
                     if (debugGPUIterator) then
                       writeln("\tCPU's task ", tid, " owns ", myIters);
-                    yield myIters.translate(whole.low);
+                    for i in myIters.translate(whole.low) {
+                      yield i;
+                    }
                   }
                 } else {
                   // GPU parallel iterator
