@@ -1,7 +1,7 @@
 TARGET=vc
 CHPLFLAGS=--fast -sverbose
 LIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda
-NVCCFLAGS=-O3 -arch sm_60
+NVCCFLAGS=-O3 -arch sm_60 -std=c++11
 
 all: baseline gpu hybrid hybrid.dist
 
