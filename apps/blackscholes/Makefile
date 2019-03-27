@@ -7,7 +7,7 @@ NVCCFLAGS=-O3 -arch sm_60 -std=c++11
 OCLLIBSFLAGS=-framework OpenCL
 OCLFLAGS=-framework OpenCL
 
-all: baseline gpu hybrid
+all: baseline gpu hybrid hybrid.dist
 
 $(TARGET).o: $(TARGET).cu
 	nvcc $(NVCCFLAGS) -c $^
@@ -31,6 +31,10 @@ oclgpu: $(TARGET).opencl.o $(TARGET).gpu.chpl
 hybrid: $(TARGET).o $(TARGET).hybrid.chpl
 	CHPL_LOCALE_MODEL=gpu chpl -M ../../modules $(CHPLFLAGS) $(TARGET).o $(TARGET).hybrid.chpl $(LIBSFLAGS)
 
+.PHONY: hybrid.dist
+hybrid.dist: $(TARGET).o $(TARGET).hybrid.dist.chpl
+	CHPL_LOCALE_MODEL=gpu chpl -M ../../modules $(CHPLFLAGS) $(TARGET).o $(TARGET).hybrid.dist.chpl $(LIBSFLAGS)
+
 .PHONY: oclhybrid
 oclhybrid: $(TARGET).opencl.o $(TARGET).hybrid.chpl
 	CHPL_LOCALE_MODEL=gpu chpl -M ../../modules $(CHPLFLAGS) $(TARGET).opencl.o $(TARGET).hybrid.chpl --ldflags "$(OCLLIBSFLAGS)"
@@ -38,4 +42,4 @@ oclhybrid: $(TARGET).opencl.o $(TARGET).hybrid.chpl
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).o
+	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).hybrid.dist $(TARGET).o *_real
