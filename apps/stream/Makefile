@@ -3,7 +3,7 @@ CHPLFLAGS=--fast -sverbose
 LIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda
 NVCCFLAGS=-O3 -arch sm_60 -std=c++11
 
-all: baseline gpu hybrid
+all: baseline gpu hybrid hybrid.dist
 
 $(TARGET).o: $(TARGET).cu
 	nvcc $(NVCCFLAGS) -c $^
