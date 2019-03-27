@@ -95,8 +95,8 @@ extern "C" {
 		cublasCreate(&handle);           
 	        float alpha = 1.0F;
 		float beta = 0.0F;
-	        int lda = N, ldb = N, ldc = N;
-		cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, N, N, N, &alpha, dA, lda, dB, ldb, &beta, dC, ldc);
+	        int lda = sqrt(N), ldb = sqrt(N), ldc = sqrt(N);
+		cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, sqrt(N), sqrt(N), sqrt(N), &alpha, dA, lda, dB, ldb, &beta, dC, ldc);
 	    }	    
 	    
 	    CudaSafeCall(cudaDeviceSynchronize());
