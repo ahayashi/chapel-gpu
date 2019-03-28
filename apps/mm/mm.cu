@@ -85,11 +85,11 @@ extern "C" {
 	    CudaSafeCall(cudaMemcpy(dB, B, sizeof(float) * N, cudaMemcpyHostToDevice));
 	    
 	    if (!tiled) {
-		mm<<<ceil(((float)N)/1024), 1024>>>(dA, dB, dC, ceil(sqrt(N)), N, GPUN);
+		mm<<<ceil(((float)N)/1024), 1024>>>(dA, dB, dC, ceil(sqrt(N)), N, N);
 	    } else if (tiled == 1){
 		dim3 block(32,32);
 		dim3 grid(ceil(sqrt(N)/32), ceil(sqrt(N)/32));
-		mm_tiled<<<grid, block>>>(dA, dB, dC, ceil(sqrt(N)), N, GPUN);
+		mm_tiled<<<grid, block>>>(dA, dB, dC, ceil(sqrt(N)), N, N);
 	    } else {
 	        cublasHandle_t handle;
 		cublasCreate(&handle);           
