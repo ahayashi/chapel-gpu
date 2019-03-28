@@ -85,18 +85,18 @@ extern "C" {
 	    CudaSafeCall(cudaMemcpy(dB, B, sizeof(float) * N, cudaMemcpyHostToDevice));
 	    
 	    if (!tiled) {
-		mm<<<ceil(((float)N)/1024), 1024>>>(dA, dB, dC, ceil(sqrt(N)), N, GPUN);
+		mm<<<ceil(((float)N)/1024), 1024>>>(dA, dB, dC, ceil(sqrt(N)), N, N);
 	    } else if (tiled == 1){
 		dim3 block(32,32);
 		dim3 grid(ceil(sqrt(N)/32), ceil(sqrt(N)/32));
-		mm_tiled<<<grid, block>>>(dA, dB, dC, ceil(sqrt(N)), N, GPUN);
+		mm_tiled<<<grid, block>>>(dA, dB, dC, ceil(sqrt(N)), N, N);
 	    } else {
 	        cublasHandle_t handle;
 		cublasCreate(&handle);           
 	        float alpha = 1.0F;
 		float beta = 0.0F;
-	        int lda = N, ldb = N, ldc = N;
-		cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, N, N, N, &alpha, dA, lda, dB, ldb, &beta, dC, ldc);
+	        int lda = sqrt(N), ldb = sqrt(N), ldc = sqrt(N);
+		cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, sqrt(N), sqrt(N), sqrt(N), &alpha, dA, lda, dB, ldb, &beta, dC, ldc);
 	    }	    
 	    
 	    CudaSafeCall(cudaDeviceSynchronize());
