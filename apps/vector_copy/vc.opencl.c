@@ -95,7 +95,6 @@ const char *getErrorString(cl_int error)
 extern "C" {
 #endif
     void vcCUDA(float* A, float *B, int start, int end, int GPUN) {
-	float *dA, *dB;
 	if (GPUN > 0) {
 	    assert(end - start + 1 == GPUN);
 #ifdef VERBOSE
@@ -202,6 +201,10 @@ extern "C" {
             printf("%s\n", getErrorString(ret));
         }
 
+        ret = clSetKernelArg(kernel, 2, sizeof(cl_int), (void *)&GPUN);
+        if (ret != CL_SUCCESS) {
+            printf("%s\n", getErrorString(ret));
+        }
 
         // Execute the OpenCL kernel on the list
         size_t local_item_size = 64; // Divide work items into groups of 64
