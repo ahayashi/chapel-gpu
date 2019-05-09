@@ -13,9 +13,12 @@ export CHPL_LAUNCHER=slurm-gasnetrun_ibv
 export GASNET_PHYSMEM_MAX=1G
 export CHPL_LAUNCHER_WALLTIME=03:00:00
 
-./lr.baseline -nl 1 --nFeatures=65536 --nSamples=32 --nIters=1 --numTrials=10
-./lr.gpu -nl 1 --nFeatures=65536 --nSamples=32 --nIters=1 --numTrials=10
-for ratio in 0 25 50 75 100;
+for i in 1 2 3 4 5;
 do
-    ./lr.hybrid -nl 1 --nFeatures=65536 --nSamples=32 --nIters=1 --numTrials=10 --CPUratio1=$ratio --CPUratio2=$ratio
+    ./lr.baseline -nl 1 --nFeatures=65536 --nSamples=32 --nIters=1 --numTrials=10
+    ./lr.gpu -nl 1 --nFeatures=65536 --nSamples=32 --nIters=1 --numTrials=10
+    for ratio in 0 25 50 75 100;
+    do
+	./lr.hybrid -nl 1 --nFeatures=65536 --nSamples=32 --nIters=1 --numTrials=10 --CPUratio1=$ratio --CPUratio2=$ratio
+    done
 done
