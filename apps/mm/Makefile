@@ -1,6 +1,7 @@
 TARGET=mm
 CHPLFLAGS=--fast -sverbose
 LIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda  -lcublas
+#LIBSFLAGS=-L/opt/apps/software/Compiler/GCC/6.4.0/CUDA/8.0.61/lib -lcudart -lcublas
 NVCCFLAGS=-O3 -arch sm_60 -std=c++11
 
 # OpenCL
