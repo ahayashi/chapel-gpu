@@ -1,5 +1,5 @@
 TARGET=bs
-CHPLFLAGS=--fast -sverbose
+CHPLFLAGS=--fast #-sverbose
 LIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda
 #LIBSFLAGS=-L/opt/apps/software/Compiler/GCC/6.4.0/CUDA/8.0.61/lib -lcudart
 NVCCFLAGS=-O3 -arch sm_60 -std=c++11
