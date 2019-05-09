@@ -1,8 +1,10 @@
 module GPUIterator {
     use Time;
     use BlockDist;
+    use DSIUtil;
 
-    param debugGPUIterator = true;
+    config param debugGPUIterator = false;
+    config param distOpt = false;
 
     // leader (block distributed domains)
     iter GPU(param tag: iterKind,
@@ -169,14 +171,33 @@ module GPUIterator {
       if (debugGPUIterator) then
 	    writeln("In GPUIterator, creating ", numSublocs, " parallel iterators (CPU/GPU)");
 
-      if (CPUratio >= 0) {
-        const CPUnumElements = (r.length * (CPUratio*1.0/100.0)): int;
+      const CPUnumElements = (r.length * (CPUratio*1.0/100.0)): int;
 
-        const CPUhi = (r.low + CPUnumElements - 1);
-        const CPUrange = r.low..CPUhi;
-        const GPUlo = CPUhi + 1;
-        const GPUrange = GPUlo..r.high;
+      const CPUhi = (r.low + CPUnumElements - 1);
+      const CPUrange = r.low..CPUhi;
+      const GPUlo = CPUhi + 1;
+      const GPUrange = GPUlo..r.high;
 
+      if (CPUratio == 0) {
+        const myIters = GPUrange;
+        if (debugGPUIterator) then
+          writeln("Subloc 1 owns ", myIters);
+        /* Current Version: importing hand-coded version */
+        CUDAWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+      } else if (CPUratio == 100) {
+        // CPU parallel iterator
+        var c = here.getChild(0);
+        const numTasks = c.maxTaskPar;
+        if (debugGPUIterator) then
+          writeln("Subloc 0 owns ", CPUrange, " and decompose it into ", numTasks, " tasks");
+        coforall tid in 0..#numTasks {
+          const myIters = computeChunk(CPUrange, tid, numTasks);
+          if (debugGPUIterator) then
+            writeln("CPU's task ", tid, " owns ", myIters);
+          for i in myIters do
+            yield i;
+        }
+      } else if (CPUratio > 0 && CPUratio < 100) {
         coforall locs in 0..1 {
           if (locs == 0) {
             // CPU parallel iterator
@@ -252,7 +273,7 @@ module GPUIterator {
       && isRectangularDom(D)
       && D.dist.type <= Block {
 
-      if (debugGPUIterator) then writeln("GPUIterator (leader)");
+      if (debugGPUIterator) then writeln("GPUIterator (standalone distributed)");
 
       var dist = D.dist;
       var whole = D.whole;
@@ -287,18 +308,34 @@ module GPUIterator {
           if (debugGPUIterator) then writeln(locDom.locale, " (", locDom.locale.name,  ") is responsible for ", tmpBlock);
 
           const r = tmpBlock;
+          const CPUnumElements = (r.size * (CPUratio*1.0/100.0)): int;
 
-          if (CPUratio >= 0) {
-              const CPUnumElements = (r.size * (CPUratio*1.0/100.0)): int;
+          const CPUhi = (r.low + CPUnumElements - 1);
+          const CPUrange = r.low..CPUhi;
+          const GPUlo = CPUhi + 1;
+          const GPUrange = GPUlo..r.high;
 
-              const CPUhi = (r.low + CPUnumElements - 1);
-              const CPUrange = r.low..CPUhi;
-              const GPUlo = CPUhi + 1;
-              const GPUrange = GPUlo..r.high;
-
+          if (CPUratio == 0) {
+            const myIters = GPUrange;
+            if (debugGPUIterator) then
+              writeln("\tSubloc  1 owns ", myIters);
+            /* Current Version: importing hand-coded version */
+            GPUWrapper(myIters.translate(whole.low).first, myIters.translate(whole.low).last, GPUrange.length);
+          } else if (CPUratio == 100) {
+            // CPU parallel iterator
+            var c = here.getChild(0);
+            const numTasks = c.maxTaskPar;
+            if (debugGPUIterator) then
+              writeln("Subloc 0 owns ", CPUrange, " and decompose it into ", numTasks, " tasks");
+            coforall tid in 0..#numTasks {
+              const myIters = computeChunk(CPUrange, tid, numTasks).translate(wholeLow);
               if (debugGPUIterator) then
-                writeln(here);
-
+                writeln("\tCPU's task ", tid, " owns ", myIters);
+              for i in myIters {
+                yield i;
+              }
+            }
+          } else if (CPUratio > 0 && CPUratio < 100) {
               coforall locs in 0..1 {
                 if (locs == 0) {
                   // CPU parallel iterator
