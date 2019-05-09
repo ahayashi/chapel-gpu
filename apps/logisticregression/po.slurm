@@ -6,7 +6,9 @@
 #SBATCH --threads-per-core=1
 #SBATCH --time=03:00:00
 #SBATCH --gres=gpu
+#SBATCH --mail-user=ahayashi@rice.edu
 #SBATCH --mail-type=ALL
+
 
 cd $SLURM_SUBMIT_DIR
 export CHPL_LAUNCHER=slurm-gasnetrun_ibv
