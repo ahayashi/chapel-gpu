@@ -73,5 +73,7 @@ void GPUfunc(float *A, float *B, int start, int end, int n) {
 ```
 You need to 1) import the GPUIterator module, 2) create a wrapper function (```GPUWrapper```) which is a callback function invoked after the module has created a task for the GPU portion of the iteration space (```lo```, ```hi```, ```n```) and eventually invokes the GPU function (```GPUfunc```), 3) then wrap the iteration space using ```GPU()``` with the wrapper function ```GPUWrapper```. Note that the last argument (```CPUPercent```), the percentage of the iteration space will be executed on the CPU, is optional. The default number for it is zero, meaning the whole itreration space goes to the GPU side.
 
+Also, currently you need to use [our Chapel compiler](https://github.com/ahayashi/chapel/tree/gpu-iterator) that includes the GPU locale model tailored for this module. Define```CHPL_LOCALE_MODEL=gpu``` when compiling a Chapel program with ```GPUIterator```.
+
 ## Further Readings
 "GPUIterator: Bridging the Gap between Chapel and GPU Platforms", Akihiro Hayashi, Sri Raj Paul, Vivek Sarkar, The ACM SIGPLAN 6th Annual Chapel Implementers and Users Workshop (CHIUW), June 2019. (co-located with PLDI2019/ACM FCRC2019)
