@@ -25,7 +25,9 @@ extern proc GPUfunc(A: [] real(32), B: [] real(32),
 var A: [1..n] real(32);
 var B: [1..n] real(32);
 GPUfunc(A, B, 1, n);
+```
 
+```c
 // Separate C file
 void GPUfunc(float *A, float *B, int start, int end) {
   // GPU Implementation (CUDA/OpenCL)
@@ -38,7 +40,15 @@ The key difference is that the original ```forall``` loop is replaced with the f
 
 Unfortunately, the source code is not very portable particularly when the user wants to explore different variants to get higher performance. Since GPUs are not always faster than CPUs (and vice versa), the user has to be juggling ```forall``` with ```GPUfunc()``` depending on the data size and the complexity of the computation (e.g., by commenting in/out each version). One intuitive workaround is to put an if statement to decide whether to use which version (CPUs or GPUs). However, this raises another problem: it is still not very portable when doing 1) multi-locale CPU+GPU execution, and 2) further advanced workload distributions such as hybrid execution of the CPU and GPU versions, the latter of which could give additional performance improvement for a certain class of applications and platforms.
 
-One may argue that it is still technically possible to do so at the user-level. For multi-locale GPU execution, we could do ```coforall loc in Locales { on loc { GPUfunc(...); } }``` with appropriate arguments to ```GPUfunc``` - i.e., a local portion of a distributed array, and a subspace of original iteration space. For hybrid CPU+GPU execution, one could create $c$ tasks and $g$ tasks that take care of a subspace of the original iteration space per locale, where $c$ and $g$ are the numbers of CPUs and GPUs. However, that is what we want to let the ```GPUIterator``` do to reduce the complexity of the user-level code.
+One may argue that it is still technically possible to do so at the user-level. For multi-locale GPU execution, we could do like this with appropriate arguments to ```GPUfunc``` - i.e., a local portion of a distributed array, and a subspace of original iteration space:
+```chapel
+coforall loc in Locales {
+  on loc {
+     GPUfunc(...);
+  }
+}
+```
+ For hybrid CPU+GPU execution, one could create $c$ tasks and $g$ tasks that take care of a subspace of the original iteration space per locale, where $c$ and $g$ are the numbers of CPUs and GPUs. However, that is what we want to let the ```GPUIterator``` do to reduce the complexity of the user-level code.
 
 
 ## How to Use the GPUIterator
@@ -63,7 +73,9 @@ forall i in GPU(1..n, GPUWrapper, CPUPercent) {
   // CPU code
   A(i) = B(i);
 }
+```
 
+```c
 // Separate C file
 void GPUfunc(float *A, float *B, int start, int end, int n) {
   // GPU Implementation (CUDA/OpenCL)
@@ -71,9 +83,53 @@ void GPUfunc(float *A, float *B, int start, int end, int n) {
   // A(1) and B(1) in the Chapel part respectively
 }
 ```
+
 You need to 1) import the GPUIterator module, 2) create a wrapper function (```GPUWrapper```) which is a callback function invoked after the module has created a task for the GPU portion of the iteration space (```lo```, ```hi```, ```n```) and eventually invokes the GPU function (```GPUfunc```), 3) then wrap the iteration space using ```GPU()``` with the wrapper function ```GPUWrapper```. Note that the last argument (```CPUPercent```), the percentage of the iteration space will be executed on the CPU, is optional. The default number for it is zero, meaning the whole itreration space goes to the GPU side.
 
 Also, currently you need to use [our Chapel compiler](https://github.com/ahayashi/chapel/tree/gpu-iterator) that includes the GPU locale model tailored for this module. Define```CHPL_LOCALE_MODEL=gpu``` when compiling a Chapel program with ```GPUIterator```.
+
+## Guide to Write GPU programs with the GPUIterator
+Here is an example CUDA program for Vector Copy:
+
+```c
+// Separate .cu file
+
+__global__ void vc(float *dA, float *dB, int N) {
+    int id = blockIdx.x * blockDim.x + threadIdx.x;
+    if (id < N) {
+	dA[id] = dB[id];
+    }
+}
+
+void GPUfunc(float *A, float *B, int start, int end, int n) {
+  // GPU Implementation (CUDA/OpenCL)
+  // Note: A[0] and B[0] here corresponds to
+  // A(1) and B(1) in the Chapel part respectively
+  assert(end - start + 1 == n)
+  if (n > 0) {
+    // device memory allocation
+    cudaMalloc(&dA, sizeof(float) * n));
+    cudaMalloc(&dB, sizeof(float) * n));
+
+    // Optimization 1: only transferring the array B because A will be updated on the device
+    cudaMemcpy(dB, B + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice);
+
+    // kernel invocation
+    vc<<<ceil(((float)n)/1024), 1024>>>(dA, dB, n);
+
+    // wait for the completion of the kernel invocation
+    cudaDeviceSynchronize();
+
+    // Optimization 2: only transferring back the array A because B is not updated on the device
+    cudaMemcpy(A + start, dA, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
+
+    // device memory deallocation
+    cudaFree(dA);
+    cudaFree(dB);
+  }
+
+}
+```
 
 ## Further Readings
 "GPUIterator: Bridging the Gap between Chapel and GPU Platforms", Akihiro Hayashi, Sri Raj Paul, Vivek Sarkar, The ACM SIGPLAN 6th Annual Chapel Implementers and Users Workshop (CHIUW), June 2019. (co-located with PLDI2019/ACM FCRC2019)
