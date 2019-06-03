@@ -86,18 +86,21 @@ void GPUfunc(float *A, float *B, int start, int end, int n) {
 
 You need to 1) import the GPUIterator module, 2) create a wrapper function (```GPUWrapper```) which is a callback function invoked after the module has created a task for the GPU portion of the iteration space (```lo```, ```hi```, ```n```) and eventually invokes the GPU function (```GPUfunc```), 3) then wrap the iteration space using ```GPU()``` with the wrapper function ```GPUWrapper```. Note that the last argument (```CPUPercent```), the percentage of the iteration space will be executed on the CPU, is optional. The default number for it is zero, meaning the whole itreration space goes to the GPU side.
 
+It is worth noting that the GPUIterator gives freedom to you of designing ```GPUfunc()```. In addition to the automatically computed numbers (```lo```, ```hi```, and ```n```), you are required to give appropriate arguments so that the GPU part can work properly. We will discuss how to write the GPU part below.
+
 Also, currently you need to use [our Chapel compiler](https://github.com/ahayashi/chapel/tree/gpu-iterator) that includes the GPU locale model tailored for this module. Define```CHPL_LOCALE_MODEL=gpu``` when compiling a Chapel program with ```GPUIterator```.
 
 ## Guide to Write GPU programs with the GPUIterator
-Here is an example CUDA program for Vector Copy:
+In summary, GPU programs for the GPUIterator should include typical host and device operations including device memory allocations, data transfers, and kernel invocations, which is pretty much the same as typical CUDA/OpenCL programs with the exception that 1) input/output data are passed from/to the Chapel part, and 2) the GPU portion of the original iteration space are provided. Here is a complete example of the GPU part for the vector copy program:
 
 ```c
 // Separate .cu file
 
+// CUDA kernel for Vector Copy
 __global__ void vc(float *dA, float *dB, int N) {
     int id = blockIdx.x * blockDim.x + threadIdx.x;
     if (id < N) {
-	dA[id] = dB[id];
+	  dA[id] = dB[id];
     }
 }
 
@@ -112,7 +115,7 @@ void GPUfunc(float *A, float *B, int start, int end, int n) {
     cudaMalloc(&dB, sizeof(float) * n));
 
     // Optimization 1: only transferring the array B because A will be updated on the device
-    cudaMemcpy(dB, B + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice);
+    cudaMemcpy(dB, B + start, sizeof(float) * n, cudaMemcpyHostToDevice);
 
     // kernel invocation
     vc<<<ceil(((float)n)/1024), 1024>>>(dA, dB, n);
@@ -121,7 +124,7 @@ void GPUfunc(float *A, float *B, int start, int end, int n) {
     cudaDeviceSynchronize();
 
     // Optimization 2: only transferring back the array A because B is not updated on the device
-    cudaMemcpy(A + start, dA, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
+    cudaMemcpy(A + start, dA, sizeof(float) * n, cudaMemcpyDeviceToHost));
 
     // device memory deallocation
     cudaFree(dA);
@@ -130,6 +133,10 @@ void GPUfunc(float *A, float *B, int start, int end, int n) {
 
 }
 ```
+
+Again, the code above is pretty much the same as typical CUDA programs. Thanks to the C interoperability feature, the Chapel arrays A and B can be treated as just C pointers, and they can be directly passed to CUDA API functions. Thus, all you have to do is to make sure that 1) the GPU kernel works only for the given subspace of the original iteration space, and 2) pass all the required data to the ```GPUfunc``` from the Chapel side.
+
+Please note that the above example does data transfer optimizations not to send ```A``` to the GPU or send back ```B``` to the host. Also, it only allocates and transfers a subarray of ```A``` and ```B``` and invokes the kernel with the subspace since they are safe to do so in this example. However, please be careful about how to optimize your GPU program  because the legality of doing so depends on a kernel.
 
 ## Further Readings
 "GPUIterator: Bridging the Gap between Chapel and GPU Platforms", Akihiro Hayashi, Sri Raj Paul, Vivek Sarkar, The ACM SIGPLAN 6th Annual Chapel Implementers and Users Workshop (CHIUW), June 2019. (co-located with PLDI2019/ACM FCRC2019)
