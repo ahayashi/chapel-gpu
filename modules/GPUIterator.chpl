@@ -446,13 +446,6 @@ module GPUIterator {
        yield i;
     }
 
-    //iter GPU(r: range(?),
-    //       GPUWrapper: func(int, int, int, void),
-    //       CPUratio: int=0) {
-    //for i in r.low..r.high do
-    //  yield i;
-    //}
-
     proc computeChunk(r: range, myChunk, numChunks)
       where r.stridable == false {
 
