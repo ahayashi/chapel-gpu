@@ -101,9 +101,9 @@ It is worth noting that the GPUIterator gives freedom to you of designing ```GPU
 Also, currently you need to use [our Chapel compiler](https://github.com/ahayashi/chapel/tree/gpu-iterator) that includes the GPU locale model tailored for this module. Define```CHPL_LOCALE_MODEL=gpu``` when compiling a Chapel program with ```GPUIterator```.
 
 ## How to Compile Your Chapel Programs with the GPUIterator
-Here we explain how to compile a Chapel program with the GPUIterator. In the following ```$CHPL_GPU_HOME``` represents the top directory of this repository and we take the vector copy code in ```$CHPL_GPU_HOME/apps/vector_copy```.
+Here we explain how to compile a Chapel program with the GPUIterator. In the following, ```$CHPL_GPU_HOME``` represents the top directory of this repository and we take the vector copy code in ```$CHPL_GPU_HOME/apps/vector_copy``` as an example.
 
-### Create an object file
+### Create an object file with a GPU compiler
 First, create an object file for the GPU program by compiling it with the ```-c``` option:
 ```bash
 $ cd $CHPL_GPU_HOME/apps/vector_copy
@@ -113,13 +113,13 @@ $ nvcc -O3 -arch sm_60 -std=c++11 -c vc.cu -o vc.gpu.o
 $ gcc -O3 -c -std=c++11 -c vc.opencl.c -o vc.gpu.o
 ```
 
-### Compile
+### Create an executable with the Chapel compiler
 Then, compile the Chapel program (```vc.hybrid.chpl```) with the object file. You will also required to give the path to the GPUIterator module with the ```-M``` option unless it is in the module search path [$CHPL_MODULE_PATH](https://chapel-lang.org/docs/master/technotes/module_search.html):
 ```bash
 // CUDA
-$ chpl --fast -M $CHPL_GPU_HOME/chapel-gpu/modules vc.hybrid.chpl vc.gpu.o -lcudart -lcuda
+$ CHPL_LOCALE_MODEL=gpu chpl --fast -M $CHPL_GPU_HOME/chapel-gpu/modules vc.hybrid.chpl vc.gpu.o -lcudart -lcuda
 // OpenCL
-$ chpl --fast -M $CHPL_GPU_HOME/chapel-gpu/modules vc.hybrid.chpl vc.gpu.o -lOpenCL
+$ CHPL_LOCALE_MODEL=gpu chpl --fast -M $CHPL_GPU_HOME/chapel-gpu/modules vc.hybrid.chpl vc.gpu.o -lOpenCL
 ```
 
 Depending on your setting, it may be required to give the ```-L``` option to let the Chapel compiler know the location of CUDA/OpenCL libraries (e.g., ```-L/usr/local/cuda/lib64```).
