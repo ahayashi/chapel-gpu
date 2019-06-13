@@ -71,8 +71,8 @@ proc main() {
   for trial in 1..numTrials {
 	for i in 1..n {
       for j in 1..n {
-		A(i, j) = i: real(32);
-		B(i, j) = i: real(32);
+		A(i, j) = (i*1.0/1000): real(32);
+		B(i, j) = (i*1.0/1000): real(32);
 		C(i, j) = 0: real(32);
       }
 	}

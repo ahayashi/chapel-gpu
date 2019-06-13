@@ -10,6 +10,13 @@
 #define CudaSafeCall( err ) __cudaSafeCall( err, __FILE__, __LINE__ )
 #define CudaCheckError()    __cudaCheckError( __FILE__, __LINE__ )
 
+long long getCurrentTime() {
+  struct timeval te;
+  gettimeofday(&te, NULL); // get current time
+  long long microseconds = te.tv_sec*1000000LL + te.tv_usec;
+  return microseconds;
+}
+
 inline void __cudaSafeCall( cudaError err, const char *file, const int line )
 {
         #ifdef CUDA_ERROR_CHECK
@@ -52,7 +59,7 @@ __global__ void mm(float *dA, float *dB, float *dC, int DIM, int N, int GPUN) {
     if (id <= GPUN) {
 	int i = id / DIM;
 	int j = id % DIM;
-	int sum = 0;
+	float sum = 0.0f;
 	for (int k = 0; k < DIM; k++) {
 	    sum += dA[i*DIM+k] * dB[k*DIM+j];
 	}
@@ -62,7 +69,7 @@ __global__ void mm(float *dA, float *dB, float *dC, int DIM, int N, int GPUN) {
 
 __global__ void mm_tiled(float *dA, float *dB, float *dC, int DIM, int N, int GPUN) {
     int it, jt, kt, i, j, k;
-    __shared__ int sA[32][32], sB[32][32];
+    __shared__ float sA[32][32], sB[32][32];
 
     // (it, jt) => the first element of a specific tile
     it = blockIdx.y * 32;
@@ -73,7 +80,7 @@ __global__ void mm_tiled(float *dA, float *dB, float *dC, int DIM, int N, int GP
     j = jt + threadIdx.x;
 
     if (i*DIM+j <= GPUN) {
-	int sum = 0;
+	float sum = 0.0f;
 	// per tile loop
 	for (kt = 0; kt < DIM; kt += 32) {
 	    // copy to shared memory
@@ -149,11 +156,22 @@ extern "C" {
 		mm_tiled<<<grid, block>>>(dA, dB, dC, ceil(sqrt(N)), N, N);
 	    } else {
 	        cublasHandle_t handle;
+#ifdef PROF
+		long long start = getCurrentTime();
+#endif	
 		cublasCreate(&handle);           
 	        float alpha = 1.0F;
 		float beta = 0.0F;
 	        int lda = sqrt(N), ldb = sqrt(N), ldc = sqrt(N);
+#ifdef PROF
+		long long end = getCurrentTime();
+		printf("cuBLAS prep: %lf msec\n", (float)(end-start)/1000);
+#endif
 		cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, sqrt(N), sqrt(N), sqrt(N), &alpha, dA, lda, dB, ldb, &beta, dC, ldc);
+#ifdef PROF
+		long long end2 = getCurrentTime();
+		printf("cuBLAS finish: %lf msec\n", (float)(end2-start)/1000);
+#endif
 	    }	    
 	    CudaCheckError();
 #ifdef PROF
