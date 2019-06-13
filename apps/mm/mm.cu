@@ -5,8 +5,10 @@
 #include <cublas_v2.h>
 
 #define VERBOSE
+#define PROF
 #define CUDA_ERROR_CHECK
 #define CudaSafeCall( err ) __cudaSafeCall( err, __FILE__, __LINE__ )
+#define CudaCheckError()    __cudaCheckError( __FILE__, __LINE__ )
 
 inline void __cudaSafeCall( cudaError err, const char *file, const int line )
 {
@@ -20,6 +22,29 @@ inline void __cudaSafeCall( cudaError err, const char *file, const int line )
         #endif
 
     return;
+}
+
+inline void __cudaCheckError( const char *file, const int line )
+{
+#ifdef CUDA_ERROR_CHECK
+  cudaError err = cudaGetLastError();
+  if ( cudaSuccess != err )
+    {
+      fprintf( stderr, "cudaCheckError() failed at %s:%i : %s\n",
+	       file, line, cudaGetErrorString( err ) );
+      exit( -1 );
+    }
+
+  // More careful checking. However, this will affect performance.
+  // Comment away if needed.
+  err = cudaDeviceSynchronize();
+  if( cudaSuccess != err )
+    {
+      fprintf( stderr, "cudaCheckError() with sync failed at %s:%i : %s\n",
+	       file, line, cudaGetErrorString( err ) );
+      exit( -1 );
+    }
+#endif
 }
 
 __global__ void mm(float *dA, float *dB, float *dC, int DIM, int N, int GPUN) {
@@ -77,13 +102,45 @@ extern "C" {
 	    printf("\t GPUN: %d\n", GPUN);
 	    printf("\t range: %d..%d\n", start, end);
 #endif	
+#ifdef PROF
+	    cudaEvent_t startCudaMallocEvent, endCudaMallocEvent;
+	    cudaEvent_t startCudaMemcpyH2DEvent, endCudaMemcpyH2DEvent;
+	    cudaEvent_t startCudaKernelEvent, endCudaKernelEvent;
+	    cudaEvent_t startCudaMemcpyD2HEvent, endCudaMemcpyD2HEvent;
+	    CudaSafeCall(cudaEventCreate(&startCudaMallocEvent));
+	    CudaSafeCall(cudaEventCreate(&endCudaMallocEvent));
+	    CudaSafeCall(cudaEventCreate(&startCudaMemcpyH2DEvent));
+	    CudaSafeCall(cudaEventCreate(&endCudaMemcpyH2DEvent));
+	    CudaSafeCall(cudaEventCreate(&startCudaKernelEvent));
+	    CudaSafeCall(cudaEventCreate(&endCudaKernelEvent));
+	    CudaSafeCall(cudaEventCreate(&startCudaMemcpyD2HEvent));
+	    CudaSafeCall(cudaEventCreate(&endCudaMemcpyD2HEvent));
+#endif
+
+#ifdef PROF
+	    CudaSafeCall(cudaEventRecord(startCudaMallocEvent));
+#endif	    
 	    CudaSafeCall(cudaMalloc(&dA, sizeof(float) * N));
 	    CudaSafeCall(cudaMalloc(&dB, sizeof(float) * N));
 	    CudaSafeCall(cudaMalloc(&dC, sizeof(float) * N));
+#ifdef PROF
+	    CudaSafeCall(cudaEventRecord(endCudaMallocEvent));
+	    CudaSafeCall(cudaEventSynchronize(endCudaMallocEvent));
+#endif
 	    
+#ifdef PROF
+	    CudaSafeCall(cudaEventRecord(startCudaMemcpyH2DEvent));
+#endif
 	    CudaSafeCall(cudaMemcpy(dA, A, sizeof(float) * N, cudaMemcpyHostToDevice));
 	    CudaSafeCall(cudaMemcpy(dB, B, sizeof(float) * N, cudaMemcpyHostToDevice));
+#ifdef PROF
+	    CudaSafeCall(cudaEventRecord(endCudaMemcpyH2DEvent));
+	    CudaSafeCall(cudaEventSynchronize(endCudaMemcpyH2DEvent));
+#endif
 	    
+#ifdef PROF
+	    CudaSafeCall(cudaEventRecord(startCudaKernelEvent));
+#endif
 	    if (!tiled) {
 		mm<<<ceil(((float)N)/1024), 1024>>>(dA, dB, dC, ceil(sqrt(N)), N, N);
 	    } else if (tiled == 1){
@@ -98,9 +155,34 @@ extern "C" {
 	        int lda = sqrt(N), ldb = sqrt(N), ldc = sqrt(N);
 		cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, sqrt(N), sqrt(N), sqrt(N), &alpha, dA, lda, dB, ldb, &beta, dC, ldc);
 	    }	    
-	    
+	    CudaCheckError();
+#ifdef PROF
+	    CudaSafeCall(cudaEventRecord(endCudaKernelEvent));
+	    CudaSafeCall(cudaEventSynchronize(endCudaKernelEvent));
+#endif
 	    CudaSafeCall(cudaDeviceSynchronize());
+
+#ifdef PROF
+	    CudaSafeCall(cudaEventRecord(startCudaMemcpyD2HEvent));
+#endif
 	    CudaSafeCall(cudaMemcpy(C + start, dC + start, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
+#ifdef PROF
+	    CudaSafeCall(cudaEventRecord(endCudaMemcpyD2HEvent));
+	    CudaSafeCall(cudaEventSynchronize(endCudaMemcpyD2HEvent));
+#endif
+
+#ifdef PROF
+	    float msecMalloc, msecH2D, msecKernel, msecD2H;
+	    CudaSafeCall(cudaEventElapsedTime(&msecMalloc, startCudaMallocEvent, endCudaMallocEvent));
+	    CudaSafeCall(cudaEventElapsedTime(&msecH2D, startCudaMemcpyH2DEvent, endCudaMemcpyH2DEvent));
+	    CudaSafeCall(cudaEventElapsedTime(&msecKernel, startCudaKernelEvent, endCudaKernelEvent));
+	    CudaSafeCall(cudaEventElapsedTime(&msecD2H, startCudaMemcpyD2HEvent, endCudaMemcpyD2HEvent));
+	    printf("CUDA malloc: %lf msec\n", msecMalloc);
+	    printf("CUDA h2d: %lf msec\n", msecH2D);
+	    printf("CUDA kernel: %lf msec\n", msecKernel);
+	    printf("CUDA d2h: %lf msec\n", msecD2H);
+#endif
+
 	    //for (int i = 0; i < GPUN; i++) {
 	    //	printf("C[%d] = %lf\n", start+i, C[start+i]);
 	    //}
