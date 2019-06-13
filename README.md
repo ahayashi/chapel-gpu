@@ -27,7 +27,7 @@ The equivalent Chapel+GPU code is shown below:
 ```chapel
 // Chapel file
 extern proc GPUfunc(A: [] real(32), B: [] real(32),
-                      lo: int, hi: int, N: int);
+                      lo: int, hi: int);
 
 var A: [1..n] real(32);
 var B: [1..n] real(32);
