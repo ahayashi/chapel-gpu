@@ -1,115 +1,160 @@
 module GPUIterator {
     use Time;
     use BlockDist;
-    use DSIUtil;
 
-    config param debugGPUIterator = false;
-    config param distOpt = false;
+    config param debugGPUIterator = true;
+
+    // Utility functions
+    inline proc computeSubranges(whole: range(?),
+                                 CPUPercent: int(64)) {
+
+      const CPUnumElements = (whole.size * CPUPercent * 1.0 / 100.0) : int(64);
+      const CPUhi = (whole.low + CPUnumElements - 1);
+      const CPUrange = whole.low..CPUhi;
+      const GPUlo = CPUhi + 1;
+      const GPUrange = GPUlo..whole.high;
+
+      return (CPUrange, GPUrange);
+    }
+
+    inline proc computeChunk(r: range, myChunk, numChunks)
+      where r.stridable == false {
+
+      const numElems = r.length;
+      const elemsPerChunk = numElems/numChunks;
+      const mylow = r.low + elemsPerChunk*myChunk;
+      if (myChunk != numChunks - 1) {
+	    return mylow..#elemsPerChunk;
+      } else {
+	    return mylow..r.high;
+      }
+    }
+
+    iter createTaskAndYield(param tag: iterKind,
+                            r: range(?),
+                            CPUrange: range(?),
+                            GPUrange: range(?),
+                            GPUWrapper: func(int, int, int, void))
+      where tag == iterKind.leader {
+
+      if (CPUrange.size == 0) {
+        const myIters = GPUrange;
+        if (debugGPUIterator) then
+          writeln("GPU portion: ", myIters);
+        GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+      } else if (GPUrange.size == 0) {
+        const numTasks = here.maxTaskPar;
+        if (debugGPUIterator) then
+          writeln("CPU portion: ", CPUrange, " by ", numTasks, " tasks");
+        coforall tid in 0..#numTasks {
+          const myIters = computeChunk(CPUrange, tid, numTasks);
+          yield (myIters.translate(-r.low),);
+        }
+      } else {
+        cobegin {
+          // CPU portion
+          {
+            const numTasks = here.maxTaskPar;
+            if (debugGPUIterator) then
+              writeln("CPU portion: ", CPUrange, " by ", numTasks, " tasks");
+            coforall tid in 0..#numTasks {
+              const myIters = computeChunk(CPUrange, tid, numTasks);
+              yield (myIters.translate(-r.low),);
+            }
+          }
+          // GPU portion
+          {
+            const myIters = GPUrange;
+            if (debugGPUIterator) then
+              writeln("GPU portion: ", myIters);
+            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+          }
+        }
+      }
+    }
+
+    iter createTaskAndYield(param tag: iterKind,
+                            r: range(?),
+                            CPUrange: range(?),
+                            GPUrange: range(?),
+                            GPUWrapper: func(int, int, int, void))
+      where tag == iterKind.standalone {
+
+      if (CPUrange.size == 0) {
+        const myIters = GPUrange;
+        if (debugGPUIterator) then
+          writeln("GPU portion: ", myIters);
+        GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+      } else if (GPUrange.size == 0) {
+        const numTasks = here.maxTaskPar;
+        if (debugGPUIterator) then
+          writeln("CPU portion: ", CPUrange, " by ", numTasks, " tasks");
+        coforall tid in 0..#numTasks {
+          const myIters = computeChunk(CPUrange, tid, numTasks);
+          for i in myIters do
+            yield i;
+        }
+      } else {
+        cobegin {
+          // CPU portion
+          {
+            const numTasks = here.maxTaskPar;
+            if (debugGPUIterator) then
+              writeln("CPU portion: ", CPUrange, " by ", numTasks, " tasks");
+            coforall tid in 0..#numTasks {
+              const myIters = computeChunk(CPUrange, tid, numTasks);
+              for i in myIters do
+                yield i;
+            }
+          }
+          // GPU portion
+          {
+            const myIters = GPUrange;
+            if (debugGPUIterator) then
+              writeln("GPU portion: ", myIters);
+            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+          }
+        }
+      }
+    }
+
+    iter createTaskAndYield(r: range(?),
+                            CPUrange: range(?),
+                            GPUrange: range(?),
+                            GPUWrapper: func(int, int, int, void)) {
+      halt("This is dummy");
+    }
 
     // leader (block distributed domains)
     iter GPU(param tag: iterKind,
              D: domain,
              GPUWrapper: func(int, int, int, void),
-             CPUratio: int = 0
+             CPUPercent: int = 0
              )
-      where tag == iterKind.leader
-      && isRectangularDom(D)
-      && D.dist.type <= Block {
+       where tag == iterKind.leader
+       && isRectangularDom(D)
+       && D.dist.type <= Block {
 
       if (debugGPUIterator) {
         writeln("GPUIterator (leader, block distributed)");
       }
 
-      var dist = D.dist;
-      var whole = D.whole;
-      var locDoms = D.locDoms;
-      type idxType = D.dist.idxType;
-      param rank = D.dist.rank;
-
-      const maxTasks = dist.dataParTasksPerLocale;
-      const ignoreRunning = dist.dataParIgnoreRunningTasks;
-      const minSize = dist.dataParMinGranularity;
-      const wholeLow = whole.low;
-      const hereId = here.id;
-      const hereIgnoreRunning = if here.runningTasks() == 1 then true
-        else ignoreRunning;
-
-      // for each locale
-      coforall locDom in locDoms do on locDom {
-          const myIgnoreRunning = if here.id == hereId then hereIgnoreRunning else ignoreRunning;
-
-          // Use the internal function for untranslate to avoid having to do
-          // extra work to negate the offset
-          type strType = chpl__signedType(idxType);
-          const tmpBlock = locDom.myBlock.chpl__unTranslate(wholeLow);
-          var locOffset: rank*idxType;
-          for param i in 1..tmpBlock.rank {
-            const stride = tmpBlock.dim(i).stride;
-            if stride < 0 && strType != idxType then
-              halt("negative stride not supported with unsigned idxType");
-            // (since locOffset is unsigned in that case)
-            locOffset(i) = tmpBlock.dim(i).first / stride:idxType;
-          }
-          if (debugGPUIterator) then writeln(locDom.locale, " (", locDom.locale.name,  ") is responsible for ", tmpBlock);
-
-          const r = tmpBlock;
-          const CPUnumElements = (r.size * (CPUratio*1.0/100.0)): int;
-
-          const CPUhi = (r.low + CPUnumElements - 1);
-          const CPUrange = r.low..CPUhi;
-          const GPUlo = CPUhi + 1;
-          const GPUrange = GPUlo..r.high;
-
-          if (CPUratio == 0) {
-            const myIters = GPUrange;
-            if (debugGPUIterator) then
-              writeln("\tSubloc 1 owns ", myIters);
-            /* Current Version: importing hand-coded version */
-            GPUWrapper(myIters.translate(whole.low).first, myIters.translate(whole.low).last, GPUrange.length);
-          } else if (CPUratio == 100) {
-            // CPU parallel iterator
-            var c = here.getChild(0);
-            const numTasks = c.maxTaskPar;
-            if (debugGPUIterator) then
-              writeln("\tSubloc 0 owns ", CPUrange, " and decompose it into ", numTasks, " tasks");
-            coforall tid in 0..#numTasks {
-              const myIters = computeChunk(CPUrange, tid, numTasks);
-              if (debugGPUIterator) then
-                writeln("\tCPU's task ", tid, " owns ", myIters);
-              yield (myIters,);
-            }
-          } else if (CPUratio > 0 && CPUratio < 100) {
-            coforall locs in 0..1 {
-              if (locs == 0) {
-                // CPU parallel iterator
-                var c = here.getChild(locs);
-                const numTasks = c.maxTaskPar;
-                if (debugGPUIterator) then
-                  writeln("\tSubloc ", locs, " owns ", CPUrange, " and decompose it into ", numTasks, " tasks");
-                coforall tid in 0..#numTasks {
-                  const myIters = computeChunk(CPUrange, tid, numTasks);
-                  if (debugGPUIterator) then
-                    writeln("\tCPU's task ", tid, " owns ", myIters);
-                  yield (myIters,);
-                }
-              } else {
-                // GPU parallel iterator
-                const myIters = GPUrange;
-                if (debugGPUIterator) then
-                  writeln("\tSubloc ", locs, " owns ", myIters);
-                /* Current Version: importing hand-coded version */
-                GPUWrapper(myIters.translate(whole.low).first, myIters.translate(whole.low).last, GPUrange.length);
-              }
-            }
+      coforall loc in D.targetLocales() do on loc {
+        for subdom in D.localSubdomains() {
+          const r = subdom.dim(1);
+          const portions = computeSubranges(r, CPUPercent);
+          for i in createTaskAndYield(tag, r, portions(1), portions(2), GPUWrapper) {
+            yield i;
           }
         }
+      }
     }
 
     // follower (block distributed domains)
     iter GPU(param tag: iterKind,
              D: domain,
              GPUWrapper: func(int, int, int, void),
-             CPUratio: int = 0,
+             CPUPercent: int = 0,
              followThis
              )
       where tag == iterKind.follower
@@ -133,7 +178,7 @@ module GPUIterator {
     iter GPU(param tag: iterKind,
              D: domain,
              GPUWrapper: func(int, int, int, void),
-             CPUratio: int = 0
+             CPUPercent: int = 0
              )
       where tag == iterKind.standalone
       && isRectangularDom(D)
@@ -143,157 +188,50 @@ module GPUIterator {
         writeln("GPUIterator (standalone distributed)");
       }
 
-      var dist = D.dist;
-      var whole = D.whole;
-      var locDoms = D.locDoms;
-      type idxType = D.dist.idxType;
-      param rank = D.dist.rank;
-
-      const maxTasks = dist.dataParTasksPerLocale;
-      const ignoreRunning = dist.dataParIgnoreRunningTasks;
-      const minSize = dist.dataParMinGranularity;
-      const wholeLow = whole.low;
-      const hereId = here.id;
-      const hereIgnoreRunning = if here.runningTasks() == 1 then true
-        else ignoreRunning;
-
       // for each locale
-      coforall locDom in locDoms do on locDom {
-          const myIgnoreRunning = if here.id == hereId then hereIgnoreRunning else ignoreRunning;
+      coforall loc in D.targetLocales() do on loc {
+        for subdom in D.localSubdomains() {
+          if (debugGPUIterator) then writeln(here, " (", here.name,  ") is responsible for ", subdom);
+          const r = subdom.dim(1);
+          const portions = computeSubranges(r, CPUPercent);
 
-          // Use the internal function for untranslate to avoid having to do
-          // extra work to negate the offset
-          type strType = chpl__signedType(idxType);
-          const tmpBlock = locDom.myBlock.chpl__unTranslate(wholeLow);
-          var locOffset: rank*idxType;
-          for param i in 1..tmpBlock.rank {
-            const stride = tmpBlock.dim(i).stride;
-            if stride < 0 && strType != idxType then
-              halt("negative stride not supported with unsigned idxType");
-            // (since locOffset is unsigned in that case)
-            locOffset(i) = tmpBlock.dim(i).first / stride:idxType;
-          }
-          if (debugGPUIterator) then writeln(locDom.locale, " (", locDom.locale.name,  ") is responsible for ", tmpBlock);
-
-          const r = tmpBlock;
-          const CPUnumElements = (r.size * (CPUratio*1.0/100.0)): int;
-
-          const CPUhi = (r.low + CPUnumElements - 1);
-          const CPUrange = r.low..CPUhi;
-          const GPUlo = CPUhi + 1;
-          const GPUrange = GPUlo..r.high;
-
-          if (CPUratio == 0) {
-            const myIters = GPUrange;
-            if (debugGPUIterator) then
-              writeln("\tSubloc 1 owns ", myIters);
-            /* Current Version: importing hand-coded version */
-            GPUWrapper(myIters.translate(whole.low).first, myIters.translate(whole.low).last, GPUrange.length);
-          } else if (CPUratio == 100) {
-            // CPU parallel iterator
-            var c = here.getChild(0);
-            const numTasks = c.maxTaskPar;
-            if (debugGPUIterator) then
-              writeln("Subloc 0 owns ", CPUrange, " and decompose it into ", numTasks, " tasks");
-            coforall tid in 0..#numTasks {
-              const myIters = computeChunk(CPUrange, tid, numTasks).translate(wholeLow);
-              if (debugGPUIterator) then
-                writeln("\tCPU's task ", tid, " owns ", myIters);
-              for i in myIters {
-                yield i;
-              }
-            }
-          } else if (CPUratio > 0 && CPUratio < 100) {
-            coforall locs in 0..1 {
-              if (locs == 0) {
-                // CPU parallel iterator
-                var c = here.getChild(locs);
-                const numTasks = c.maxTaskPar;
-                if (debugGPUIterator) then
-                  writeln("\tSubloc ", locs, " owns ", CPUrange, " and decompose it into ", numTasks, " tasks");
-                coforall tid in 0..#numTasks {
-                  const myIters = computeChunk(CPUrange, tid, numTasks);
-                  if (debugGPUIterator) then
-                    writeln("\tCPU's task ", tid, " owns ", myIters);
-                  for i in myIters.translate(whole.low) {
-                    yield i;
-                  }
-                }
-              } else {
-                // GPU parallel iterator
-                const myIters = GPUrange;
-                if (debugGPUIterator) then
-                  writeln("\tSubloc ", locs, " owns ", myIters);
-                /* Current Version: importing hand-coded version */
-                GPUWrapper(myIters.translate(whole.low).first, myIters.translate(whole.low).last, GPUrange.length);
-              }
-            }
+          for i in createTaskAndYield(tag, r, portions(1), portions(2), GPUWrapper) {
+            yield i;
           }
         }
+      }
+    }
+
+    // serial iterator (block distributed domains)
+    iter GPU(D: domain,
+             GPUWrapper: func(int, int, int, void),
+             CPUPercent: int = 0
+             )
+      where isRectangularDom(D)
+      && D.dist.type <= Block {
+
+      if (debugGPUIterator) {
+        writeln("GPUIterator (serial distributed)");
+      }
+      for i in D {
+        yield i;
+      }
     }
 
     // leader (range)
     iter GPU(param tag: iterKind,
              r: range(?),
              GPUWrapper: func(int, int, int, void),
-             CPUratio: int = 0
+             CPUPercent: int = 0
              )
       where tag == iterKind.leader {
 
-      const numSublocs = here.getChildCount();
-
       if (debugGPUIterator) then
-	    writeln("In GPUIterator, creating ", numSublocs, " parallel iterators (CPU/GPU)");
+	    writeln("In GPUIterator (leader range)");
 
-      const CPUnumElements = (r.length * (CPUratio*1.0/100.0)): int;
-
-      const CPUhi = (r.low + CPUnumElements - 1);
-      const CPUrange = r.low..CPUhi;
-      const GPUlo = CPUhi + 1;
-      const GPUrange = GPUlo..r.high;
-
-      if (CPUratio == 0) {
-        // GPU parallel iterator
-        const myIters = GPUrange;
-        if (debugGPUIterator) then
-          writeln("Subloc 1 owns ", myIters);
-        /* Current Version: importing hand-coded version */
-        GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
-      } else if (CPUratio == 100) {
-        // CPU parallel iterator
-        var c = here.getChild(0);
-        const numTasks = c.maxTaskPar;
-        if (debugGPUIterator) then
-          writeln("Subloc 0 owns ", CPUrange, " and decompose it into ", numTasks, " tasks");
-        coforall tid in 0..#numTasks {
-          const myIters = computeChunk(CPUrange, tid, numTasks);
-          if (debugGPUIterator) then
-            writeln("CPU's task ", tid, " owns ", myIters);
-          yield (myIters.translate(-r.low),);
-        }
-      } else if (CPUratio > 0 && CPUratio < 100) {
-        coforall locs in 0..1 {
-          if (locs == 0) {
-            // CPU parallel iterator
-            var c = here.getChild(locs);
-            const numTasks = c.maxTaskPar;
-            if (debugGPUIterator) then
-              writeln("Subloc ", locs, " owns ", CPUrange, " and decompose it into ", numTasks, " tasks");
-            coforall tid in 0..#numTasks {
-              const myIters = computeChunk(CPUrange, tid, numTasks);
-              if (debugGPUIterator) then
-                writeln("CPU's task ", tid, " owns ", myIters);
-              yield (myIters.translate(-r.low),);
-            }
-          } else {
-            // GPU parallel iterator
-            const myIters = GPUrange;
-            if (debugGPUIterator) then
-              writeln("Subloc ", locs, " owns ", myIters);
-            /* Current Version: importing hand-coded version */
-            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
-          }
-        }
+      const portions = computeSubranges(r, CPUPercent);
+      for i in createTaskAndYield(tag, r, portions(1), portions(2), GPUWrapper) {
+        yield i;
       }
     }
 
@@ -301,7 +239,7 @@ module GPUIterator {
     iter GPU(param tag: iterKind,
              r:range(?),
              GPUWrapper: func(int, int, int, void),
-             CPUratio: int = 0,
+             CPUPercent: int = 0,
              followThis
              )
       where tag == iterKind.follower
@@ -323,139 +261,28 @@ module GPUIterator {
     iter GPU(param tag: iterKind,
              r: range(?),
              GPUWrapper: func(int, int, int, void),
-             CPUratio: int = 0
+             CPUPercent: int = 0
              )
   	  where tag == iterKind.standalone {
 
-      const numSublocs = here.getChildCount();
-
       if (debugGPUIterator) then
-	    writeln("In GPUIterator, creating ", numSublocs, " parallel iterators (CPU/GPU)");
+	    writeln("In GPUIterator (standalone)");
 
-      const CPUnumElements = (r.length * (CPUratio*1.0/100.0)): int;
-
-      const CPUhi = (r.low + CPUnumElements - 1);
-      const CPUrange = r.low..CPUhi;
-      const GPUlo = CPUhi + 1;
-      const GPUrange = GPUlo..r.high;
-
-      if (CPUratio == 0) {
-        const myIters = GPUrange;
-        if (debugGPUIterator) then
-          writeln("Subloc 1 owns ", myIters);
-        /* Current Version: importing hand-coded version */
-        GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
-      } else if (CPUratio == 100) {
-        // CPU parallel iterator
-        var c = here.getChild(0);
-        const numTasks = c.maxTaskPar;
-        if (debugGPUIterator) then
-          writeln("Subloc 0 owns ", CPUrange, " and decompose it into ", numTasks, " tasks");
-        coforall tid in 0..#numTasks {
-          const myIters = computeChunk(CPUrange, tid, numTasks);
-          if (debugGPUIterator) then
-            writeln("CPU's task ", tid, " owns ", myIters);
-          for i in myIters do
-            yield i;
-        }
-      } else if (CPUratio > 0 && CPUratio < 100) {
-        coforall locs in 0..1 {
-          if (locs == 0) {
-            // CPU parallel iterator
-            var c = here.getChild(locs);
-            const numTasks = c.maxTaskPar;
-            if (debugGPUIterator) then
-              writeln("Subloc ", locs, " owns ", CPUrange, " and decompose it into ", numTasks, " tasks");
-            coforall tid in 0..#numTasks {
-              const myIters = computeChunk(CPUrange, tid, numTasks);
-              if (debugGPUIterator) then
-                writeln("CPU's task ", tid, " owns ", myIters);
-              for i in myIters do
-                yield i;
-            }
-          } else {
-            // GPU parallel iterator
-            const myIters = GPUrange;
-            if (debugGPUIterator) then
-              writeln("Subloc ", locs, " owns ", myIters);
-            /* Current Version: importing hand-coded version */
-            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
-          }
-        }
-      } else {
-        var execTimes: [0..100 by 10] real;
-        for ratio in 0..100 by 10 {
-          const startTime = getCurrentTime();
-          const CPUnumElements = (r.length * (ratio*1.0/100.0)): int;
-
-          const CPUhi = (r.low + CPUnumElements - 1);
-          const CPUrange = r.low..CPUhi;
-          const GPUlo = CPUhi + 1;
-          const GPUrange = GPUlo..r.high;
-
-          coforall locs in 0..1 {
-            if (locs == 0) {
-              // CPU parallel iterator
-              var c = here.getChild(locs);
-              const numTasks = c.maxTaskPar;
-              if (debugGPUIterator) then
-                writeln("Subloc ", locs, " owns ", CPUrange, " and decompose it into ", numTasks, " tasks");
-              coforall tid in 0..#numTasks {
-                const myIters = computeChunk(CPUrange, tid, numTasks);
-                if (debugGPUIterator) then
-                  writeln("CPU's task ", tid, " owns ", myIters);
-                for i in myIters do
-                  yield i;
-              }
-            } else {
-              // GPU parallel iterator
-              const myIters = GPUrange;
-              if (debugGPUIterator) then
-                writeln("Subloc ", locs, " owns ", myIters);
-              /* Current Version: importing hand-coded version */
-              GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
-            }
-          }
-          execTimes(ratio) = getCurrentTime() - startTime;
-        }
-        for ratio in 0..100 by 10 {
-          writeln("CPUratio = ", ratio, ", ", execTimes(ratio));
-        }
-      }
-    }
-
-
-    // serial iterator
-    iter GPU(D,
-             GPUWrapper: func(int, int, int, void),
-             CPUratio: int = 0
-             ) {
-      if (debugGPUIterator) then writeln("GPUIterator (serial)");
-      for i in D {
+      const portions = computeSubranges(r, CPUPercent);
+      for i in createTaskAndYield(tag, r, portions(1), portions(2), GPUWrapper) {
         yield i;
       }
     }
 
+    // serial iterators (range)
     iter GPU(r:range(?),
              GPUWrapper: func(int, int, int, void),
-             CPUratio: int = 0
-             )
-    {
-     writeln("In GPU standalone: yielding ", r);
-     for i in r do
-       yield i;
-    }
+             CPUPercent: int = 0
+             ) {
+      if (debugGPUIterator) then
+        writeln("In GPUIterator (serial)");
 
-    proc computeChunk(r: range, myChunk, numChunks)
-      where r.stridable == false {
-
-      const numElems = r.length;
-      const elemsPerChunk = numElems/numChunks;
-      const mylow = r.low + elemsPerChunk*myChunk;
-      if (myChunk != numChunks - 1) {
-	    return mylow..#elemsPerChunk;
-      } else {
-	    return mylow..r.high;
-      }
+      for i in r do
+        yield i;
     }
 }
