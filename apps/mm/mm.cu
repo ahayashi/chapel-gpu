@@ -5,7 +5,7 @@
 #include <cublas_v2.h>
 
 #define VERBOSE
-#define PROF
+//#define PROF
 #define CUDA_ERROR_CHECK
 #define CudaSafeCall( err ) __cudaSafeCall( err, __FILE__, __LINE__ )
 #define CudaCheckError()    __cudaCheckError( __FILE__, __LINE__ )

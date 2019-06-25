@@ -9,7 +9,7 @@ use GPUIterator;
 /// Runtime Options
 ////////////////////////////////////////////////////////////////////////////////
 config const n = 32: int;
-config const CPUratio = 0: int;
+config const CPUPercent = 0: int;
 config const numTrials = 1: int;
 config const output = 0: int;
 config param verbose = false;
@@ -75,6 +75,7 @@ proc printLocaleInfo() {
 proc main() {
   writeln("BlackScholes: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n);
+  writeln("CPU Percent: ", CPUPercent);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
 
@@ -98,7 +99,7 @@ proc main() {
 	}
 
 	const startTime = getCurrentTime();
-	forall i in GPU(1..n, CUDAWrapper, CPUratio)  {
+	forall i in GPU(1..n, CUDAWrapper, CPUPercent)  {
       var c1 = 0.319381530: real(32);
       var c2 = -0.356563782: real(32);
       var c3 = 1.781477937: real(32);

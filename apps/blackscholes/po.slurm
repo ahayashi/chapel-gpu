@@ -16,9 +16,12 @@ export CHPL_LAUNCHER_WALLTIME=03:00:00
 
 N=536870912
 
-./bs.baseline -nl 1 --n=$N --numTrials=10
-./bs.gpu -nl 1 --n=$N --numTrials=10
-for ratio in 0 25 50 75 100;
+for i in 1 2 3 4 5;
 do
-    ./bs.hybrid -nl 1 --n=$N --numTrials=10 --CPUratio=$ratio
+    ./bs.baseline -nl 1 --n=$N --numTrials=10
+    ./bs.gpu -nl 1 --n=$N --numTrials=10
+    for ratio in 0 25 50 75 100;
+    do
+	./bs.hybrid -nl 1 --n=$N --numTrials=10 --CPUPercent=$ratio
+    done
 done

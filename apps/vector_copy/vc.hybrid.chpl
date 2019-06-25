@@ -9,7 +9,7 @@ use GPUIterator;
 /// Runtime Options
 ////////////////////////////////////////////////////////////////////////////////
 config const n = 32: int;
-config const CPUratio = 0: int;
+config const CPUPercent = 0: int;
 config const numTrials = 1: int;
 config const output = 0: int;
 config param verbose = false;
@@ -52,7 +52,7 @@ proc printResults(execTimes) {
 
 proc printLocaleInfo() {
   for loc in Locales {
-    writeln(loc, " info: ");
+    writeln(loc, " info: ", localeModelHasSublocales);
     const numSublocs = loc.getChildCount();
     if (numSublocs != 0) {
       for sublocID in 0..#numSublocs {
@@ -74,7 +74,7 @@ proc printLocaleInfo() {
 proc main() {
   writeln("Vector Copy: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n);
-  writeln("CPU ratio: ", CPUratio);
+  writeln("CPU Percent: ", CPUPercent);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
 
@@ -88,7 +88,7 @@ proc main() {
 	}
 
 	const startTime = getCurrentTime();
-	forall i in GPU(1..n, CUDAWrapper, CPUratio) {
+	forall i in GPU(1..n, CUDAWrapper, CPUPercent) {
       A(i) = B(i);
 	}
 	execTimes(trial) = getCurrentTime() - startTime;

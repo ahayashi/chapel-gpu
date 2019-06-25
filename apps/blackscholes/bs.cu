@@ -4,6 +4,7 @@
 #include <assert.h>
 #define CUDA_ERROR_CHECK
 #define CudaSafeCall( err ) __cudaSafeCall( err, __FILE__, __LINE__ )
+#define CudaCheckError()    __cudaCheckError( __FILE__, __LINE__ )
 
 inline void __cudaSafeCall( cudaError err, const char *file, const int line )
 {
@@ -18,6 +19,29 @@ inline void __cudaSafeCall( cudaError err, const char *file, const int line )
 
     return;
 }
+
+inline void __cudaCheckError( const char *file, const int line )
+{
+#ifdef CUDA_ERROR_CHECK
+  cudaError err = cudaGetLastError();
+  if ( cudaSuccess != err )
+    {
+      fprintf( stderr, "cudaCheckError() failed at %s:%i : %s\n",
+	       file, line, cudaGetErrorString( err ) );
+      exit( -1 );
+    }
+
+  // More careful checking. However, this will affect performance.
+  // Comment away if needed.
+  err = cudaDeviceSynchronize();
+  if( cudaSuccess != err )
+    {
+      fprintf( stderr, "cudaCheckError() with sync failed at %s:%i : %s\n",
+	       file, line, cudaGetErrorString( err ) );
+      exit( -1 );
+    }
+}
+#endif
 
 #define S_LOWER_LIMIT 10.0f
 #define S_UPPER_LIMIT 100.0f
@@ -118,7 +142,7 @@ extern "C" {
 	    CudaSafeCall(cudaMemcpy(drand, rand + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
 	    
 	    bs<<<ceil(((float)GPUN)/1024), 1024>>>(drand, dput, dcall, GPUN);
-	    
+	    CudaCheckError();	    
 	    CudaSafeCall(cudaDeviceSynchronize());
 	    CudaSafeCall(cudaMemcpy(put + start, dput, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
 	    CudaSafeCall(cudaMemcpy(call + start, dcall, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));

@@ -14,17 +14,28 @@ export CHPL_LAUNCHER=slurm-gasnetrun_ibv
 export GASNET_PHYSMEM_MAX=1G
 export CHPL_LAUNCHER_WALLTIME=02:00:00
 
-./mm.baseline -nl 1 --n=1024 --numTrials=10
-./mm.gpu -nl 1 --n=1024 --tiled=0 --numTrials=10
-
-for ratio in 0 25 50 75 100;
+for i in 1 2 3 4 5;
 do
-    ./mm.hybrid -nl 1 --n=1024 --tiled=0 --numTrials=10 --CPUratio=$ratio
-done
 
-./mm.gpu -nl 1 --n=1024 --tiled=1 --numTrials=10
+    ./mm.baseline -nl 1 --n=2048 --numTrials=10
+    ./mm.gpu -nl 1 --n=2048 --tiled=0 --numTrials=10
 
-for ratio in 0 25 50 75 100;
-do
-    ./mm.hybrid -nl 1 --n=1024 --tiled=1 --numTrials=10 --CPUratio=$ratio
+    for ratio in 0 25 50 75 100;
+    do
+	./mm.hybrid -nl 1 --n=2048 --tiled=0 --numTrials=10 --CPUPercent=$ratio
+    done
+
+    ./mm.gpu -nl 1 --n=2048 --tiled=1 --numTrials=10
+
+    for ratio in 0 25 50 75 100;
+    do
+	./mm.hybrid -nl 1 --n=2048 --tiled=1 --numTrials=10 --CPUPercent=$ratio
+    done
+
+    ./mm.gpu -nl 1 --n=2048 --tiled=2 --numTrials=10
+
+    for ratio in 0 25 50 75 100;
+    do
+	./mm.hybrid -nl 1 --n=2048 --tiled=2 --numTrials=10 --CPUPercent=$ratio
+    done
 done
