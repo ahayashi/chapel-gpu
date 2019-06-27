@@ -3,12 +3,12 @@ CHPLFLAGS=--fast
 CHPLMODULE=../../src
 
 # For CUDA
-#CUDALIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda
-CUDALIBSFLAGS=-L/opt/apps/software/Compiler/GCC/6.4.0/CUDA/8.0.61/lib -lcudart -lcublas
+CUDALIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda
+#CUDALIBSFLAGS=-L/opt/apps/software/Compiler/GCC/6.4.0/CUDA/8.0.61/lib -lcudart -lcublas
 NVCCFLAGS=-O3 -arch sm_37 -std=c++11
 
 # For OpenCL
-OPCLLIBSFLAGS=-framework OpenCL
+OCLLIBSFLAGS=-framework OpenCL
 OCLFLAGS=-framework OpenCL
 
 all: baseline cudagpu cudahybrid cudahybrid.dist
