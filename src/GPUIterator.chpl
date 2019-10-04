@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2019, Rice University
  * Copyright (c) 2019, Georgia Institute of Technology
  *
@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-  
+
 module GPUIterator {
     use Time;
     use BlockDist;
 
-    config param debugGPUIterator = true;
+    config param debugGPUIterator = false;
 
     // Utility functions
     inline proc computeSubranges(whole: range(?),
@@ -212,7 +212,7 @@ module GPUIterator {
           const r = subdom.dim(1);
           const portions = computeSubranges(r, CPUPercent);
 
-          for i in createTaskAndYield(tag, r, portions(1), portions(2), GPUWrapper) {
+          for i in createTaskAndYield(tag, 0..0, portions(1), portions(2), GPUWrapper) {
             yield i;
           }
         }
