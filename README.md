@@ -117,9 +117,9 @@ $ gcc -O3 -c -std=c++11 -c vc.opencl.c -o vc.gpu.o
 Then, compile the Chapel program (```vc.hybrid.chpl```) with the object file. You will also required to give the path to the GPUIterator module with the ```-M``` option unless it is in the module search path [$CHPL_MODULE_PATH](https://chapel-lang.org/docs/master/technotes/module_search.html):
 ```bash
 // CUDA
-$ CHPL_LOCALE_MODEL=gpu chpl --fast -M $CHPL_GPU_HOME/chapel-gpu/src vc.hybrid.chpl vc.gpu.o -lcudart -lcuda
+$ chpl --fast -M $CHPL_GPU_HOME/chapel-gpu/src vc.hybrid.chpl vc.gpu.o -lcudart -lcuda
 // OpenCL
-$ CHPL_LOCALE_MODEL=gpu chpl --fast -M $CHPL_GPU_HOME/chapel-gpu/src vc.hybrid.chpl vc.gpu.o -lOpenCL
+$ chpl --fast -M $CHPL_GPU_HOME/chapel-gpu/src vc.hybrid.chpl vc.gpu.o -lOpenCL
 ```
 
 Depending on your setting, it may be required to give the ```-L``` option to let the Chapel compiler know the location of CUDA/OpenCL libraries (e.g., ```-L/usr/local/cuda/lib64```).
