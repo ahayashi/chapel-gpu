@@ -160,7 +160,7 @@ module GPUIterator {
         for subdom in D.localSubdomains() {
           const r = subdom.dim(1);
           const portions = computeSubranges(r, CPUPercent);
-          for i in createTaskAndYield(tag, r, portions(1), portions(2), GPUWrapper) {
+          for i in createTaskAndYield(tag, 0..0, portions(1), portions(2), GPUWrapper) {
             yield i;
           }
         }
