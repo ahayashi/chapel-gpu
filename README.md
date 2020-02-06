@@ -184,6 +184,9 @@ Again, the code above is pretty much the same as typical CUDA programs. Thanks t
 
 Please note that the above example does data transfer optimizations where there is no host-to-device transfer of  ```A``` or device-to-host transfer of ```B```. Also, it only allocates and transfers a subarray of ```A``` and ```B``` and invokes the kernel with the subspace since they are safe to do so in this example. However, please be careful about how to optimize your GPU program because the legality of doing so depends on a kernel. For more details, please see the applications in the ```app``` directory.
 
+### Using Other Accelerators
+Techinically, the GPUIterator can invoke other accelerators' programs (e.g., FPGAs) as long as programmers prepare them in accordance with the instruction above. No modication to the Chapel part is required.
+
 ## License
 The GPUIterator module is developed and released under the terms of the Apache 2.0 license. See the LICENSE file in this directory for details.
 
