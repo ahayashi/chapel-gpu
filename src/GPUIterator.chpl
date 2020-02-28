@@ -18,9 +18,16 @@
 module GPUIterator {
     use Time;
     use BlockDist;
+    use GPUAPI;
 
     config param debugGPUIterator = false;
-    config const nGPUs = 1;
+    config const nGPUs = getNumDevices();
+
+    proc getNumDevices() {
+       var count: int;
+       GetDeviceCount(count);
+       return count;
+    }
 
     // Utility functions
     inline proc computeSubranges(whole: range(?),
@@ -56,10 +63,25 @@ module GPUIterator {
       where tag == iterKind.leader {
 
       if (CPUrange.size == 0) {
-        const myIters = GPUrange;
-        if (debugGPUIterator) then
-          writeln("GPU portion: ", myIters);
-        GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+        select nGPUs {
+          when 0 {
+            writeln("Warning: No GPUs found");
+          }
+          when 1 {
+            const myIters = GPUrange;
+            if (debugGPUIterator) then
+              writeln("GPU portion: ", myIters);
+            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+          }
+          otherwise {
+            coforall tid in 0..#nGPUs {
+              const myIters = computeChunk(GPUrange, tid, nGPUs);
+              writeln("GPU", tid, ":", myIters);
+              SetDevice(tid);
+              GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
+            }
+          }
+        }
       } else if (GPUrange.size == 0) {
         const numTasks = here.maxTaskPar;
         if (debugGPUIterator) then
@@ -82,10 +104,25 @@ module GPUIterator {
           }
           // GPU portion
           {
-            const myIters = GPUrange;
-            if (debugGPUIterator) then
-              writeln("GPU portion: ", myIters);
-            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length, 0);
+            select nGPUs {
+              when 0 {
+                writeln("Warning: No GPUs found");
+              }
+              when 1 {
+                const myIters = GPUrange;
+                if (debugGPUIterator) then
+                  writeln("GPU portion: ", myIters);
+                GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+              }
+              otherwise {
+                coforall tid in 0..#nGPUs {
+                  const myIters = computeChunk(GPUrange, tid, nGPUs);
+                  writeln("GPU", tid, ":", myIters);
+                  SetDevice(tid);
+                  GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
+                }
+              }
+            }
           }
         }
       }
@@ -99,13 +136,24 @@ module GPUIterator {
       where tag == iterKind.standalone {
 
       if (CPUrange.size == 0) {
-        const numGPUs = nGPUs;
-        if (debugGPUIterator) then
-          writeln("GPU portion: ", GPUrange, " by ", numGPUs, " GPUs");
-        coforall tid in 0..#numGPUs {
-          const myIters = computeChunk(GPUrange, tid, numGPUs);
-          writeln("GPU", tid, ":", myIters);
-          GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length, tid);
+        select nGPUs {
+          when 0 {
+            writeln("Warning: No GPUs found");
+          }
+          when 1 {
+            const myIters = GPUrange;
+            if (debugGPUIterator) then
+              writeln("GPU portion: ", myIters);
+            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+          }
+          otherwise {
+            coforall tid in 0..#nGPUs {
+              const myIters = computeChunk(GPUrange, tid, nGPUs);
+              writeln("GPU", tid, ":", myIters);
+              SetDevice(tid);
+              GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
+            }
+          }
         }
       } else if (GPUrange.size == 0) {
         const numTasks = here.maxTaskPar;
@@ -131,12 +179,24 @@ module GPUIterator {
           }
           // GPU portion
           {
-            const numGPUs = nGPUs;
-            if (debugGPUIterator) then
-              writeln("GPU portion: ", GPUrange, " by ", numGPUs, " GPUs");
-            coforall tid in 0..#numGPUs {
-              const myIters = computeChunk(GPUrange, tid, numGPUs);
-              GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length, tid);
+            select nGPUs {
+              when 0 {
+                writeln("Warning: No GPUs found");
+              }
+              when 1 {
+                const myIters = GPUrange;
+                if (debugGPUIterator) then
+                  writeln("GPU portion: ", myIters);
+                GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+              }
+              otherwise {
+                coforall tid in 0..#nGPUs {
+                  const myIters = computeChunk(GPUrange, tid, nGPUs);
+                  writeln("GPU", tid, ":", myIters);
+                  SetDevice(tid);
+                  GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
+                }
+              }
             }
           }
         }
