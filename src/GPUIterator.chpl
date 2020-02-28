@@ -20,6 +20,7 @@ module GPUIterator {
     use BlockDist;
 
     config param debugGPUIterator = false;
+    config const nGPUs = 1;
 
     // Utility functions
     inline proc computeSubranges(whole: range(?),
@@ -51,7 +52,7 @@ module GPUIterator {
                             r: range(?),
                             CPUrange: range(?),
                             GPUrange: range(?),
-                            GPUWrapper: func(int, int, int, void))
+                            GPUWrapper: func(int, int, int, int, void))
       where tag == iterKind.leader {
 
       if (CPUrange.size == 0) {
@@ -84,7 +85,7 @@ module GPUIterator {
             const myIters = GPUrange;
             if (debugGPUIterator) then
               writeln("GPU portion: ", myIters);
-            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length, 0);
           }
         }
       }
@@ -94,14 +95,18 @@ module GPUIterator {
                             r: range(?),
                             CPUrange: range(?),
                             GPUrange: range(?),
-                            GPUWrapper: func(int, int, int, void))
+                            GPUWrapper: func(int, int, int, int, void))
       where tag == iterKind.standalone {
 
       if (CPUrange.size == 0) {
-        const myIters = GPUrange;
+        const numGPUs = nGPUs;
         if (debugGPUIterator) then
-          writeln("GPU portion: ", myIters);
-        GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+          writeln("GPU portion: ", GPUrange, " by ", numGPUs, " GPUs");
+        coforall tid in 0..#numGPUs {
+          const myIters = computeChunk(GPUrange, tid, numGPUs);
+          writeln("GPU", tid, ":", myIters);
+          GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length, tid);
+        }
       } else if (GPUrange.size == 0) {
         const numTasks = here.maxTaskPar;
         if (debugGPUIterator) then
@@ -126,10 +131,13 @@ module GPUIterator {
           }
           // GPU portion
           {
-            const myIters = GPUrange;
+            const numGPUs = nGPUs;
             if (debugGPUIterator) then
-              writeln("GPU portion: ", myIters);
-            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+              writeln("GPU portion: ", GPUrange, " by ", numGPUs, " GPUs");
+            coforall tid in 0..#numGPUs {
+              const myIters = computeChunk(GPUrange, tid, numGPUs);
+              GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length, tid);
+            }
           }
         }
       }
@@ -138,7 +146,7 @@ module GPUIterator {
     iter createTaskAndYield(r: range(?),
                             CPUrange: range(?),
                             GPUrange: range(?),
-                            GPUWrapper: func(int, int, int, void)) {
+                            GPUWrapper: func(int, int, int, int, void)) {
       halt("This is dummy");
     }
 
@@ -170,7 +178,7 @@ module GPUIterator {
     // follower (block distributed domains)
     iter GPU(param tag: iterKind,
              D: domain,
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper: func(int, int, int, int, void),
              CPUPercent: int = 0,
              followThis
              )
@@ -194,7 +202,7 @@ module GPUIterator {
     // standalone (block distributed domains)
     iter GPU(param tag: iterKind,
              D: domain,
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper: func(int, int, int, int, void),
              CPUPercent: int = 0
              )
       where tag == iterKind.standalone
@@ -221,7 +229,7 @@ module GPUIterator {
 
     // serial iterator (block distributed domains)
     iter GPU(D: domain,
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper: func(int, int, int, int, void),
              CPUPercent: int = 0
              )
       where isRectangularDom(D)
@@ -238,7 +246,7 @@ module GPUIterator {
     // leader (range)
     iter GPU(param tag: iterKind,
              r: range(?),
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper: func(int, int, int, int, void),
              CPUPercent: int = 0
              )
       where tag == iterKind.leader {
@@ -255,7 +263,7 @@ module GPUIterator {
     // follower
     iter GPU(param tag: iterKind,
              r:range(?),
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper: func(int, int, int, int, void),
              CPUPercent: int = 0,
              followThis
              )
