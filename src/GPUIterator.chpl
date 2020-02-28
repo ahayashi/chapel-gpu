@@ -77,7 +77,7 @@ module GPUIterator {
             coforall tid in 0..#nGPUs {
               const myIters = computeChunk(GPUrange, tid, nGPUs);
               if (debugGPUIterator) then
-                writeln("[DEBUG GPUITERATOR] GPU", tid, " portation", ":", myIters, " CPU portion is ZERO");
+                writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters, " CPU portion is ZERO");
               SetDevice(tid);
               GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
             }
@@ -119,7 +119,7 @@ module GPUIterator {
                 coforall tid in 0..#nGPUs {
                   const myIters = computeChunk(GPUrange, tid, nGPUs);
                   if (debugGPUIterator) then
-                    writeln("[DEBUG GPUITERATOR] GPU", tid, " portation", ":", myIters);
+                    writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters);
                   SetDevice(tid);
                   GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
                 }
@@ -152,7 +152,7 @@ module GPUIterator {
             coforall tid in 0..#nGPUs {
               const myIters = computeChunk(GPUrange, tid, nGPUs);
               if (debugGPUIterator) then
-                writeln("[DEBUG GPUITERATOR] GPU", tid, " portation", ":", myIters, " CPU portion is ZERO");
+                writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters, " CPU portion is ZERO");
               SetDevice(tid);
               GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
             }
@@ -196,7 +196,7 @@ module GPUIterator {
                 coforall tid in 0..#nGPUs {
                   const myIters = computeChunk(GPUrange, tid, nGPUs);
                   if (debugGPUIterator) then
-                    writeln("[DEBUG GPUITERATOR] GPU", tid, " portation", ":", myIters);
+                    writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters);
                   SetDevice(tid);
                   GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
                 }
