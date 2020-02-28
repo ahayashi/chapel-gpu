@@ -17,5 +17,7 @@
 
 module GPUAPI {
     extern proc GetDeviceCount(ref count: int);
-    extern proc SetDevice(device: int);   
+    extern proc SetDevice(device: int);
+
+
 }
