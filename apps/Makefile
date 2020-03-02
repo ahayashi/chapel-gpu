@@ -1,9 +1,10 @@
 # Flags for the Chapel compiler
-CHPLFLAGS=--fast
+CHPLFLAGS=--fast -sverbose -sdebugGPUIterator
 CHPLMODULE=../../src
 
 # For CUDA
-CUDALIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda
+#CUDALIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda
+CUDALIBSFLAGS=-L/sw/summit/cuda/10.1.168/lib64 -lcudart -lcuda
 #CUDALIBSFLAGS=-L/opt/apps/software/Compiler/GCC/6.4.0/CUDA/8.0.61/lib -lcudart -lcublas
 NVCCFLAGS=-O3 -arch sm_37 -std=c++11
 
@@ -30,7 +31,7 @@ baseline: $(TARGET).baseline.chpl
 
 .PHONY: blas
 blas:
-	chpl $(CHPLFLAGS) $(TARGET).blas.chpl 
+	chpl $(CHPLFLAGS) $(TARGET).blas.chpl
 
 .PHONY: cudagpu
 cudagpu: $(TARGET).o $(TARGET).gpu.chpl
@@ -43,6 +44,10 @@ cudahybrid: $(TARGET).o $(TARGET).hybrid.chpl
 .PHONY: cudahybrid.dist
 cudahybrid.dist: $(TARGET).o $(TARGET).hybrid.dist.chpl
 	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(TARGET).hybrid.dist.chpl $(CUDALIBSFLAGS)
+
+.PHONY: cudahybrid.dist.explicit
+cudahybrid.dist.explicit: $(TARGET).o $(TARGET).hybrid.dist.chpl
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(CHPLMODULE)/GPUAPI.o $(TARGET).hybrid.dist.explicit.chpl $(CUDALIBSFLAGS)
 
 .PHONY: openclgpu
 oclgpu: $(TARGET).opencl.o $(TARGET).gpu.chpl
