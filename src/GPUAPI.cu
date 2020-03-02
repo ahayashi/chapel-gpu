@@ -59,7 +59,6 @@ inline void call_gpu_functor(unsigned niters, unsigned tile_size,
 
     const unsigned block_size = tile_size;
     const unsigned nblocks = (niters + block_size - 1) / block_size;
-
     driver_kernel<<<nblocks, block_size, 0, stream>>>(functor, niters);
 }
 
@@ -67,6 +66,10 @@ extern "C" {
 
   void GetDeviceCount(int *count) {
     CudaSafeCall(cudaGetDeviceCount(count));
+  }
+
+  void GetDevice(int *device) {
+    CudaSafeCall(cudaGetDevice(device));
   }
 
   void SetDevice(int device) {
@@ -99,8 +102,10 @@ extern "C" {
       }
   }
 
-  void Launch(int *dA, int *dB, int N) {
-    call_gpu_functor(N, N, NULL, [=] __device__ (int i) { dA[i] = dB[i]; });
+  void Launch(float *dA, float *dB, int N) {
+    printf("Launching kernel\n");
+    call_gpu_functor(N, 1024, NULL, [=] __device__ (int i) { dA[i] = dB[i]; });
     cudaDeviceSynchronize();
+    CudaCheckError();
   }
 }

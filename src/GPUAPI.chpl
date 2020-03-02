@@ -17,6 +17,7 @@
 
 module GPUAPI {
     extern proc GetDeviceCount(ref count: int);
+    extern proc GetDevice(ref device: int);
     extern proc SetDevice(device: int);
 
     extern proc ProfilerStart();
