@@ -19,5 +19,11 @@ module GPUAPI {
     extern proc GetDeviceCount(ref count: int);
     extern proc SetDevice(device: int);
 
+    extern proc ProfilerStart();
+    extern proc ProfilerStop();
+
+    extern proc Malloc(ref devPtr: c_void_ptr, size: size_t);
+    extern proc Memcpy(dst: c_void_ptr, src: c_void_ptr, count: size_t, kind: int);
+    extern proc Launch(arg1: c_void_ptr, arg2: c_void_ptr, size: size_t);
 
 }

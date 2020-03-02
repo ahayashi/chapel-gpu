@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <assert.h>
+#include <cuda_profiler_api.h>
 
 #define CudaSafeCall( err ) __cudaSafeCall( err, __FILE__, __LINE__ )
 #define CudaCheckError()    __cudaCheckError( __FILE__, __LINE__ )
@@ -43,13 +44,63 @@ inline void __cudaCheckError( const char *file, const int line )
 #endif
 }
 
+template<typename functor_type>
+static __global__ void driver_kernel(functor_type functor, unsigned niters) {
+    const int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (tid < niters) {
+        functor(tid);
+    }
+}
+
+template <typename functor_type>
+inline void call_gpu_functor(unsigned niters, unsigned tile_size,
+        cudaStream_t stream, functor_type functor) {
+    //functor_type *actual = (functor_type *)functor;
+
+    const unsigned block_size = tile_size;
+    const unsigned nblocks = (niters + block_size - 1) / block_size;
+
+    driver_kernel<<<nblocks, block_size, 0, stream>>>(functor, niters);
+}
+
 extern "C" {
 
   void GetDeviceCount(int *count) {
     CudaSafeCall(cudaGetDeviceCount(count));
   }
-  
+
   void SetDevice(int device) {
     CudaSafeCall(cudaSetDevice(device));
+  }
+
+  void ProfilerStart() {
+    CudaSafeCall(cudaProfilerStart());
+  }
+
+  void ProfilerStop() {
+    CudaSafeCall(cudaProfilerStop());
+  }
+
+  void Malloc(void** devPtr, size_t size) {
+    CudaSafeCall(cudaMalloc(devPtr, size));
+    printf("in malloc ptr: %p\n", *devPtr);
+  }
+
+  void Memcpy(void* dst, void* src, size_t count, int kind) {
+      switch (kind) {
+      case 0:
+          CudaSafeCall(cudaMemcpy(dst, src, count, cudaMemcpyHostToDevice));
+          break;
+      case 1:
+          CudaSafeCall(cudaMemcpy(dst, src, count, cudaMemcpyDeviceToHost));
+          break;
+      default:
+          printf("Warning\n");
+      }
+  }
+
+  void Launch(int *dA, int *dB, int N) {
+    call_gpu_functor(N, N, NULL, [=] __device__ (int i) { dA[i] = dB[i]; });
+    cudaDeviceSynchronize();
   }
 }
