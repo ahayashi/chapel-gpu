@@ -1,12 +1,13 @@
 # Flags for the Chapel compiler
 CHPLFLAGS=--fast -sverbose -sdebugGPUIterator
 CHPLMODULE=../../src
+GPUAPIFLAGS=$(CHPLMODULE)/GPUAPI.h GPUAPI.o
 
 # For CUDA
-#CUDALIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda
-CUDALIBSFLAGS=-L/sw/summit/cuda/10.1.168/lib64 -lcudart -lcuda
+CUDALIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda
+#CUDALIBSFLAGS=-L/sw/summit/cuda/10.1.168/lib64 -lcudart -lcuda
 #CUDALIBSFLAGS=-L/opt/apps/software/Compiler/GCC/6.4.0/CUDA/8.0.61/lib -lcudart -lcublas
-NVCCFLAGS=-O3 -arch sm_37 -std=c++11
+NVCCFLAGS=-O3 -arch sm_37 -std=c++11 --extended-lambda
 
 # For OpenCL
 OCLLIBSFLAGS=-framework OpenCL
@@ -20,6 +21,9 @@ HIPLIBSFLAGS=-L$(ROCM_HOME)/lib -lhip_hcc
 all: baseline cudagpu cudahybrid cudahybrid.dist
 
 $(TARGET).o: $(TARGET).cu
+	nvcc $(NVCCFLAGS) -c $^
+
+GPUAPI.o: $(CHPLMODULE)/GPUAPI.cu
 	nvcc $(NVCCFLAGS) -c $^
 
 $(TARGET).opencl.o: $(TARGET).opencl.c
@@ -39,15 +43,18 @@ cudagpu: $(TARGET).o $(TARGET).gpu.chpl
 
 .PHONY: cudahybrid
 cudahybrid: $(TARGET).o $(TARGET).hybrid.chpl
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(TARGET).hybrid.chpl $(CUDALIBSFLAGS)
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(GPUAPIFLAGS) $(TARGET).hybrid.chpl $(CUDALIBSFLAGS)
 
 .PHONY: cudahybrid.dist
 cudahybrid.dist: $(TARGET).o $(TARGET).hybrid.dist.chpl
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(TARGET).hybrid.dist.chpl $(CUDALIBSFLAGS)
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.chpl $(CUDALIBSFLAGS)
 
 .PHONY: cudahybrid.dist.explicit
-cudahybrid.dist.explicit: $(TARGET).o $(TARGET).hybrid.dist.chpl
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(CHPLMODULE)/GPUAPI.o $(TARGET).hybrid.dist.explicit.chpl $(CUDALIBSFLAGS)
+cudahybrid.dist.explicit: $(TARGET).kernel.cu $(TARGET).hybrid.dist.explicit.chpl
+	nvcc $(NVCCFLAGS) -DUSE_LAMBDA -c $(TARGET).kernel.cu -o $(TARGET).lambda.o
+	nvcc $(NVCCFLAGS)              -c $(TARGET).kernel.cu -o $(TARGET).kernel.o
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).kernel.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.explicit.chpl $(CUDALIBSFLAGS) -o $(TARGET).hybrid.dist.explicit.kernel
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).lambda.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.explicit.chpl $(CUDALIBSFLAGS) -o $(TARGET).hybrid.dist.explicit.lambda
 
 .PHONY: openclgpu
 oclgpu: $(TARGET).opencl.o $(TARGET).gpu.chpl
@@ -71,4 +78,4 @@ hiphybrid: $(TARGET).cu $(TARGET).hybrid.chpl
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).hybrid.dist $(TARGET).o *_real
+	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).hybrid.dist $(TARGET).hybrid.dist.explicit.kernel $(TARGET).hybrid.dist.explicit.lambda $(TARGET).o *_real
