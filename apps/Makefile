@@ -50,7 +50,7 @@ cudahybrid.dist: $(TARGET).o $(TARGET).hybrid.dist.chpl
 	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.chpl $(CUDALIBSFLAGS)
 
 .PHONY: cudahybrid.dist.explicit
-cudahybrid.dist.explicit: $(TARGET).kernel.cu $(TARGET).hybrid.dist.explicit.chpl
+cudahybrid.dist.explicit: GPUAPI.o $(TARGET).kernel.cu $(TARGET).hybrid.dist.explicit.chpl
 	nvcc $(NVCCFLAGS) -DUSE_LAMBDA -c $(TARGET).kernel.cu -o $(TARGET).lambda.o
 	nvcc $(NVCCFLAGS)              -c $(TARGET).kernel.cu -o $(TARGET).kernel.o
 	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).kernel.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.explicit.chpl $(CUDALIBSFLAGS) -o $(TARGET).hybrid.dist.explicit.kernel
