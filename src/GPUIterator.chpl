@@ -24,7 +24,7 @@ module GPUIterator {
     config const nGPUs = getNumDevices();
 
     proc getNumDevices() {
-       var count: int;
+       var count: int(32);
        GetDeviceCount(count);
        return count;
     }
@@ -78,7 +78,7 @@ module GPUIterator {
               const myIters = computeChunk(GPUrange, tid, nGPUs);
               if (debugGPUIterator) then
                 writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters, " CPU portion is ZERO");
-              SetDevice(tid);
+              SetDevice(tid:int(32));
               GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
             }
           }
@@ -120,7 +120,7 @@ module GPUIterator {
                   const myIters = computeChunk(GPUrange, tid, nGPUs);
                   if (debugGPUIterator) then
                     writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters);
-                  SetDevice(tid);
+                  SetDevice(tid:int(32));
                   GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
                 }
               }
@@ -153,7 +153,7 @@ module GPUIterator {
               const myIters = computeChunk(GPUrange, tid, nGPUs);
               if (debugGPUIterator) then
                 writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters, " CPU portion is ZERO");
-              SetDevice(tid);
+              SetDevice(tid:int(32));
               GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
             }
           }
@@ -197,7 +197,7 @@ module GPUIterator {
                   const myIters = computeChunk(GPUrange, tid, nGPUs);
                   if (debugGPUIterator) then
                     writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters);
-                  SetDevice(tid);
+                  SetDevice(tid:int(32));
                   GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
                 }
               }
