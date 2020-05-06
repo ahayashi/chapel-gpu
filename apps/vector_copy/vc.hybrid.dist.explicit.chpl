@@ -4,6 +4,9 @@ use Time;
 /// GPUIterator
 ////////////////////////////////////////////////////////////////////////////////
 use GPUIterator;
+use GPUAPI;
+use BlockDist;
+use SysCTypes;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -27,13 +30,13 @@ var B: [D] real(32);
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc vcCUDA(A: [] real(32), B: [] real(32), lo: int, hi: int, N: int);
+extern proc LaunchVC(A: c_void_ptr, B: c_void_ptr, N: size_t);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
 proc CUDAWrapper(lo: int, hi: int, N: int) {
   if (verbose) {
-    var device, count: int;
+    var device, count: int(32);
     GetDevice(device);
     GetDeviceCount(count);
 	writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, "), GPU", device, " of ", count, " @", here);
@@ -48,7 +51,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   Malloc(dA, size);
   Malloc(dB, size);
   Memcpy(dB, c_ptrTo(lB), size, 0);
-  Launch(dA, dB, size);
+  LaunchVC(dA, dB, size);
   Memcpy(c_ptrTo(lA), dA, size, 1);
   ProfilerStop();
 
