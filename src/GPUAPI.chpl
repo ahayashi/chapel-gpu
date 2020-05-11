@@ -27,7 +27,5 @@ module GPUAPI {
 
     extern proc Malloc(ref devPtr: c_void_ptr, size: size_t);
     extern proc Memcpy(dst: c_void_ptr, src: c_void_ptr, count: size_t, kind: int);
-    extern proc Launch(arg1: c_void_ptr, arg2: c_void_ptr, size: size_t);
-    extern proc LaunchStream(arg1: c_void_ptr, arg2: c_void_ptr, arg3: c_void_ptr, alpha: real(32), size: size_t);
-
+    extern proc Free(devPtr: c_void_ptr);
 }

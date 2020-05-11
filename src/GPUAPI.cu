@@ -83,4 +83,7 @@ extern "C" {
           printf("Warning\n");
       }
   }
+    void Free(void* devPtr) {
+        CudaSafeCall(cudaFree(devPtr));
+    }
 }
