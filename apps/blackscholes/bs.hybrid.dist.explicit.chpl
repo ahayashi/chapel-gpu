@@ -39,16 +39,18 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   ref lrand = rand.localSlice(lo .. hi);  
   ref lput = put.localSlice(lo .. hi);
   ref lcall = call.localSlice(lo .. hi);
-  writeln(lrand, lput, lcall);
 
   ProfilerStart();
-  var drand, dput, dcall: c_void_ptr;
+  var drand: c_void_ptr;
+  var dput: c_void_ptr;
+  var dcall: c_void_ptr;
   var size: size_t = (lrand.size:size_t * c_sizeof(lrand.eltType)) : size_t;
   Malloc(drand, size);
   Malloc(dput, size);
   Malloc(dcall, size);
   Memcpy(drand, c_ptrTo(lrand), size, 0);
-  LaunchBS(drand, dput, dcall, size);
+  LaunchBS(drand, dput, dcall, N:size_t);
+  DeviceSynchronize();
   Memcpy(c_ptrTo(lput), dput, size, 1);
   Memcpy(c_ptrTo(lcall), dcall, size, 1);
 
@@ -202,6 +204,7 @@ proc main() {
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
       writeln("call: ", call);
+      writeln("");
       writeln("put: ", put);
 	}
   }

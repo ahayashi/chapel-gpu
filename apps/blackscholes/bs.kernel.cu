@@ -62,7 +62,7 @@ __global__ void bs(float *drand, float *dput, float *dcall, int n) {
 	phiD2 = (X < zero) ? (one - y) : y; 
 		    
 	dcall[id] = S * phiD1 - KexpMinusRT * phiD2;
-	
+
 	// phiD1 = phi(-d1);
 	X = -d1;
 	absX = abs(X);
