@@ -7,7 +7,7 @@ GPUAPIFLAGS=-sdebugGPUIterator $(CHPLMODULE)/GPUAPI.h GPUAPI.o
 CUDALIBSFLAGS=-L$(CUDA_HOME)/lib64 -lcudart -lcuda
 #CUDALIBSFLAGS=-L/sw/summit/cuda/10.1.168/lib64 -lcudart -lcuda
 #CUDALIBSFLAGS=-L/opt/apps/software/Compiler/GCC/6.4.0/CUDA/8.0.61/lib -lcudart -lcublas
-NVCCFLAGS=-O3 -arch sm_37 -std=c++11 --extended-lambda
+NVCCFLAGS=-O3 -arch sm_37 -std=c++11 --extended-lambda -I$(CHPLMODULE)
 
 # For OpenCL
 OCLLIBSFLAGS=-framework OpenCL
