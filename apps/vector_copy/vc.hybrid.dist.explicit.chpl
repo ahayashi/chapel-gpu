@@ -51,7 +51,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   Malloc(dA, size);
   Malloc(dB, size);
   Memcpy(dB, c_ptrTo(lB), size, 0);
-  LaunchVC(dA, dB, size);
+  LaunchVC(dA, dB, N:size_t);
   Memcpy(c_ptrTo(lA), dA, size, 1);
   Free(dA);
   Free(dB);
