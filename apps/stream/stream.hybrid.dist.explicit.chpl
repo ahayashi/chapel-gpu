@@ -58,7 +58,8 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   Malloc(dC, size);
   Memcpy(dB, c_ptrTo(lB), size, 0);
   Memcpy(dC, c_ptrTo(lC), size, 0);
-  LaunchStream(dA, dB, dC, alpha, N:size_t);
+  LaunchStream(dA, dB, dC, alpha, N: size_t);
+  DeviceSynchronize();
   Memcpy(c_ptrTo(lA), dA, size, 1);
   ProfilerStop();
 
