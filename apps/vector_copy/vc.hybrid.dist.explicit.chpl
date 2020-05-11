@@ -53,6 +53,8 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   Memcpy(dB, c_ptrTo(lB), size, 0);
   LaunchVC(dA, dB, size);
   Memcpy(c_ptrTo(lA), dA, size, 1);
+  Free(dA);
+  Free(dB);
   ProfilerStop();
 
   //vcCUDA(lA, lB, 0, hi-lo, N);
