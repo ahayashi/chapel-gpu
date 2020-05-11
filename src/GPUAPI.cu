@@ -67,6 +67,11 @@ extern "C" {
     CudaSafeCall(cudaProfilerStop());
   }
 
+  void DeviceSynchronize() {
+    CudaCheckError();
+    CudaSafeCall(cudaDeviceSynchronize());
+  }
+
   void Malloc(void** devPtr, size_t size) {
     CudaSafeCall(cudaMalloc(devPtr, size));
   }
@@ -80,10 +85,12 @@ extern "C" {
           CudaSafeCall(cudaMemcpy(dst, src, count, cudaMemcpyDeviceToHost));
           break;
       default:
-          printf("Warning\n");
+          printf("Fatal: Wrong Memcpy kind!\n");
+          exit(1);
       }
   }
-    void Free(void* devPtr) {
-        CudaSafeCall(cudaFree(devPtr));
-    }
+    
+  void Free(void* devPtr) {
+      CudaSafeCall(cudaFree(devPtr));
+  }
 }

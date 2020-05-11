@@ -25,6 +25,8 @@ module GPUAPI {
     extern proc ProfilerStart();
     extern proc ProfilerStop();
 
+    extern proc DeviceSynchronize();
+
     extern proc Malloc(ref devPtr: c_void_ptr, size: size_t);
     extern proc Memcpy(dst: c_void_ptr, src: c_void_ptr, count: size_t, kind: int);
     extern proc Free(devPtr: c_void_ptr);
