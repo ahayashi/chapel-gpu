@@ -28,7 +28,7 @@ var call: [D] real(32);
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc bsCUDA(rand: [] real(32), put: [] real(32), call: [] real(32), lo: int, hi, N: int);
+extern proc LaunchBS(drand: c_void_ptr, dput: c_void_ptr, dcall: c_void_ptr, N: size_t);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
@@ -36,10 +36,29 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   if (verbose) {
 	writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
   }
-  ref lrand = rand.localSlice(lo .. hi);
+  ref lrand = rand.localSlice(lo .. hi);  
   ref lput = put.localSlice(lo .. hi);
   ref lcall = call.localSlice(lo .. hi);
-  bsCUDA(lrand, lput, lcall, 0, hi-lo, N);
+  writeln(lrand, lput, lcall);
+
+  ProfilerStart();
+  var drand, dput, dcall: c_void_ptr;
+  var size: size_t = (lrand.size:size_t * c_sizeof(lrand.eltType)) : size_t;
+  Malloc(drand, size);
+  Malloc(dput, size);
+  Malloc(dcall, size);
+  Memcpy(drand, c_ptrTo(lrand), size, 0);
+  LaunchBS(drand, dput, dcall, size);
+  Memcpy(c_ptrTo(lput), dput, size, 1);
+  Memcpy(c_ptrTo(lcall), dcall, size, 1);
+
+  Free(drand);
+  Free(dput);
+  Free(dcall);
+  
+  ProfilerStop();
+  
+  //  bsCUDA(lrand, lput, lcall, 0, hi-lo, N);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
