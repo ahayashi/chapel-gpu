@@ -1,7 +1,7 @@
 # Flags for the Chapel compiler
 CHPLFLAGS=--fast -sverbose
 CHPLMODULE=../../src
-GPUAPIFLAGS=-sdebugGPUIterator $(CHPLMODULE)/GPUAPI.h GPUAPI.o
+GPUAPIFLAGS=-sdebugGPUAPI -sdebugGPUIterator $(CHPLMODULE)/GPUAPI.h GPUAPI.o
 
 # For CUDA
 CUDALIBSFLAGS=-L$(CUDA_HOME)/lib64 -lcudart -lcuda
@@ -55,6 +55,14 @@ cudahybrid.dist.explicit: GPUAPI.o $(TARGET).kernel.cu $(TARGET).hybrid.dist.exp
 	nvcc $(NVCCFLAGS)              -c $(TARGET).kernel.cu -o $(TARGET).kernel.o
 	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).kernel.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.explicit.chpl $(CUDALIBSFLAGS) -o $(TARGET).hybrid.dist.explicit.kernel
 	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).lambda.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.explicit.chpl $(CUDALIBSFLAGS) -o $(TARGET).hybrid.dist.explicit.lambda
+
+.PHONY: cudahybrid.dist.explicit.mid
+cudahybrid.dist.explicit.mid: GPUAPI.o $(TARGET).kernel.cu $(TARGET).hybrid.dist.explicit.mid.chpl
+	nvcc $(NVCCFLAGS) -DUSE_LAMBDA -c $(TARGET).kernel.cu -o $(TARGET).lambda.o
+	nvcc $(NVCCFLAGS)              -c $(TARGET).kernel.cu -o $(TARGET).kernel.o
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).kernel.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.explicit.mid.chpl $(CUDALIBSFLAGS) -o $(TARGET).hybrid.dist.explicit.mid.kernel
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).lambda.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.explicit.mid.chpl $(CUDALIBSFLAGS) -o $(TARGET).hybrid.dist.explicit.mid.lambda
+
 
 .PHONY: openclgpu
 oclgpu: $(TARGET).opencl.o $(TARGET).gpu.chpl
