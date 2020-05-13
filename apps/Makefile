@@ -4,7 +4,7 @@ CHPLMODULE=../../src
 GPUAPIFLAGS=-sdebugGPUAPI -sdebugGPUIterator $(CHPLMODULE)/GPUAPI.h GPUAPI.o
 
 # For CUDA
-CUDALIBSFLAGS=-L$(CUDA_HOME)/lib64 -lcudart -lcuda
+CUDALIBSFLAGS=-L$(CUDA_HOME)/lib64 -lcudart -lcuda -lcublas
 #CUDALIBSFLAGS=-L/sw/summit/cuda/10.1.168/lib64 -lcudart -lcuda
 #CUDALIBSFLAGS=-L/opt/apps/software/Compiler/GCC/6.4.0/CUDA/8.0.61/lib -lcudart -lcublas
 NVCCFLAGS=-O3 -arch sm_37 -std=c++11 --extended-lambda -I$(CHPLMODULE)
@@ -47,7 +47,7 @@ cudahybrid: GPUAPI.o $(TARGET).o $(TARGET).hybrid.chpl
 
 .PHONY: cudahybrid.dist
 cudahybrid.dist: GPUAPI.o $(TARGET).o $(TARGET).hybrid.dist.chpl
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.chpl $(CUDALIBSFLAGS)
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).h $(TARGET).o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.chpl $(CUDALIBSFLAGS)
 
 .PHONY: cudahybrid.dist.explicit
 cudahybrid.dist.explicit: GPUAPI.o $(TARGET).kernel.cu $(TARGET).hybrid.dist.explicit.chpl
