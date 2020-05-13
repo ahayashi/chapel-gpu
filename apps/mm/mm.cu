@@ -127,9 +127,9 @@ extern "C" {
 #ifdef PROF
 	    CudaSafeCall(cudaEventRecord(startCudaMallocEvent));
 #endif	    
-	    CudaSafeCall(cudaMalloc(&dA, sizeof(float) * N));
+	    CudaSafeCall(cudaMalloc(&dA, sizeof(float) * GPUN));
 	    CudaSafeCall(cudaMalloc(&dB, sizeof(float) * N));
-	    CudaSafeCall(cudaMalloc(&dC, sizeof(float) * N));
+	    CudaSafeCall(cudaMalloc(&dC, sizeof(float) * GPUN));
 #ifdef PROF
 	    CudaSafeCall(cudaEventRecord(endCudaMallocEvent));
 	    CudaSafeCall(cudaEventSynchronize(endCudaMallocEvent));
@@ -138,7 +138,7 @@ extern "C" {
 #ifdef PROF
 	    CudaSafeCall(cudaEventRecord(startCudaMemcpyH2DEvent));
 #endif
-	    CudaSafeCall(cudaMemcpy(dA, A, sizeof(float) * N, cudaMemcpyHostToDevice));
+	    CudaSafeCall(cudaMemcpy(dA, A+start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
 	    CudaSafeCall(cudaMemcpy(dB, B, sizeof(float) * N, cudaMemcpyHostToDevice));
 #ifdef PROF
 	    CudaSafeCall(cudaEventRecord(endCudaMemcpyH2DEvent));
@@ -149,7 +149,7 @@ extern "C" {
 	    CudaSafeCall(cudaEventRecord(startCudaKernelEvent));
 #endif
 	    if (!tiled) {
-		mm<<<ceil(((float)N)/1024), 1024>>>(dA, dB, dC, ceil(sqrt(N)), N, N);
+		mm<<<ceil(((float)GPUN)/1024), 1024>>>(dA, dB, dC, ceil(sqrt(N)), N, GPUN);
 	    } else if (tiled == 1){
 		dim3 block(32,32);
 		dim3 grid(ceil(sqrt(N)/32), ceil(sqrt(N)/32));
@@ -183,7 +183,7 @@ extern "C" {
 #ifdef PROF
 	    CudaSafeCall(cudaEventRecord(startCudaMemcpyD2HEvent));
 #endif
-	    CudaSafeCall(cudaMemcpy(C + start, dC + start, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
+	    CudaSafeCall(cudaMemcpy(C + start, dC, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
 #ifdef PROF
 	    CudaSafeCall(cudaEventRecord(endCudaMemcpyD2HEvent));
 	    CudaSafeCall(cudaEventSynchronize(endCudaMemcpyD2HEvent));

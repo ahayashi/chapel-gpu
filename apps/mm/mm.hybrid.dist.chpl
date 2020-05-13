@@ -1,0 +1,126 @@
+use Time;
+use ReplicatedDist;
+////////////////////////////////////////////////////////////////////////////////
+/// GPUIterator
+////////////////////////////////////////////////////////////////////////////////
+use GPUIterator;
+
+////////////////////////////////////////////////////////////////////////////////
+/// Runtime Options
+////////////////////////////////////////////////////////////////////////////////
+config const n = 32: int;
+config const CPUPercent = 0: int;
+config const numTrials = 1: int;
+config const tiled = 0;
+config const output = 0: int;
+config param verbose = false;
+
+////////////////////////////////////////////////////////////////////////////////
+/// Global Arrays
+////////////////////////////////////////////////////////////////////////////////
+// For now, these arrays are global so the arrays can be seen from CUDAWrapper
+// TODO: Explore the possiblity of declaring the arrays and CUDAWrapper
+//       in the main proc (e.g., by using lambdas)
+const S = {1..n, 1..n};
+const RS = S dmapped Replicated();
+var D: domain(1) dmapped Block(boundingBox = {1..n*n}) = {1..n*n};
+
+var A: [D] real(32);
+var B: [RS] real(32);
+var C: [D] real(32);
+
+////////////////////////////////////////////////////////////////////////////////
+/// C Interoperability
+////////////////////////////////////////////////////////////////////////////////
+extern proc mmCUDA(A: [] real(32), B: [] real(32), C: [] real(32), N:int, lo: int, hi: int, GPUN: int, tiled: int);
+
+// CUDAWrapper is called from GPUIterator
+// to invoke a specific CUDA program (using C interoperability)
+proc CUDAWrapper(lo: int, hi: int, N: int) {
+  if (verbose) {
+	writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
+  }
+  //if(tiled) {
+  //  assert(N/n>=32 && (N/n)%32==0, "should use multiples of 32 rows in GPU when tiled");
+  //}
+  assert(N%n == 0, "should offload full rows to GPU");
+  ref lA = A.localSlice(lo .. hi);
+  ref lC = C.localSlice(lo .. hi);
+  mmCUDA(lA, B, lC, n*n, 0, hi-lo, N, tiled);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Utility Functions
+////////////////////////////////////////////////////////////////////////////////
+proc printResults(execTimes) {
+  const totalTime = + reduce execTimes,
+	avgTime = totalTime / numTrials,
+	minTime = min reduce execTimes;
+  writeln("Execution time:");
+  writeln("  tot = ", totalTime);
+  writeln("  avg = ", avgTime);
+  writeln("  min = ", minTime);
+}
+
+proc printLocaleInfo() {
+  for loc in Locales {
+    writeln(loc, " info: ");
+    const numSublocs = loc.getChildCount();
+    if (numSublocs != 0) {
+      for sublocID in 0..#numSublocs {
+        const subloc = loc.getChild(sublocID);
+        writeln("\t Subloc: ", sublocID);
+        writeln("\t Name: ", subloc);
+        writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+      }
+    } else {
+      writeln("\t Name: ", loc);
+      writeln("\t maxTaskPar: ", loc.maxTaskPar);
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Chapel main
+////////////////////////////////////////////////////////////////////////////////
+proc main() {
+  writeln("Matrix Multiplication: CPU/GPU Execution (using GPUIterator)");
+  writeln("Size: ", n, "x", n);
+  writeln("CPU ratio: ", CPUPercent);
+  writeln("nTrials: ", numTrials);
+  writeln("tiled: ", tiled);
+  writeln("output: ", output);
+
+  printLocaleInfo();
+
+  var execTimes: [1..numTrials] real;
+  for trial in 1..numTrials {
+    coforall loc in Locales do on loc {
+      for i in 1..n {
+        for j in 1..n {
+          var e: int = (i-1)*n+(j-1)+1;
+          A(e) = (i*1.0/1000): real(32);
+          B(i, j) = (i*1.0/1000): real(32);
+          C(e) = 0: real(32);
+        }
+      }
+    }
+
+	const startTime = getCurrentTime();
+	// TODO: Consider using a 2D iterator
+	forall e in GPU(D, CUDAWrapper, CPUPercent) {
+      var i: int = (e - 1) / n + 1;
+      var j: int = (e - 1) % n + 1;
+      var sum: real(32) = C(e);
+      for k in 1..n {
+		sum += A((i-1)*n+k) * B(k, j);
+      }
+      C(e) = sum;
+	}
+	execTimes(trial) = getCurrentTime() - startTime;
+	if (output) {
+      writeln(reshape(C, {1..n, 1..n}));
+	}
+  }
+  printResults(execTimes);
+}
