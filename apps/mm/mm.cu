@@ -167,7 +167,11 @@ extern "C" {
 		long long end = getCurrentTime();
 		printf("cuBLAS prep: %lf msec\n", (float)(end-start)/1000);
 #endif
-		cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, sqrt(N), sqrt(N), sqrt(N), &alpha, dA, lda, dB, ldb, &beta, dC, ldc);
+		cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, sqrt(N), GPUN/sqrt(N), sqrt(N), &alpha, dB, ldb, dA, lda, &beta, dC, ldc);
+
+        //http://peterwittek.com/cublas-matrix-c-style.html
+        //C:mxn = A:mxk X B:kxn
+        //stat=cublasSgemm(handle,CUBLAS_OP_N,CUBLAS_OP_N,n,m,k,&a1,d_b,n,d_a,k,&bet,d_c,n);
 #ifdef PROF
 		long long end2 = getCurrentTime();
 		printf("cuBLAS finish: %lf msec\n", (float)(end2-start)/1000);
