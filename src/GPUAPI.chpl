@@ -41,10 +41,10 @@ module GPUAPI {
       var size: size_t;
       var sizeInBytes: size_t;
 
-      proc init(ref arr, h2d, d2h) {
+      proc init(ref arr) {
         // Properties
-        this.h2d = h2d;
-        this.d2h = d2h;
+        this.h2d = true;
+        this.d2h = true;
         // Low-level info
         this.devPtr = nil;
         this.hosPtr = c_ptrTo(arr);

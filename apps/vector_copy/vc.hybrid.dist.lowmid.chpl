@@ -43,11 +43,9 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   }
   ref lA = A.localSlice(lo .. hi);
   ref lB = B.localSlice(lo .. hi);
-  writeln("localSlice Size:", lA.size);
-  ProfilerStart();
-  var dA: c_void_ptr;
-  var dB: c_void_ptr;
-  var size: size_t = (lA.size * 4): size_t;
+  if (verbose) { ProfilerStart(); }
+  var dA, dB: c_void_ptr;
+  var size: size_t = (lA.size:size_t * c_sizeof(lA.eltType));
   Malloc(dA, size);
   Malloc(dB, size);
   Memcpy(dB, c_ptrTo(lB), size, 0);
@@ -56,9 +54,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   Memcpy(c_ptrTo(lA), dA, size, 1);
   Free(dA);
   Free(dB);
-  ProfilerStop();
-
-  //vcCUDA(lA, lB, 0, hi-lo, N);
+  if (verbose) { ProfilerStop(); }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

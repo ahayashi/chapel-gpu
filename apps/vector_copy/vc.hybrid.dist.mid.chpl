@@ -43,18 +43,15 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   }
   ref lA = A.localSlice(lo .. hi);
   ref lB = B.localSlice(lo .. hi);
-  writeln("localSlice Size:", lA.size);
-  ProfilerStart();
-  var dA = new GPUArray(lA, h2d=false, d2h=true);
-  var dB = new GPUArray(lB, h2d=true, d2h=false);
-  toDevice(dA, dB);
+  if (verbose) { ProfilerStart(); }
+  var dA = new GPUArray(lA);
+  var dB = new GPUArray(lB);
+  toDevice(dB);
   LaunchVC(dA.dPtr(), dB.dPtr(), N: size_t);
   DeviceSynchronize();
-  fromDevice(dA, dB);
+  fromDevice(dA);
   free(dA, dB);
-  ProfilerStop();
-
-  //vcCUDA(lA, lB, 0, hi-lo, N);
+  if (verbose) { ProfilerStop(); }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
