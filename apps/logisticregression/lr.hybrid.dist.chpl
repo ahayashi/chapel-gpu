@@ -55,11 +55,11 @@ proc CUDAWrapper1(lo: int, hi: int, N: int) {
 }
 
 proc CUDAWrapper2(lo: int, hi: int, N: int) {
-  if (verbose) {
+  //if (verbose) {
 	writeln("In CUDAWrapper2(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
-  }
+  //}
   ref lW = W.localSlice(lo .. hi);
-  lrCUDA2(X, Y, lW, Wcurr, alpha, nSamples, nFeatures, 0, hi-lo, N);
+  lrCUDA2(X, Y, lW, Wcurr, alpha, nSamples, nFeatures, lo, hi, N);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -108,20 +108,38 @@ proc main() {
 
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
-	forall i in D {
-      W(i) = 0: real(32);
-	}
-    coforall loc in Locales do on loc {
-      for i in 1..nSamples {
-        Y(i) = (i % 2): real(32);
-        for j in 1..nFeatures {
-          if (j != 0) {
-            X(i, j) = (i % 2): real(32);
-          } else {
-            X(i, j) = 1;
+    if (false) {
+      forall i in D {
+        W(i) = 0: real(32);
+      }
+      coforall loc in Locales do on loc {
+          for i in 1..nSamples {
+            Y(i) = (i % 2): real(32);
+            for j in 1..nFeatures {
+              if (j != 0) {
+                X(i, j) = (i % 2): real(32);
+              } else {
+                X(i, j) = 1;
+              }
+            }
           }
         }
+    } else {
+      forall i in D {
+        W(i) = 0: real(32);
       }
+      coforall loc in Locales do on loc {
+          for i in 1..nSamples {
+            Y(i) = i: real(32);
+            for j in 1..nFeatures {
+              if (j != 0) {
+                X(i, j) = j: real(32);
+              } else {
+                X(i, j) = j : real(32);
+              }
+            }
+          }
+        }
     }
 
     const startTime = getCurrentTime();

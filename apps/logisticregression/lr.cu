@@ -26,7 +26,7 @@ __global__ void kernel1(float *dW, float *dWcurr, int N) {
     }
 }
 
-__global__ void kernel2(float *dW, float *dWcurr, float *dX, float *dY, float alpha, int nSamples, int nFeatures, int N) {
+__global__ void kernel2(float *dW, float *dWcurr, float *dX, float *dY, float alpha, int nSamples, int nFeatures, int start, int N) {
     int id = blockIdx.x * blockDim.x + threadIdx.x;
     if (id < N) {
 	float err = 0.0;
@@ -36,9 +36,9 @@ __global__ void kernel2(float *dW, float *dWcurr, float *dX, float *dY, float al
 		arg += dWcurr[f] * dX[s * (nFeatures) + f];
 	    }
 	    float hypo = 1 / (1 + exp(-arg));
-	    err += (hypo - dY[s]) * dX[s * (nFeatures) + id];
+	    err += (hypo - dY[s]) * dX[s * (nFeatures) + start + id];
 	}
-	dW[id] = dWcurr[id] - alpha * err;
+	dW[id] = dWcurr[start + id] - alpha * err;
     }
 }
 
@@ -84,9 +84,9 @@ extern "C" {
 	    CudaSafeCall(cudaMemcpy(dY, Y, sizeof(float) * nSamples, cudaMemcpyHostToDevice));		
 	    CudaSafeCall(cudaMemcpy(dWcurr, Wcurr, sizeof(float) * nFeatures, cudaMemcpyHostToDevice));
 	    
-	    kernel2<<<ceil(((float)GPUN)/1024), 1024>>>(dW, dWcurr, dX, dY, alpha, nSamples, nFeatures, GPUN);
+	    kernel2<<<ceil(((float)GPUN)/1024), 1024>>>(dW, dWcurr, dX, dY, alpha, nSamples, nFeatures, start-1, GPUN);
 	    CudaSafeCall(cudaDeviceSynchronize());
-	    CudaSafeCall(cudaMemcpy(W + start, dW, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
+	    CudaSafeCall(cudaMemcpy(W, dW, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
 	    
 	    CudaSafeCall(cudaFree(dX));
 	    CudaSafeCall(cudaFree(dY));
