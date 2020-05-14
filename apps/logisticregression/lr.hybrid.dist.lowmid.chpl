@@ -14,8 +14,7 @@ use SysCTypes;
 config const nFeatures = 32: int;
 config const nSamples = 32: int;
 config const nIters = 32: int;
-config const CPUPercent1 = 0: int;
-config const CPUPercent2 = 0: int;
+config const CPUPercent = 0: int;
 config const numTrials = 1: int;
 config const output = 0: int;
 config param verbose = false;
@@ -49,14 +48,7 @@ extern proc LaunchLR(X: c_void_ptr, Y: c_void_ptr, W: c_void_ptr, Wcurr: c_void_
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
-proc CUDAWrapper1(lo: int, hi: int, N: int) {
-  if (verbose) {
-	writeln("In CUDAWrapper1(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
-  }
-  lrCUDA1(W, Wcurr, lo, hi, N);
-}
-
-proc CUDAWrapper2(lo: int, hi: int, N: int) {
+proc CUDAWrapper(lo: int, hi: int, N: int) {
   if (verbose) {
 	writeln("In CUDAWrapper2(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
   }
@@ -117,8 +109,7 @@ proc printLocaleInfo() {
 proc main() {
   writeln("Logistic Regression: CPU/GPU Execution (using GPUIterator)");
   writeln("nSamples :", nSamples, " nFeatures :",  nFeatures);
-  writeln("CPU Percent1: ", CPUPercent1);
-  writeln("CPU Percent2: ", CPUPercent2);
+  writeln("CPU Percent: ", CPUPercent);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
 
@@ -168,8 +159,7 @@ proc main() {
         }
       }
       const start = getCurrentTime();
-      forall i in GPU(D, CUDAWrapper2, CPUPercent2) {
-      //forall i in D {
+      forall i in GPU(D, CUDAWrapper, CPUPercent) {
 		var err = 0: real(32);
 		for s in 1..nSamples {
           var arg = 0: real(32);
