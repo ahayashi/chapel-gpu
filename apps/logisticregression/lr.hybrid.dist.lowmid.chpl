@@ -61,33 +61,23 @@ proc CUDAWrapper2(lo: int, hi: int, N: int) {
 	writeln("In CUDAWrapper2(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
   }
   ref lW = W.localSlice(lo .. hi);
-  ProfilerStart();
-  var dX: c_void_ptr;
-  var dY: c_void_ptr;
-  var dWcurr: c_void_ptr;
-  var dW: c_void_ptr;
-  writeln("X.size: ", X.size, " Y.size: ", Y.size);
+  if (verbose) { ProfilerStart(); }
+  var dX, dY, dWcurr, dW: c_void_ptr;
   Malloc(dX, X.size:size_t * c_sizeof(X.eltType));
   Malloc(dY, Y.size:size_t * c_sizeof(Y.eltType));
   Malloc(dWcurr, Wcurr.size:size_t * c_sizeof(Wcurr.eltType));
   Malloc(dW, lW.size:size_t * c_sizeof(lW.eltType));
-
   Memcpy(dX, c_ptrTo(X), X.size:size_t * c_sizeof(X.eltType), 0);
   Memcpy(dY, c_ptrTo(Y), Y.size:size_t * c_sizeof(Y.eltType), 0);
   Memcpy(dWcurr, c_ptrTo(Wcurr), Wcurr.size:size_t * c_sizeof(Wcurr.eltType), 0);
-
   LaunchLR(dX, dY, dW, dWcurr, alpha, nSamples, nFeatures, lo, hi, N);
   DeviceSynchronize();
-
   Memcpy(c_ptrTo(lW), dW, lW.size:size_t * c_sizeof(lW.eltType), 1);
-
   Free(dX);
   Free(dY);
   Free(dW);
-  Free(dWcurr);   
-
-  ProfilerStop();
-  //lrCUDA2(X, Y, lW, Wcurr, alpha, nSamples, nFeatures, lo, hi, N);
+  Free(dWcurr);
+  if (verbose) { ProfilerStop(); }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
