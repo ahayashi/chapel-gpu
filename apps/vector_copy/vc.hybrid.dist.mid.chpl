@@ -46,10 +46,10 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   if (verbose) { ProfilerStart(); }
   var dA = new GPUArray(lA);
   var dB = new GPUArray(lB);
-  toDevice(dB);
+  dB.toDevice();
   LaunchVC(dA.dPtr(), dB.dPtr(), N: size_t);
   DeviceSynchronize();
-  fromDevice(dA);
+  dA.fromDevice();
   free(dA, dB);
   if (verbose) { ProfilerStop(); }
 }
