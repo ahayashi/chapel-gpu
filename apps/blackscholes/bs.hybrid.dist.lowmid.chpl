@@ -39,12 +39,9 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   ref lrand = rand.localSlice(lo .. hi);  
   ref lput = put.localSlice(lo .. hi);
   ref lcall = call.localSlice(lo .. hi);
-
-  ProfilerStart();
-  var drand: c_void_ptr;
-  var dput: c_void_ptr;
-  var dcall: c_void_ptr;
-  var size: size_t = (lrand.size:size_t * c_sizeof(lrand.eltType)) : size_t;
+  if (verbose) { ProfilerStart(); }
+  var drand, dput, dcall: c_void_ptr;
+  var size: size_t = (lrand.size:size_t * c_sizeof(lrand.eltType));
   Malloc(drand, size);
   Malloc(dput, size);
   Malloc(dcall, size);
@@ -53,14 +50,10 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   DeviceSynchronize();
   Memcpy(c_ptrTo(lput), dput, size, 1);
   Memcpy(c_ptrTo(lcall), dcall, size, 1);
-
   Free(drand);
   Free(dput);
   Free(dcall);
-  
-  ProfilerStop();
-  
-  //  bsCUDA(lrand, lput, lcall, 0, hi-lo, N);
+  if (verbose) { ProfilerStop(); }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
