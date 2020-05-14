@@ -1,22 +1,25 @@
-# Flags for the Chapel compiler
+# Chapel
 CHPLFLAGS=--fast -sverbose
 CHPLMODULE=../../src
 GPUAPIFLAGS=-sdebugGPUAPI -sdebugGPUIterator $(CHPLMODULE)/GPUAPI.h GPUAPI.o
 
-# For CUDA
+# CUDA
+CUDA_HOME?=/usr/local/cuda
+CUDA_SM?=sm_70
 CUDALIBSFLAGS=-L$(CUDA_HOME)/lib64 -lcudart -lcuda -lcublas
-#CUDALIBSFLAGS=-L/sw/summit/cuda/10.1.168/lib64 -lcudart -lcuda
-#CUDALIBSFLAGS=-L/opt/apps/software/Compiler/GCC/6.4.0/CUDA/8.0.61/lib -lcudart -lcublas
-NVCCFLAGS=-O3 -arch sm_37 -std=c++11 --extended-lambda -I$(CHPLMODULE)
+NVCCFLAGS=-O3 -arch $(CUDA_SM) -std=c++11 --extended-lambda -I$(CHPLMODULE)
+$(info CUDA_HOME is $(CUDA_HOME))
+$(info CUDA_SM is $(CUDA_SM))
 
-# For OpenCL
-OCLLIBSFLAGS=-framework OpenCL
-OCLFLAGS=-framework OpenCL
-
-# For HIP
-ROCM_HOME=/opt/rocm
+# ROCM
+ROCM_HOME?=/opt/rocm
 HIP_HOME=$(ROCM_HOME)/hip
 HIPLIBSFLAGS=-L$(ROCM_HOME)/lib -lhip_hcc
+$(info ROCM_HOME is $(ROCM_HOME))
+
+# For OpenCL (MacOS)
+OCLLIBSFLAGS=-framework OpenCL
+OCLFLAGS=-framework OpenCL
 
 all: baseline cudagpu cudahybrid cudahybrid.dist
 
@@ -81,4 +84,4 @@ hiphybrid: $(TARGET).cu $(TARGET).hybrid.chpl
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).hybrid.dist $(TARGET).hybrid.dist.lowmid $(TARGET).hybrid.dist.mid $(TARGET).o *_real
+	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).hybrid.dist $(TARGET).hybrid.dist.lowmid $(TARGET).hybrid.dist.mid $(TARGET).o GPUAPI.o *_real
