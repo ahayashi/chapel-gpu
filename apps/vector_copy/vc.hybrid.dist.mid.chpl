@@ -112,14 +112,15 @@ proc main() {
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
       writeln(A);
-	}
-    for i in 1..n {
-      if (A(i) != B(i)) {
-        writeln("Verification Error");
-        exit();
+      for i in 1..n {
+        if (A(i) != B(i)) {
+          writeln("Verification Error");
+          exit();
+        }
       }
-    }
+      writeln("Verified");
+	}
   }
-  writeln("Verified");
+
   printResults(execTimes);
 }
