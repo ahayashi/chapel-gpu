@@ -9,7 +9,7 @@ use GPUIterator;
 /// Runtime Options
 ////////////////////////////////////////////////////////////////////////////////
 config const n = 32: int;
-config const CPUPercent = 0: int;
+config const CPUratio = 0: int;
 config const numTrials = 1: int;
 config const tiled = 0;
 config const output = 0: int;
@@ -86,7 +86,7 @@ proc printLocaleInfo() {
 proc main() {
   writeln("Matrix Multiplication: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n, "x", n);
-  writeln("CPU ratio: ", CPUPercent);
+  writeln("CPU ratio: ", CPUratio);
   writeln("nGPUs: ", nGPUs);    
   writeln("nTrials: ", numTrials);
   writeln("tiled: ", tiled);
@@ -109,7 +109,7 @@ proc main() {
 
 	const startTime = getCurrentTime();
 	// TODO: Consider using a 2D iterator
-	forall e in GPU(D, CUDAWrapper, CPUPercent) {
+	forall e in GPU(D, CUDAWrapper, CPUratio) {
       var i: int = (e - 1) / n + 1;
       var j: int = (e - 1) % n + 1;
       var sum: real(32) = C(e);
