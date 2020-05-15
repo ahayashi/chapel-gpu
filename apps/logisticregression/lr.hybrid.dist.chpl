@@ -91,6 +91,7 @@ proc main() {
   writeln("Logistic Regression: CPU/GPU Execution (using GPUIterator)");
   writeln("nSamples :", nSamples, " nFeatures :",  nFeatures);
   writeln("CPU Percent: ", CPUPercent);
+  writeln("nGPUs: ", nGPUs);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
 
@@ -119,9 +120,9 @@ proc main() {
         W(i) = 0: real(32);
       }
       coforall loc in Locales do on loc {
-          for i in 1..nSamples {
+          forall i in 1..nSamples {
             Y(i) = i: real(32);
-            for j in 1..nFeatures {
+            forall j in 1..nFeatures {
               if (j != 0) {
                 X(i, j) = j: real(32);
               } else {

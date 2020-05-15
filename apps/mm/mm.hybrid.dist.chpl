@@ -87,6 +87,7 @@ proc main() {
   writeln("Matrix Multiplication: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n, "x", n);
   writeln("CPU ratio: ", CPUPercent);
+  writeln("nGPUs: ", nGPUs);    
   writeln("nTrials: ", numTrials);
   writeln("tiled: ", tiled);
   writeln("output: ", output);
@@ -96,8 +97,8 @@ proc main() {
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
     coforall loc in Locales do on loc {
-      for i in 1..n {
-        for j in 1..n {
+      forall i in 1..n {
+        forall j in 1..n {
           var e: int = (i-1)*n+(j-1)+1;
           A(e) = (i*1.0/1000): real(32);
           B(i, j) = (i*1.0/1000): real(32);

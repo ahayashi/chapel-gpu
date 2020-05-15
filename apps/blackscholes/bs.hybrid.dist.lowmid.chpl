@@ -93,6 +93,8 @@ proc printLocaleInfo() {
 proc main() {
   writeln("BlackScholes: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n);
+  writeln("CPU ratio: ", CPUratio);
+  writeln("nGPUs: ", nGPUs);    
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
 
@@ -111,7 +113,7 @@ proc main() {
 
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
-	for i in 1..n {
+	forall i in D {
       rand(i) = (i: real(32) / n): real(32);
 	}
 
