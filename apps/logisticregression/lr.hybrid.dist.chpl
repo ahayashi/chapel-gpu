@@ -98,6 +98,7 @@ proc main() {
   printLocaleInfo();
 
   var execTimes: [1..numTrials] real;
+  var execTimes2: [1..numTrials] real;
   for trial in 1..numTrials {
     if (false) {
       forall i in D {
@@ -153,7 +154,7 @@ proc main() {
 		}
 		W(i) = Wcurr(i) - alpha * err;
       }
-      writeln(getCurrentTime() - start, " sec");
+      execTimes2(trial) = getCurrentTime() - start;
 	}
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
@@ -161,4 +162,5 @@ proc main() {
 	}
   }
   printResults(execTimes);
+  printResults(execTimes2);
 }
