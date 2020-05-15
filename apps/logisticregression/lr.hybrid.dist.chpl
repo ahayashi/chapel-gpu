@@ -46,9 +46,9 @@ extern proc lrCUDA2(X: [] real(32), Y: [] real(32), W: [] real(32), Wcurr: [] re
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
 proc CUDAWrapper(lo: int, hi: int, N: int) {
-  //if (verbose) {
+  if (verbose) {
 	writeln("In CUDAWrapper2(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
-  //}
+  }
   ref lW = W.localSlice(lo .. hi);
   lrCUDA2(X, Y, lW, Wcurr, alpha, nSamples, nFeatures, lo, hi, N);
 }
