@@ -141,7 +141,7 @@ proc main() {
       coforall loc in Locales do on loc {
           forall i in 1..nSamples {
             Y(i) = i: real(32);
-            forall j in 1..nFeatures {
+            for j in 1..nFeatures {
               if (j != 0) {
                 X(i, j) = j: real(32);
               } else {
