@@ -18,6 +18,7 @@ config const CPUratio = 0: int;
 config const numTrials = 1: int;
 config const output = 0: int;
 config param verbose = false;
+config const reduction = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Global Arrays
@@ -113,6 +114,7 @@ proc main() {
   writeln("nGPUs: ", nGPUs);  
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
+  writeln("reduction: ", reduction);
 
   printLocaleInfo();
 
@@ -165,8 +167,12 @@ proc main() {
 		var err = 0: real(32);
 		for s in 1..nSamples {
           var arg = 0: real(32);
-          for f in 1..nFeatures {
-			arg += Wcurr(f) * X(s, f);
+          if (reduction) {
+            arg = (+ reduce (Wcurr(1..nFeatures) * X(s, 1..nFeatures)));
+          } else {
+            for f in 1..nFeatures {
+              arg += Wcurr(f) * X(s, f);
+            }
           }
           var hypo = 1 / (1 + exp(-arg));
           err += (hypo - Y(s)) * X(s, i);
