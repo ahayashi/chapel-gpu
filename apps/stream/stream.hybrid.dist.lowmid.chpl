@@ -47,21 +47,24 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   ref lA = A.localSlice(lo .. hi);
   ref lB = B.localSlice(lo .. hi);
   ref lC = C.localSlice(lo .. hi);
-  writeln("localSlice Size:", lA.size);
-  ProfilerStart();
-  var dA: c_void_ptr;
-  var dB: c_void_ptr;
-  var dC: c_void_ptr;
-  var size: size_t = (lA.size * 4): size_t;
+  //writeln("localSlice Size:", lA.size);
+  if (verbose) { ProfilerStart(); }
+  var dA, dB, dC: c_void_ptr;
+  var size: size_t = (lA.size:size_t * c_sizeof(lA.eltType));
   Malloc(dA, size);
   Malloc(dB, size);
   Malloc(dC, size);
+
   Memcpy(dB, c_ptrTo(lB), size, 0);
   Memcpy(dC, c_ptrTo(lC), size, 0);
   LaunchStream(dA, dB, dC, alpha, N: size_t);
   DeviceSynchronize();
   Memcpy(c_ptrTo(lA), dA, size, 1);
-  ProfilerStop();
+
+  Free(dA);
+  Free(dB);
+  Free(dC);
+  if (verbose) { ProfilerStop(); }
 
   //streamCUDA(lA, lB, lC, alpha, 0, hi-lo, N);
 }
@@ -104,6 +107,7 @@ proc main() {
   writeln("Stream: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n);
   writeln("CPU ratio: ", CPUratio);
+  writeln("nGPUs: ", nGPUs);
   writeln("alpha: ", alpha);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
@@ -112,7 +116,7 @@ proc main() {
 
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
-	for i in 1..n {
+	forall i in D {
       B(i) = i: real(32);
       C(i) = 2*i: real(32);
 	}
