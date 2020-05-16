@@ -1,9 +1,12 @@
 use Time;
-
+use ReplicatedDist;
 ////////////////////////////////////////////////////////////////////////////////
 /// GPUIterator
 ////////////////////////////////////////////////////////////////////////////////
 use GPUIterator;
+use GPUAPI;
+use BlockDist;
+use SysCTypes;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -21,14 +24,18 @@ config param verbose = false;
 // For now, these arrays are global so the arrays can be seen from CUDAWrapper
 // TODO: Explore the possiblity of declaring the arrays and CUDAWrapper
 //       in the main proc (e.g., by using lambdas)
-var A: [1..n, 1..n] real(32);
-var B: [1..n, 1..n] real(32);
-var C: [1..n, 1..n] real(32);
+const S = {1..n, 1..n};
+const RS = S dmapped Replicated();
+var D: domain(1) dmapped Block(boundingBox = {1..n*n}) = {1..n*n};
+
+var A: [D] real(32);
+var B: [RS] real(32);
+var C: [D] real(32);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc mmCUDA(A: [] real(32), B: [] real(32), C: [] real(32), N:int, lo: int, hi: int, GPUN: int, tiled: int);
+extern proc LaunchMM(A: c_void_ptr, B: c_void_ptr, C: c_void_ptr, N: int, lo:int, hi:int, GPUN: int, tiled: int);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
@@ -36,7 +43,35 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   if (verbose) {
 	writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
   }
-  mmCUDA(A, B, C, n*n, lo, hi, N, tiled);
+  //if(tiled) {
+  //  assert(N/n>=32 && (N/n)%32==0, "should use multiples of 32 rows in GPU when tiled");
+  //}
+  assert(N%n == 0, "should offload full rows to GPU");
+  ref lA = A.localSlice(lo .. hi);
+  ref lC = C.localSlice(lo .. hi);
+  assert(lA.size == lC.size);
+
+  if (verbose) { ProfilerStart(); }
+  var dA, dB, dC: c_void_ptr;
+
+  //writeln("lA.size: ", lA.size, " B.size: ", B.size);
+  Malloc(dA, lA.size:size_t * c_sizeof(lA.eltType));
+  Malloc(dB, B.size:size_t  * c_sizeof(B.eltType));
+  Malloc(dC, lC.size:size_t * c_sizeof(lC.eltType));
+
+  Memcpy(dA, c_ptrTo(lA), lA.size:size_t * c_sizeof(lA.eltType), 0);
+  Memcpy(dB, c_ptrTo(B),  B.size:size_t  * c_sizeof(B.eltType),  0);
+
+  LaunchMM(dA, dB, dC, n*n, 0, hi-lo, N, tiled);
+  DeviceSynchronize();
+  Memcpy(c_ptrTo(lC), dC, lC.size:size_t * c_sizeof(lC.eltType), 1);
+
+  Free(dA);
+  Free(dB);
+  Free(dC);
+  if (verbose) { ProfilerStop(); }
+
+  //mmCUDA(lA, B, lC, n*n, 0, hi-lo, N, tiled);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,6 +112,7 @@ proc main() {
   writeln("Matrix Multiplication: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n, "x", n);
   writeln("CPU ratio: ", CPUratio);
+  writeln("nGPUs: ", nGPUs);
   writeln("nTrials: ", numTrials);
   writeln("tiled: ", tiled);
   writeln("output: ", output);
@@ -85,28 +121,31 @@ proc main() {
 
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
-	forall i in 1..n {
-      forall j in 1..n {
-		A(i, j) = (i*1.0/1000): real(32);
-		B(i, j) = (i*1.0/1000): real(32);
-		C(i, j) = 0: real(32);
+    coforall loc in Locales do on loc {
+      forall i in 1..n {
+        forall j in 1..n {
+          var e: int = (i-1)*n+(j-1)+1;
+          A(e) = (i*1.0/1000): real(32);
+          B(i, j) = (i*1.0/1000): real(32);
+          C(e) = 0: real(32);
+        }
       }
-	}
+    }
 
 	const startTime = getCurrentTime();
 	// TODO: Consider using a 2D iterator
-	forall e in GPU(1..n*n, CUDAWrapper, CPUratio) {
+	forall e in GPU(D, CUDAWrapper, CPUratio) {
       var i: int = (e - 1) / n + 1;
       var j: int = (e - 1) % n + 1;
-      var sum: real(32) = C(i, j);
+      var sum: real(32) = C(e);
       for k in 1..n {
-		sum += A(i, k) * B(k, j);
+		sum += A((i-1)*n+k) * B(k, j);
       }
-      C(i, j) = sum;
+      C(e) = sum;
 	}
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
-      writeln(C);
+      writeln(reshape(C, {1..n, 1..n}));
 	}
   }
   printResults(execTimes);

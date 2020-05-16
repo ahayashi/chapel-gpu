@@ -12,7 +12,7 @@ use SysCTypes;
 /// Runtime Options
 ////////////////////////////////////////////////////////////////////////////////
 config const n = 32: int;
-config const CPUPercent = 0: int;
+config const CPUratio = 0: int;
 config const numTrials = 1: int;
 config const tiled = 0;
 config const output = 0: int;
@@ -51,27 +51,19 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   ref lC = C.localSlice(lo .. hi);
   assert(lA.size == lC.size);
 
-  ProfilerStart();
-  var dA: c_void_ptr;
-  var dB: c_void_ptr;
-  var dC: c_void_ptr;
+  if (verbose) { ProfilerStart(); }
+  var dA = new GPUArray(lA);
+  var dB = new GPUArray(B);
+  var dC = new GPUArray(lC);
 
-  writeln("lA.size: ", lA.size, " B.size: ", B.size);
-  Malloc(dA, lA.size:size_t * c_sizeof(lA.eltType));
-  Malloc(dB, B.size:size_t  * c_sizeof(B.eltType));
-  Malloc(dC, lC.size:size_t * c_sizeof(lC.eltType));
-
-  Memcpy(dA, c_ptrTo(lA), lA.size:size_t * c_sizeof(lA.eltType), 0);
-  Memcpy(dB, c_ptrTo(B),  B.size:size_t  * c_sizeof(B.eltType),  0);
-
-  LaunchMM(dA, dB, dC, n*n, 0, hi-lo, N, tiled);
+  //writeln("lA.size: ", lA.size, " B.size: ", B.size);
+  toDevice(dA, dB);
+  LaunchMM(dA.dPtr(), dB.dPtr(), dC.dPtr(), n*n, 0, hi-lo, N, tiled);
   DeviceSynchronize();
-  Memcpy(c_ptrTo(lC), dC, lC.size:size_t * c_sizeof(lC.eltType), 1);
+  dC.fromDevice();
 
-  Free(dA);
-  Free(dB);
-  Free(dC);
-  ProfilerStop();
+  free(dA, dB, dC);
+  if (verbose) { ProfilerStop(); }
 
   //mmCUDA(lA, B, lC, n*n, 0, hi-lo, N, tiled);
 }
@@ -113,7 +105,8 @@ proc printLocaleInfo() {
 proc main() {
   writeln("Matrix Multiplication: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n, "x", n);
-  writeln("CPU ratio: ", CPUPercent);
+  writeln("CPU ratio: ", CPUratio);
+  writeln("nGPUs: ", nGPUs);
   writeln("nTrials: ", numTrials);
   writeln("tiled: ", tiled);
   writeln("output: ", output);
@@ -123,8 +116,8 @@ proc main() {
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
     coforall loc in Locales do on loc {
-      for i in 1..n {
-        for j in 1..n {
+      forall i in 1..n {
+        forall j in 1..n {
           var e: int = (i-1)*n+(j-1)+1;
           A(e) = (i*1.0/1000): real(32);
           B(i, j) = (i*1.0/1000): real(32);
@@ -135,7 +128,7 @@ proc main() {
 
 	const startTime = getCurrentTime();
 	// TODO: Consider using a 2D iterator
-	forall e in GPU(D, CUDAWrapper, CPUPercent) {
+	forall e in GPU(D, CUDAWrapper, CPUratio) {
       var i: int = (e - 1) / n + 1;
       var j: int = (e - 1) % n + 1;
       var sum: real(32) = C(e);
