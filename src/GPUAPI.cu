@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <assert.h>
+#include <cuda.h>
+#ifdef __NVCC__
 #include <cuda_profiler_api.h>
+#endif
 
 #define CUDA_ERROR_CHECK
 #define CudaSafeCall( err ) __cudaSafeCall( err, __FILE__, __LINE__ )
@@ -60,11 +63,15 @@ extern "C" {
   }
 
   void ProfilerStart() {
+#ifdef __NVCC__
     CudaSafeCall(cudaProfilerStart());
+#endif
   }
 
   void ProfilerStop() {
+#ifdef __NVCC__
     CudaSafeCall(cudaProfilerStop());
+#endif
   }
 
   void DeviceSynchronize() {

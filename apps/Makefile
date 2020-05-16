@@ -29,6 +29,10 @@ $(TARGET).o: $(TARGET).cu
 GPUAPI.o: $(CHPLMODULE)/GPUAPI.cu
 	nvcc $(NVCCFLAGS) -c $^
 
+GPUAPI.hip.o: $(CHPLMODULE)/GPUAPI.cu
+	$(HIP_HOME)/bin/hipify-perl $^ > GPUAPI.hip.cpp
+	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c GPUAPI.hip.cpp -fno-gpu-rdc
+
 $(TARGET).opencl.o: $(TARGET).opencl.c
 	gcc -O3 -Wall $(OCLFLAGS) -c $^
 
@@ -80,7 +84,29 @@ hipgpu: $(TARGET).cu $(TARGET).gpu.chpl
 hiphybrid: $(TARGET).cu $(TARGET).hybrid.chpl
 	$(HIP_HOME)/bin/hipify-perl $(TARGET).cu > $(TARGET).hip.cpp
 	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c $(TARGET).hip.cpp -fno-gpu-rdc
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).hip.o $(TARGET).hybrid.chpl --ldflags $(HIPLIBSFLAGS)
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).h $(TARGET).hip.o $(TARGET).hybrid.chpl --ldflags $(HIPLIBSFLAGS)
+
+.PHONY: hiphybrid.dist
+hiphybrid.dist: GPUAPI.hip.o $(TARGET).cu $(TARGET).hybrid.dist.chpl
+	$(HIP_HOME)/bin/hipify-perl $(TARGET).cu > $(TARGET).hip.cpp
+	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c $(TARGET).hip.cpp -fno-gpu-rdc
+	cp GPUAPI.hip.o GPUAPI.o
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).h $(TARGET).hip.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.chpl --ldflags $(HIPLIBSFLAGS)
+
+.PHONY: hiphybrid.dist.lowmid
+hiphybrid.dist.lowmid: GPUAPI.hip.o $(TARGET).kernel.cu $(TARGET).hybrid.dist.lowmid.chpl
+	$(HIP_HOME)/bin/hipify-perl $(TARGET).kernel.cu > $(TARGET).kernel.hip.cpp
+	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c $(TARGET).kernel.hip.cpp -fno-gpu-rdc
+	cp GPUAPI.hip.o GPUAPI.o
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).kernel.hip.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.lowmid.chpl --ldflags $(HIPLIBSFLAGS)
+
+.PHONY: hiphybrid.dist.mid
+hiphybrid.dist.mid: GPUAPI.hip.o $(TARGET).kernel.cu $(TARGET).hybrid.dist.mid.chpl
+	$(HIP_HOME)/bin/hipify-perl $(TARGET).kernel.cu > $(TARGET).kernel.hip.cpp
+	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c $(TARGET).kernel.hip.cpp -fno-gpu-rdc
+	cp GPUAPI.hip.o GPUAPI.o
+	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).kernel.hip.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.mid.chpl --ldflags $(HIPLIBSFLAGS)
+
 
 .PHONY: clean
 clean:
