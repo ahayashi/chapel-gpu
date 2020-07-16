@@ -84,17 +84,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
 
 # Offer the user the choice of overriding the installation directories
 set(INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR} CACHE PATH "Installation directory for libraries")
-set(INSTALL_BINDIR ${CMAKE_INSTALL_BINDIR} CACHE PATH "Installation directory for executables")
 set(INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Installation directory for header files")
+set(INSTALL_BINDIR ${CMAKE_INSTALL_BINDIR} CACHE PATH "Installation directory for executables")
 if(WIN32 AND NOT CYGWIN)
   set(DEF_INSTALL_CMAKEDIR CMake)
 else()
   set(DEF_INSTALL_CMAKEDIR share/cmake/${PROJECT_NAME})
 endif()
 set(INSTALL_CMAKEDIR ${DEF_INSTALL_CMAKEDIR} CACHE PATH "Installation directory for CMake files")
+set(INSTALL_MODULEDIR modules CACHE PATH "Installation directory for Chapel module files")
 
 # Report to user
-foreach(p LIB INCLUDE)
+foreach(p LIB INCLUDE MODULE)
   file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${INSTALL_${p}DIR} _path )
   message(STATUS "${p} components will be installed to ${_path}")
   unset(_path)
@@ -126,3 +127,19 @@ if(OpenCL_FOUND)
     PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDEDIR}
     )
 endif()
+
+if(CMAKE_CUDA_COMPILER OR HIP_FOUND)
+  install(
+    FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/lambda.h
+    DESTINATION ${INSTALL_INCLUDEDIR}
+    )
+endif()
+
+install(
+  FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUIterator.chpl
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.chpl  
+  DESTINATION ${INSTALL_MODULEDIR}
+  )
+
