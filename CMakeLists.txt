@@ -3,7 +3,7 @@ project(ChapelGPUAPI)
 
 # FindCUDA
 include(CheckLanguage)
-check_language(CUDA)
+check_language(CUDA QUIET)
 
 # FindHIP
 if(NOT DEFINED HIP_PATH)
@@ -14,10 +14,10 @@ if(NOT DEFINED HIP_PATH)
     endif()
 endif()
 set(CMAKE_MODULE_PATH "${HIP_PATH}/cmake" ${CMAKE_MODULE_PATH})
-find_package(HIP)
+find_package(HIP QUIET)
 
 # FindOpenCL
-find_package(OpenCL)
+find_package(OpenCL QUIET)
 
 set(GPU_COMPILER_FOUND OFF)
 
@@ -32,6 +32,7 @@ endif()
 
 if(HIP_FOUND)
   if(EXISTS "${HIP_ROOT_DIR}/hip/bin/hipify-perl")
+    message(STATUS "Found HIP: " ${HIP_VERSION})
     message(STATUS "Found HIPIFY: " ${HIP_ROOT_DIR}/hip/bin/hipify-perl)
     add_custom_command(
       OUTPUT GPUAPI.hip.cc
@@ -47,15 +48,23 @@ if(HIP_FOUND)
     set_target_properties(GPUAPIHIP PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.h)
     set(GPU_COMPILER_FOUND ON)
   else ()
+    message(STATUS "Found HIP, but HIPIFY NOTFOUND")
     set(HIP_FOUND OFF)
   endif()
+else()
+    message(STATUS "HIP NOTFOUND")
 endif()
 
 if(OpenCL_FOUND)
+  message(STATUS "Found OpenCL: " ${OpenCL_VERSION_STRING})
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
   add_library(GPUAPIOPENCL SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.opencl.c)
   add_library(GPUAPIOPENCL_static STATIC ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.opencl.c)
+  target_link_libraries(GPUAPIOPENCL OpenCL::OpenCL)
+  target_link_libraries(GPUAPIOPENCL_static OpenCL::OpenCL)  
   set(GPU_COMPILER_FOUND ON)
+else()
+  message(STATUS "OpenCL Not Found")
 endif()
 
 if(NOT GPU_COMPILER_FOUND)
@@ -87,7 +96,7 @@ set(INSTALL_CMAKEDIR ${DEF_INSTALL_CMAKEDIR} CACHE PATH "Installation directory 
 # Report to user
 foreach(p LIB INCLUDE)
   file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${INSTALL_${p}DIR} _path )
-  message(STATUS "Installing ${p} components to ${_path}")
+  message(STATUS "${p} components will be installed to ${_path}")
   unset(_path)
 endforeach()
 
