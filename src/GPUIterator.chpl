@@ -230,9 +230,9 @@ module GPUIterator {
 
       coforall loc in D.targetLocales() do on loc {
         for subdom in D.localSubdomains() {
-          const r = subdom.dim(1);
+          const r = subdom.dim(0);
           const portions = computeSubranges(r, CPUPercent);
-          for i in createTaskAndYield(tag, 0..0, portions(1), portions(2), GPUWrapper) {
+          for i in createTaskAndYield(tag, 0..0, portions(0), portions(1), GPUWrapper) {
             yield i;
           }
         }
@@ -251,7 +251,7 @@ module GPUIterator {
       && isRectangularDom(D)
       && D.dist.type <= Block {
 
-      const lowBasedIters = followThis(1).translate(D.low);
+      const lowBasedIters = followThis(0).translate(D.low);
 
       if (debugGPUIterator) {
         writeln("[DEBUG GPUITERATOR] GPUIterator (follower, block distributed)");
@@ -281,10 +281,10 @@ module GPUIterator {
       coforall loc in D.targetLocales() do on loc {
         for subdom in D.localSubdomains() {
           if (debugGPUIterator) then writeln("[DEBUG GPUITERATOR]", here, " (", here.name,  ") is responsible for ", subdom);
-          const r = subdom.dim(1);
+          const r = subdom.dim(0);
           const portions = computeSubranges(r, CPUPercent);
 
-          for i in createTaskAndYield(tag, 0..0, portions(1), portions(2), GPUWrapper) {
+          for i in createTaskAndYield(tag, 0..0, portions(0), portions(1), GPUWrapper) {
             yield i;
           }
         }
@@ -319,7 +319,7 @@ module GPUIterator {
 	    writeln("[DEBUG GPUITERATOR] In GPUIterator (leader range)");
 
       const portions = computeSubranges(r, CPUPercent);
-      for i in createTaskAndYield(tag, r, portions(1), portions(2), GPUWrapper) {
+      for i in createTaskAndYield(tag, r, portions(0), portions(1), GPUWrapper) {
         yield i;
       }
     }
@@ -334,7 +334,7 @@ module GPUIterator {
       where tag == iterKind.follower
       && followThis.size == 1 {
 
-      const lowBasedIters = followThis(1).translate(r.low);
+      const lowBasedIters = followThis(0).translate(r.low);
 
       if (debugGPUIterator) {
         writeln("[DEBUG GPUITERATOR] GPUIterator (follower)");
@@ -358,7 +358,7 @@ module GPUIterator {
 	    writeln("[DEBUG GPUITERATOR] In GPUIterator (standalone)");
 
       const portions = computeSubranges(r, CPUPercent);
-      for i in createTaskAndYield(tag, r, portions(1), portions(2), GPUWrapper) {
+      for i in createTaskAndYield(tag, r, portions(0), portions(1), GPUWrapper) {
         yield i;
       }
     }
