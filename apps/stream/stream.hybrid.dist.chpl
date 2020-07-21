@@ -4,6 +4,7 @@ use Time;
 /// GPUIterator
 ////////////////////////////////////////////////////////////////////////////////
 use GPUIterator;
+use BlockDist;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -81,7 +82,7 @@ proc main() {
   writeln("Stream: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n);
   writeln("CPU ratio: ", CPUratio);
-  writeln("nGPUs: ", nGPUs);  
+  writeln("nGPUs: ", nGPUs);
   writeln("alpha: ", alpha);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);

@@ -4,6 +4,7 @@ use Time;
 /// GPUIterator
 ////////////////////////////////////////////////////////////////////////////////
 use GPUIterator;
+use BlockDist;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -80,7 +81,7 @@ proc main() {
   writeln("BlackScholes: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n);
   writeln("CPU ratio: ", CPUratio);
-  writeln("nGPUs: ", nGPUs);  
+  writeln("nGPUs: ", nGPUs);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
 
