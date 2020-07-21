@@ -45,7 +45,7 @@ module GPUIterator {
     inline proc computeChunk(r: range, myChunk, numChunks)
       where r.stridable == false {
 
-      const numElems = r.length;
+      const numElems = r.size;
       const elemsPerChunk = numElems/numChunks;
       const mylow = r.low + elemsPerChunk*myChunk;
       if (myChunk != numChunks - 1) {
@@ -71,7 +71,7 @@ module GPUIterator {
             const myIters = GPUrange;
             if (debugGPUIterator) then
               writeln("[DEBUG GPUITERATOR] GPU portion: ", myIters, " CPU portion is ZERO");
-            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.size);
           }
           otherwise {
             coforall tid in 0..#nGPUs {
@@ -79,7 +79,7 @@ module GPUIterator {
               if (debugGPUIterator) then
                 writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters, " CPU portion is ZERO");
               SetDevice(tid:int(32));
-              GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
+              GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.size);
             }
           }
         }
@@ -113,7 +113,7 @@ module GPUIterator {
                 const myIters = GPUrange;
                 if (debugGPUIterator) then
                   writeln("[DEBUG GPUITERATOR] GPU portion: ", myIters);
-                GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+                GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.size);
               }
               otherwise {
                 coforall tid in 0..#nGPUs {
@@ -121,7 +121,7 @@ module GPUIterator {
                   if (debugGPUIterator) then
                     writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters);
                   SetDevice(tid:int(32));
-                  GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
+                  GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.size);
                 }
               }
             }
@@ -146,7 +146,7 @@ module GPUIterator {
             const myIters = GPUrange;
             if (debugGPUIterator) then
               writeln("[DEBUG GPUITERATOR] GPU portion: ", myIters, " CPU portion is ZERO");
-            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
+            GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.size);
           }
           otherwise {
             coforall tid in 0..#nGPUs {
@@ -154,7 +154,7 @@ module GPUIterator {
               if (debugGPUIterator) then
                 writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters, " CPU portion is ZERO");
               SetDevice(tid:int(32));
-              GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
+              GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.size);
             }
           }
         }
@@ -190,7 +190,7 @@ module GPUIterator {
                 const myIters = GPUrange;
                 if (debugGPUIterator) then
                   writeln("[DEBUG GPUITERATOR] GPU portion: ", myIters);
-                GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.length);
+                GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, GPUrange.size);
               }
               otherwise {
                 coforall tid in 0..#nGPUs {
@@ -198,7 +198,7 @@ module GPUIterator {
                   if (debugGPUIterator) then
                     writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters);
                   SetDevice(tid:int(32));
-                  GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.length);
+                  GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.size);
                 }
               }
             }
