@@ -59,7 +59,7 @@ module GPUIterator {
                             r: range(?),
                             CPUrange: range(?),
                             GPUrange: range(?),
-                            GPUWrapper: func(int, int, int, void))
+                            GPUWrapper)
       where tag == iterKind.leader {
 
       if (CPUrange.size == 0) {
@@ -134,7 +134,7 @@ module GPUIterator {
                             r: range(?),
                             CPUrange: range(?),
                             GPUrange: range(?),
-                            GPUWrapper: func(int, int, int, void))
+                            GPUWrapper)
       where tag == iterKind.standalone {
 
       if (CPUrange.size == 0) {
@@ -210,14 +210,14 @@ module GPUIterator {
     iter createTaskAndYield(r: range(?),
                             CPUrange: range(?),
                             GPUrange: range(?),
-                            GPUWrapper: func(int, int, int, void)) {
+                            GPUWrapper) {
       halt("This is dummy");
     }
 
     // leader (block distributed domains)
     iter GPU(param tag: iterKind,
              D: domain,
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper,
              CPUPercent: int = 0
              )
        where tag == iterKind.leader
@@ -230,9 +230,9 @@ module GPUIterator {
 
       coforall loc in D.targetLocales() do on loc {
         for subdom in D.localSubdomains() {
-          const r = subdom.dim(0);
-          const portions = computeSubranges(r, CPUPercent);
-          for i in createTaskAndYield(tag, 0..0, portions(0), portions(1), GPUWrapper) {
+          const (r,) = subdom.dims();
+          const (CPURange, GPURange) = computeSubranges(r, CPUPercent);
+          for i in createTaskAndYield(tag, 0..0, CPURange, GPURange, GPUWrapper) {
             yield i;
           }
         }
@@ -242,7 +242,7 @@ module GPUIterator {
     // follower (block distributed domains)
     iter GPU(param tag: iterKind,
              D: domain,
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper,
              CPUPercent: int = 0,
              followThis
              )
@@ -251,7 +251,9 @@ module GPUIterator {
       && isRectangularDom(D)
       && D.dist.type <= Block {
 
-      const lowBasedIters = followThis(0).translate(D.low);
+      // index-neutral
+      const (followInds,) = followThis;
+      const lowBasedIters = followInds.translate(D.low);
 
       if (debugGPUIterator) {
         writeln("[DEBUG GPUITERATOR] GPUIterator (follower, block distributed)");
@@ -266,7 +268,7 @@ module GPUIterator {
     // standalone (block distributed domains)
     iter GPU(param tag: iterKind,
              D: domain,
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper,
              CPUPercent: int = 0
              )
       where tag == iterKind.standalone
@@ -281,10 +283,10 @@ module GPUIterator {
       coforall loc in D.targetLocales() do on loc {
         for subdom in D.localSubdomains() {
           if (debugGPUIterator) then writeln("[DEBUG GPUITERATOR]", here, " (", here.name,  ") is responsible for ", subdom);
-          const r = subdom.dim(0);
-          const portions = computeSubranges(r, CPUPercent);
+          const (r,) = subdom.dims();
+          const (CPURange, GPURange) = computeSubranges(r, CPUPercent);
 
-          for i in createTaskAndYield(tag, 0..0, portions(0), portions(1), GPUWrapper) {
+          for i in createTaskAndYield(tag, 0..0, CPURange, GPURange, GPUWrapper) {
             yield i;
           }
         }
@@ -293,7 +295,7 @@ module GPUIterator {
 
     // serial iterator (block distributed domains)
     iter GPU(D: domain,
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper,
              CPUPercent: int = 0
              )
       where isRectangularDom(D)
@@ -310,7 +312,7 @@ module GPUIterator {
     // leader (range)
     iter GPU(param tag: iterKind,
              r: range(?),
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper,
              CPUPercent: int = 0
              )
       where tag == iterKind.leader {
@@ -318,8 +320,8 @@ module GPUIterator {
       if (debugGPUIterator) then
 	    writeln("[DEBUG GPUITERATOR] In GPUIterator (leader range)");
 
-      const portions = computeSubranges(r, CPUPercent);
-      for i in createTaskAndYield(tag, r, portions(0), portions(1), GPUWrapper) {
+      const (CPURange, GPURange) = computeSubranges(r, CPUPercent);
+      for i in createTaskAndYield(tag, r, CPURange, GPURange, GPUWrapper) {
         yield i;
       }
     }
@@ -327,14 +329,16 @@ module GPUIterator {
     // follower
     iter GPU(param tag: iterKind,
              r:range(?),
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper,
              CPUPercent: int = 0,
              followThis
              )
       where tag == iterKind.follower
       && followThis.size == 1 {
 
-      const lowBasedIters = followThis(0).translate(r.low);
+      // index-neutral
+      const (followInds,) = followThis;
+      const lowBasedIters = followInds.translate(r.low);
 
       if (debugGPUIterator) {
         writeln("[DEBUG GPUITERATOR] GPUIterator (follower)");
@@ -349,7 +353,7 @@ module GPUIterator {
     // standalone (range)
     iter GPU(param tag: iterKind,
              r: range(?),
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper,
              CPUPercent: int = 0
              )
   	  where tag == iterKind.standalone {
@@ -357,15 +361,15 @@ module GPUIterator {
       if (debugGPUIterator) then
 	    writeln("[DEBUG GPUITERATOR] In GPUIterator (standalone)");
 
-      const portions = computeSubranges(r, CPUPercent);
-      for i in createTaskAndYield(tag, r, portions(0), portions(1), GPUWrapper) {
+      const (CPURange, GPURange) = computeSubranges(r, CPUPercent);
+      for i in createTaskAndYield(tag, r, CPURange, GPURange, GPUWrapper) {
         yield i;
       }
     }
 
     // serial iterators (range)
     iter GPU(r:range(?),
-             GPUWrapper: func(int, int, int, void),
+             GPUWrapper,
              CPUPercent: int = 0
              ) {
       if (debugGPUIterator) then
