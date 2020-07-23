@@ -19,7 +19,8 @@ find_package(HIP QUIET)
 # FindOpenCL
 find_package(OpenCL QUIET)
 
-set(GPU_COMPILER_FOUND OFF)
+#
+set(GPU_ROOT_DIRS "")
 
 if(CMAKE_CUDA_COMPILER)
   enable_language(CUDA)
@@ -27,7 +28,7 @@ if(CMAKE_CUDA_COMPILER)
   add_library(GPUAPICUDA SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.cu)
   add_library(GPUAPICUDA_static STATIC ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.cu)
   set_target_properties(GPUAPICUDA PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.h)
-  set(GPU_COMPILER_FOUND ON)
+  list(APPEND GPU_ROOT_DIRS "export CUDA_ROOT_DIR=${${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}/..")
 endif()
 
 if(HIP_FOUND)
@@ -46,7 +47,7 @@ if(HIP_FOUND)
     hip_add_library(GPUAPIHIP SHARED GPUAPI.hip.cc)
     hip_add_library(GPUAPIHIP_static STATIC GPUAPI.hip.cc)
     set_target_properties(GPUAPIHIP PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.h)
-    set(GPU_COMPILER_FOUND ON)
+    list(APPEND GPU_ROOT_DIRS "export HIP_ROOT_DIR=${HIP_ROOT_DIR}")
   else ()
     message(STATUS "Found HIP, but HIPIFY NOTFOUND")
     set(HIP_FOUND OFF)
@@ -61,14 +62,21 @@ if(OpenCL_FOUND)
   add_library(GPUAPIOPENCL SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.opencl.c)
   add_library(GPUAPIOPENCL_static STATIC ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.opencl.c)
   target_link_libraries(GPUAPIOPENCL OpenCL::OpenCL)
-  target_link_libraries(GPUAPIOPENCL_static OpenCL::OpenCL)  
+  target_link_libraries(GPUAPIOPENCL_static OpenCL::OpenCL)
+  list(APPEND GPU_ROOT_DIRS "export OpenCL_INCLUDE_DIRS=${OpenCL_INCLUDE_DIRS}")
+  list(APPEND GPU_ROOT_DIRS "export OpenCL_LIBRARIES=${OpenCL_LIBRARIES}")
   set(GPU_COMPILER_FOUND ON)
 else()
   message(STATUS "OpenCL Not Found")
 endif()
 
-if(NOT GPU_COMPILER_FOUND)
+if(NOT GPU_ROOT_DIRS)
   message(FATAL_ERROR "No GPU compiler found")
+else()
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/env.sh "#!/bin/bash\n")
+  foreach (p ${GPU_ROOT_DIRS})
+    file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/env.sh ${p}\n)
+  endforeach()
 endif()
 
 # Installation
@@ -141,4 +149,10 @@ install(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUIterator.chpl
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.chpl
   DESTINATION ${INSTALL_MODULEDIR}
+  )
+
+install(
+  PROGRAMS
+  ${CMAKE_CURRENT_BINARY_DIR}/env.sh
+  DESTINATION ${INSTALL_BINDIR}
   )
