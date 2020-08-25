@@ -11,8 +11,8 @@ use GPUIterator;
 config const nFeatures = 32: int;
 config const nSamples = 32: int;
 config const nIters = 32: int;
-config const CPUPercent1 = 0: int;
-config const CPUPercent2 = 0: int;
+config const CPUratio1 = 0: int;
+config const CPUratio2 = 0: int;
 config const numTrials = 1: int;
 config const output = 0: int;
 config param verbose = false;
@@ -88,8 +88,8 @@ proc printLocaleInfo() {
 proc main() {
   writeln("Logistic Regression: CPU/GPU Execution (using GPUIterator)");
   writeln("nSamples :", nSamples, " nFeatures :",  nFeatures);
-  writeln("CPU Percent1: ", CPUPercent1);
-  writeln("CPU Percent2: ", CPUPercent2);
+  writeln("CPU Percent1: ", CPUratio1);
+  writeln("CPU Percent2: ", CPUratio2);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
 
@@ -113,10 +113,10 @@ proc main() {
 
 	const startTime = getCurrentTime();
 	for ite in 1..nIters {
-      forall i in GPU(1..nFeatures, CUDAWrapper1, CPUPercent1) {
+      forall i in GPU(1..nFeatures, CUDAWrapper1, CPUratio1) {
 		Wcurr(i) = W(i);
       }
-      forall i in GPU(1..nFeatures, CUDAWrapper2, CPUPercent2) {
+      forall i in GPU(1..nFeatures, CUDAWrapper2, CPUratio2) {
 		var err = 0: real(32);
 		for s in 1..nSamples {
           var arg = 0: real(32);

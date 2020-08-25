@@ -69,7 +69,7 @@ proc main() {
 
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
-	for i in 1..n {
+	forall i in 1..n {
       B(i) = i: real(32);
       C(i) = 2*i: real(32);
 	}

@@ -4,7 +4,9 @@ use Time;
 /// GPUIterator
 ////////////////////////////////////////////////////////////////////////////////
 use GPUIterator;
+use GPUAPI;
 use BlockDist;
+use SysCTypes;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -30,18 +32,36 @@ var C: [D] real(32);
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc streamCUDA(A: [] real(32), B: [] real(32), C: [] real(32), alpha: real(32), lo: int, hi: int, N: int);
+extern proc LaunchStream(A: c_void_ptr, B: c_void_ptr, C: c_void_ptr, alpha: c_float, N: size_t);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
 proc CUDAWrapper(lo: int, hi: int, N: int) {
   if (verbose) {
-	writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
+    var device, count: int(32);
+    GetDevice(device);
+    GetDeviceCount(count);
+    writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, "), GPU", device, " of ", count, " @", here);
   }
+
   ref lA = A.localSlice(lo .. hi);
   ref lB = B.localSlice(lo .. hi);
   ref lC = C.localSlice(lo .. hi);
-  streamCUDA(lA, lB, lC, alpha, 0, hi-lo, N);
+  //writeln("localSlice Size:", lA.size);
+  if (verbose) { ProfilerStart(); }
+  var dA = new GPUArray(lA);
+  var dB = new GPUArray(lB);
+  var dC = new GPUArray(lC);
+
+  toDevice(dB, dC);
+  LaunchStream(dA.dPtr(), dB.dPtr(), dC.dPtr(), alpha, N: size_t);
+  DeviceSynchronize();
+  dA.fromDevice();
+
+  free(dA, dB, dC);
+  if (verbose) { ProfilerStop(); }
+
+  //streamCUDA(lA, lB, lC, alpha, 0, hi-lo, N);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +123,13 @@ proc main() {
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
       writeln(A);
+      for i in 1..n {
+        if(A(i) != B(i) + alpha * C(i)) {
+          writeln("Verification Error");
+          exit();
+        }
+      }
+      writeln("Verified");
 	}
   }
   printResults(execTimes);

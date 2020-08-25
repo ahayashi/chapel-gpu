@@ -2,6 +2,12 @@
 [brick]
 name = "GPUIterator"
 version = "0.1.0"
-chplVersion = "1.16.0..1.20.0"
+chplVersion = "1.16.0..1.22.0"
 
 [dependencies]
+
+
+[examples]
+examples = ["vc.chpl"]
+[examples.vc]
+compopts = "-sdisableMultiGPUs"

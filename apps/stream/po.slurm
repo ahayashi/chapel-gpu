@@ -22,6 +22,6 @@ do
     ./stream.gpu -nl 1 --n=$N --numTrials=10
     for ratio in 0 25 50 75 100;
     do
-	./stream.hybrid -nl 1 --n=$N --numTrials=10 --CPUPercent=$ratio
+	./stream.hybrid -nl 1 --n=$N --numTrials=10 --CPUratio=$ratio
     done
 done
