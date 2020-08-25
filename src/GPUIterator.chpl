@@ -21,12 +21,15 @@ module GPUIterator {
     use GPUAPI;
 
     config param debugGPUIterator = false;
-    config const nGPUs = getNumDevices();
 
-    proc getNumDevices() {
-       var count: int(32);
-       GetDeviceCount(count);
-       return count;
+    // if true, don't use GetDeviceCount/SetDeivce
+    config param disableMultiGPUs = false;
+    config const nGPUs = if (disableMultiGPUs) then 1 else getNumDevices();
+
+    proc getNumDevices() where disableMultiGPUs == false {
+      var count: int(32);
+      GetDeviceCount(count);
+      return count;
     }
 
     // Utility functions
@@ -78,7 +81,8 @@ module GPUIterator {
               const myIters = computeChunk(GPUrange, tid, nGPUs);
               if (debugGPUIterator) then
                 writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters, " CPU portion is ZERO");
-              SetDevice(tid:int(32));
+              if (disableMultiGPUs == false) then
+                SetDevice(tid:int(32));
               GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.size);
             }
           }
@@ -120,7 +124,8 @@ module GPUIterator {
                   const myIters = computeChunk(GPUrange, tid, nGPUs);
                   if (debugGPUIterator) then
                     writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters);
-                  SetDevice(tid:int(32));
+                  if (disableMultiGPUs == false) then
+                    SetDevice(tid:int(32));
                   GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.size);
                 }
               }
@@ -153,7 +158,8 @@ module GPUIterator {
               const myIters = computeChunk(GPUrange, tid, nGPUs);
               if (debugGPUIterator) then
                 writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters, " CPU portion is ZERO");
-              SetDevice(tid:int(32));
+              if (disableMultiGPUs == false) then
+                SetDevice(tid:int(32));
               GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.size);
             }
           }
@@ -197,7 +203,8 @@ module GPUIterator {
                   const myIters = computeChunk(GPUrange, tid, nGPUs);
                   if (debugGPUIterator) then
                     writeln("[DEBUG GPUITERATOR] GPU", tid, " portion", ":", myIters);
-                  SetDevice(tid:int(32));
+                  if (disableMultiGPUs == false) then
+                    SetDevice(tid:int(32));
                   GPUWrapper(myIters.translate(-r.low).first, myIters.translate(-r.low).last, myIters.size);
                 }
               }
