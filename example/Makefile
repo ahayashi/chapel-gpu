@@ -9,7 +9,7 @@ HIP_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIHIP_static -L./build -lvc.hip -L$(HIP_RO
 # OpenCL
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static -L./build -lvc.opencl -framework OpenCL
+	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static -L./build -lvc.opencl --ldflags '-framework OpenCL'
 else
 	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static -L./build -lvc.opencl -L$(subst libOpenCL.so,,$(OpenCL_LIBRARIES)) -lOpenCL
 endif
