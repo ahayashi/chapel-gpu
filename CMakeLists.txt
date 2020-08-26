@@ -43,7 +43,7 @@ if(HIP_FOUND)
       COMMENT "Convering GPUAPI.cu to GPUAPI.hip.cc"
       )
     set(CMAKE_CXX_COMPILER "${HIP_ROOT_DIR}/hip/bin/hipcc")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fno-gpu-rdc")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fno-gpu-rdc -fPIC")
     hip_add_library(GPUAPIHIP SHARED GPUAPI.hip.cc)
     hip_add_library(GPUAPIHIP_static STATIC GPUAPI.hip.cc)
     set_target_properties(GPUAPIHIP PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.h)
