@@ -20,6 +20,7 @@ if(CMAKE_CUDA_COMPILER)
   enable_language(CUDA)
   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
   add_library(${APP}.cuda STATIC ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.cu)
+  add_library(${APP}.kernel.cuda STATIC ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.kernel.cu)
 endif()
 
 if(HIP_FOUND)
@@ -33,9 +34,17 @@ if(HIP_FOUND)
       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.cu
       COMMENT "Convering .cu to .hip.cc"
       )
+    add_custom_command(
+      OUTPUT ${APP}.kernel.hip.cc
+      COMMAND ${HIP_ROOT_DIR}/hip/bin/hipify-perl ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.kernel.cu > ${APP}.kernel.hip.cc
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.kernel.cu
+      COMMENT "Convering .cu to .hip.cc"
+      )
     set(CMAKE_CXX_COMPILER "${HIP_ROOT_DIR}/hip/bin/hipcc")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fno-gpu-rdc -fPIC")
     hip_add_library(${APP}.hip STATIC ${APP}.hip.cc)
+    hip_add_library(${APP}.kernel.hip STATIC ${APP}.kernel.hip.cc)
   else ()
     message(STATUS "Found HIP, but HIPIFY NOTFOUND")
     set(HIP_FOUND OFF)
