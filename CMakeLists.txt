@@ -107,7 +107,7 @@ endforeach()
 
 if (GPU_ROOT_DIRS)
   file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/env.sh "#!/bin/bash\n")
-  file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/env.sh "export CHPL_GPU_HOME="${CMAKE_INSTALL_PREFIX}\n)
+  file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/env.sh "export CHPL_GPU_HOME=${CMAKE_INSTALL_PREFIX}\n")
   foreach (p ${GPU_ROOT_DIRS})
     file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/env.sh ${p}\n)
   endforeach()
