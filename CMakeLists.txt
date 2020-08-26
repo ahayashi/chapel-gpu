@@ -73,11 +73,6 @@ endif()
 
 if(NOT GPU_ROOT_DIRS)
   message(FATAL_ERROR "No GPU compiler found")
-else()
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/env.sh "#!/bin/bash\n")
-  foreach (p ${GPU_ROOT_DIRS})
-    file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/env.sh ${p}\n)
-  endforeach()
 endif()
 
 # Installation
@@ -109,6 +104,14 @@ foreach(p LIB INCLUDE MODULE)
   message(STATUS "${p} components will be installed to ${_path}")
   unset(_path)
 endforeach()
+
+if (GPU_ROOT_DIRS)
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/env.sh "#!/bin/bash\n")
+  file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/env.sh "export CHPL_GPU_HOME="${CMAKE_INSTALL_PREFIX}\n)
+  foreach (p ${GPU_ROOT_DIRS})
+    file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/env.sh ${p}\n)
+  endforeach()
+endif()
 
 if(CMAKE_CUDA_COMPILER)
   install(
