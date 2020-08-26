@@ -1,113 +1,32 @@
-# Chapel
-CHPLFLAGS=--fast -sverbose
-CHPLMODULE=../../src
-GPUAPIFLAGS=-sdebugGPUAPI -sdebugGPUIterator $(CHPLMODULE)/GPUAPI.h GPUAPI.o
+CHPL_GPU_MODULES=-M $(CHPL_GPU_HOME)/modules $(CHPL_GPU_HOME)/include/GPUAPI.h
+CHPL_FLAGS=--fast $(CHPL_GPU_MODULES)
 
 # CUDA
-CUDA_HOME?=/usr/local/cuda
-CUDA_SM?=sm_70
-CUDALIBSFLAGS=-L$(CUDA_HOME)/lib64 -lcudart -lcuda -lcublas
-NVCCFLAGS=-O3 -arch $(CUDA_SM) -std=c++11 --extended-lambda -I$(CHPLMODULE)
-$(info CUDA_HOME is $(CUDA_HOME))
-$(info CUDA_SM is $(CUDA_SM))
+ifeq ($(USE_CUBLAS), yes)
+  CUBLAS_LIB=-lcublas
+endif
+CUDA_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPICUDA_static -L./build -l$(TARGET).cuda -L$(CUDA_ROOT_DIR)/lib -lcudart $(CUBLAS_LIB)
+# HIP
+HIP_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIHIP_static -L./build -l$(TARGET).hip -L$(HIP_ROOT_DIR)/lib -lhip_hcc
 
-# ROCM
-ROCM_HOME?=/opt/rocm
-HIP_HOME=$(ROCM_HOME)/hip
-HIPLIBSFLAGS=-L$(ROCM_HOME)/lib -lhip_hcc
-$(info ROCM_HOME is $(ROCM_HOME))
+# OpenCL
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static -L./build -l$(TARGET).opencl --ldflags '-framework OpenCL'
+else
+	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static -L./build -l$(TARGET).opencl -L$(subst libOpenCL.so,,$(OpenCL_LIBRARIES)) -lOpenCL
+endif
 
-# For OpenCL (MacOS)
-OCLLIBSFLAGS=-framework OpenCL
-OCLFLAGS=-framework OpenCL
+all: cudahybrid.dist
 
-all: baseline cudagpu cudahybrid cudahybrid.dist
+gpu: $(TARGET).cu
+	rm -rf build &&	mkdir build && cd build && cmake .. && make
 
-$(TARGET).o: $(TARGET).cu
-	nvcc $(NVCCFLAGS) -c $^
+cuda%: gpu $(TARGET).%.chpl
+	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl $(CUDA_LIBS) -o $(TARGET).cuda.$*
 
-GPUAPI.o: $(CHPLMODULE)/GPUAPI.cu
-	nvcc $(NVCCFLAGS) -c $^
+hip%: gpu $(TARGET).%.chpl
+	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl $(HIP_LIBS) -o $(TARGET).hip.$*
 
-GPUAPI.hip.o: $(CHPLMODULE)/GPUAPI.cu
-	$(HIP_HOME)/bin/hipify-perl $^ > GPUAPI.hip.cpp
-	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c GPUAPI.hip.cpp -fno-gpu-rdc
-
-$(TARGET).opencl.o: $(TARGET).opencl.c
-	gcc -O3 -Wall $(OCLFLAGS) -c $^
-
-.PHONY: baseline
-baseline: $(TARGET).baseline.chpl
-	chpl $(CHPLFLAGS) $(TARGET).baseline.chpl
-
-.PHONY: blas
-blas:
-	chpl $(CHPLFLAGS) $(TARGET).blas.chpl
-
-.PHONY: cudagpu
-cudagpu: $(TARGET).o $(TARGET).gpu.chpl
-	chpl $(CHPLFLAGS) $(TARGET).o $(TARGET).gpu.chpl $(CUDALIBSFLAGS)
-
-.PHONY: cudahybrid
-cudahybrid: GPUAPI.o $(TARGET).o $(TARGET).hybrid.chpl
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(GPUAPIFLAGS) $(TARGET).hybrid.chpl $(CUDALIBSFLAGS)
-
-.PHONY: cudahybrid.dist
-cudahybrid.dist: GPUAPI.o $(TARGET).o $(TARGET).hybrid.dist.chpl
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).h $(TARGET).o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.chpl $(CUDALIBSFLAGS)
-
-.PHONY: cudahybrid.dist.lowmid
-cudahybrid.dist.lowmid: GPUAPI.o $(TARGET).kernel.cu $(TARGET).hybrid.dist.lowmid.chpl
-	nvcc $(NVCCFLAGS) -c $(TARGET).kernel.cu -o $(TARGET).kernel.o
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).kernel.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.lowmid.chpl $(CUDALIBSFLAGS) -o $(TARGET).hybrid.dist.lowmid
-
-.PHONY: cudahybrid.dist.mid
-cudahybrid.dist.mid: GPUAPI.o $(TARGET).kernel.cu $(TARGET).hybrid.dist.mid.chpl
-	nvcc $(NVCCFLAGS) -c $(TARGET).kernel.cu -o $(TARGET).kernel.o
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).kernel.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.mid.chpl $(CUDALIBSFLAGS) -o $(TARGET).hybrid.dist.mid
-
-.PHONY: openclgpu
-oclgpu: $(TARGET).opencl.o $(TARGET).gpu.chpl
-	chpl $(CHPLFLAGS) $(TARGET).opencl.o $(TARGET).gpu.chpl --ldflags $(OCLLIBSFLAGS)
-
-.PHONY: openclhybrid
-oclhybrid: $(TARGET).opencl.o $(TARGET).hybrid.chpl
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).opencl.o $(TARGET).hybrid.chpl --ldflags $(OCLLIBSFLAGS)
-
-.PHONY: hipgpu
-hipgpu: $(TARGET).cu $(TARGET).gpu.chpl
-	$(HIP_HOME)/bin/hipify-perl $(TARGET).cu > $(TARGET).hip.cpp
-	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c $(TARGET).hip.cpp -fno-gpu-rdc
-	chpl $(CHPLFLAGS) $(TARGET).hip.o $(TARGET).gpu.chpl --ldflags $(HIPLIBSFLAGS)
-
-.PHONY: hiphybrid
-hiphybrid: $(TARGET).cu $(TARGET).hybrid.chpl
-	$(HIP_HOME)/bin/hipify-perl $(TARGET).cu > $(TARGET).hip.cpp
-	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c $(TARGET).hip.cpp -fno-gpu-rdc
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).h $(TARGET).hip.o $(TARGET).hybrid.chpl --ldflags $(HIPLIBSFLAGS)
-
-.PHONY: hiphybrid.dist
-hiphybrid.dist: GPUAPI.hip.o $(TARGET).cu $(TARGET).hybrid.dist.chpl
-	$(HIP_HOME)/bin/hipify-perl $(TARGET).cu > $(TARGET).hip.cpp
-	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c $(TARGET).hip.cpp -fno-gpu-rdc
-	cp GPUAPI.hip.o GPUAPI.o
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).h $(TARGET).hip.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.chpl --ldflags $(HIPLIBSFLAGS)
-
-.PHONY: hiphybrid.dist.lowmid
-hiphybrid.dist.lowmid: GPUAPI.hip.o $(TARGET).kernel.cu $(TARGET).hybrid.dist.lowmid.chpl
-	$(HIP_HOME)/bin/hipify-perl $(TARGET).kernel.cu > $(TARGET).kernel.hip.cpp
-	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c $(TARGET).kernel.hip.cpp -fno-gpu-rdc
-	cp GPUAPI.hip.o GPUAPI.o
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).kernel.hip.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.lowmid.chpl --ldflags $(HIPLIBSFLAGS)
-
-.PHONY: hiphybrid.dist.mid
-hiphybrid.dist.mid: GPUAPI.hip.o $(TARGET).kernel.cu $(TARGET).hybrid.dist.mid.chpl
-	$(HIP_HOME)/bin/hipify-perl $(TARGET).kernel.cu > $(TARGET).kernel.hip.cpp
-	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c $(TARGET).kernel.hip.cpp -fno-gpu-rdc
-	cp GPUAPI.hip.o GPUAPI.o
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).kernel.h $(TARGET).kernel.hip.o $(GPUAPIFLAGS) $(TARGET).hybrid.dist.mid.chpl --ldflags $(HIPLIBSFLAGS)
-
-
-.PHONY: clean
-clean:
-	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).hybrid.dist $(TARGET).hybrid.dist.lowmid $(TARGET).hybrid.dist.mid $(TARGET).o GPUAPI.o *_real
+opencl%: gpu $(TARGET).%.chpl
+	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl $(OPNCL_LIBS) -o $(TARGET).opencl.$*
