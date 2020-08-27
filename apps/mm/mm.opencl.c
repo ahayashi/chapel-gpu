@@ -138,8 +138,9 @@ extern "C" {
             }
 
             cl_device_id device_id = device_ids[did];
-            clGetDeviceInfo(device_id, CL_DEVICE_NAME, sizeof(str), str, &ret);
-            printf("GPU %s\n", str);
+            size_t sret;
+            clGetDeviceInfo(device_id, CL_DEVICE_NAME, sizeof(str), str, &sret);
+            printf("clGetDeviceInfo = %ld, GPU %s\n", sret, str);
 
             // Create an OpenCL context
             cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
