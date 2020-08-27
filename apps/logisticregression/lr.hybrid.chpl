@@ -48,7 +48,7 @@ proc CUDAWrapper2(lo: int, hi: int, N: int) {
   if (verbose) {
 	writeln("In CUDAWrapper2(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
   }
-  lrCUDA2(X, Y, W, Wcurr, alpha, nSamples, nFeatures, lo, hi, N);
+  lrCUDA2(X, Y, W, Wcurr, alpha, nSamples, nFeatures, lo+1, hi+1, N);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,19 +97,35 @@ proc main() {
 
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
-	for i in 1..nFeatures {
-      W(i) = 0: real(32);
-	}
-	for i in 1..nSamples {
-      Y(i) = (i % 2): real(32);
-      for j in 1..nFeatures {
-		if (j != 0) {
-          X(i, j) = (i % 2): real(32);
-		} else {
-          X(i, j) = 1;
-		}
+    if (false) {
+      for i in 1..nFeatures {
+        W(i) = 0: real(32);
       }
-	}
+      for i in 1..nSamples {
+        Y(i) = (i % 2): real(32);
+        for j in 1..nFeatures {
+          if (j != 0) {
+            X(i, j) = (i % 2): real(32);
+          } else {
+            X(i, j) = 1;
+          }
+        }
+      }
+    } else {
+      forall i in 1..nFeatures {
+        W(i) = 0: real(32);
+      }
+      for i in 1..nSamples {
+        Y(i) = i: real(32);
+        for j in 1..nFeatures {
+          if (j != 0) {
+            X(i, j) = j: real(32);
+          } else {
+            X(i, j) = j : real(32);
+          }
+        }
+      }
+    }
 
 	const startTime = getCurrentTime();
 	for ite in 1..nIters {
