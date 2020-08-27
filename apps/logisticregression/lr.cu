@@ -44,54 +44,54 @@ __global__ void kernel2(float *dW, float *dWcurr, float *dX, float *dY, float al
 
 extern "C" {
     void lrCUDA1(float *W, float *Wcurr, int start, int end, int GPUN) {
-    float *dW, *dWcurr;
-    if (GPUN > 0) {
-        assert(end - start + 1 == GPUN);
+        float *dW, *dWcurr;
+        if (GPUN > 0) {
+            assert(end - start + 1 == GPUN);
 #ifdef VERBOSE
-        printf("In lrCUDA1\n");
-        printf("\t GPUN: %d\n", GPUN);
-        printf("\t range: %d..%d\n", start, end);
+            printf("In lrCUDA1\n");
+            printf("\t GPUN: %d\n", GPUN);
+            printf("\t range: %d..%d\n", start, end);
 #endif
-        CudaSafeCall(cudaMalloc(&dW, sizeof(float) * GPUN));
-        CudaSafeCall(cudaMalloc(&dWcurr, sizeof(float) * GPUN));
+            CudaSafeCall(cudaMalloc(&dW, sizeof(float) * GPUN));
+            CudaSafeCall(cudaMalloc(&dWcurr, sizeof(float) * GPUN));
 
-        CudaSafeCall(cudaMemcpy(dW, W + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
-        kernel1<<<ceil(((float)GPUN)/1024), 1024>>>(dW, dWcurr, GPUN);
+            CudaSafeCall(cudaMemcpy(dW, W + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
+            kernel1<<<ceil(((float)GPUN)/1024), 1024>>>(dW, dWcurr, GPUN);
 
-        CudaSafeCall(cudaDeviceSynchronize());
-        CudaSafeCall(cudaMemcpy(Wcurr + start, dWcurr, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
+            CudaSafeCall(cudaDeviceSynchronize());
+            CudaSafeCall(cudaMemcpy(Wcurr + start, dWcurr, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
 
-        CudaSafeCall(cudaFree(dW));
-        CudaSafeCall(cudaFree(dWcurr));
-    }
+            CudaSafeCall(cudaFree(dW));
+            CudaSafeCall(cudaFree(dWcurr));
+        }
     }
 
     void lrCUDA2(float* X, float *Y, float *W, float *Wcurr, float alpha, int nSamples, int nFeatures, int start, int end, int GPUN) {
-    float *dX, *dY, *dW, *dWcurr;
-    if (GPUN > 0) {
-        assert(end - start + 1 == GPUN);
+        float *dX, *dY, *dW, *dWcurr;
+        if (GPUN > 0) {
+            assert(end - start + 1 == GPUN);
 #ifdef VERBOSE
-        printf("In lrCUDA2\n");
-        printf("\t GPUN: %d\n", GPUN);
-        printf("\t range: %d..%d\n", start, end);
+            printf("In lrCUDA2\n");
+            printf("\t GPUN: %d\n", GPUN);
+            printf("\t range: %d..%d\n", start, end);
 #endif
-        CudaSafeCall(cudaMalloc(&dX, sizeof(float) * nSamples * nFeatures));
-        CudaSafeCall(cudaMalloc(&dY, sizeof(float) * nSamples));
-        CudaSafeCall(cudaMalloc(&dWcurr, sizeof(float) * nFeatures));
-        CudaSafeCall(cudaMalloc(&dW, sizeof(float) * GPUN));
+            CudaSafeCall(cudaMalloc(&dX, sizeof(float) * nSamples * nFeatures));
+            CudaSafeCall(cudaMalloc(&dY, sizeof(float) * nSamples));
+            CudaSafeCall(cudaMalloc(&dWcurr, sizeof(float) * nFeatures));
+            CudaSafeCall(cudaMalloc(&dW, sizeof(float) * GPUN));
 
-        CudaSafeCall(cudaMemcpy(dX, X, sizeof(float) * nSamples * nFeatures, cudaMemcpyHostToDevice));
-        CudaSafeCall(cudaMemcpy(dY, Y, sizeof(float) * nSamples, cudaMemcpyHostToDevice));
-        CudaSafeCall(cudaMemcpy(dWcurr, Wcurr, sizeof(float) * nFeatures, cudaMemcpyHostToDevice));
+            CudaSafeCall(cudaMemcpy(dX, X, sizeof(float) * nSamples * nFeatures, cudaMemcpyHostToDevice));
+            CudaSafeCall(cudaMemcpy(dY, Y, sizeof(float) * nSamples, cudaMemcpyHostToDevice));
+            CudaSafeCall(cudaMemcpy(dWcurr, Wcurr, sizeof(float) * nFeatures, cudaMemcpyHostToDevice));
 
-        kernel2<<<ceil(((float)GPUN)/1024), 1024>>>(dW, dWcurr, dX, dY, alpha, nSamples, nFeatures, start-1, GPUN);
-        CudaSafeCall(cudaDeviceSynchronize());
-        CudaSafeCall(cudaMemcpy(W, dW, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
+            kernel2<<<ceil(((float)GPUN)/1024), 1024>>>(dW, dWcurr, dX, dY, alpha, nSamples, nFeatures, start-1, GPUN);
+            CudaSafeCall(cudaDeviceSynchronize());
+            CudaSafeCall(cudaMemcpy(W, dW, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
 
-        CudaSafeCall(cudaFree(dX));
-        CudaSafeCall(cudaFree(dY));
-        CudaSafeCall(cudaFree(dW));
-        CudaSafeCall(cudaFree(dWcurr));
-    }
+            CudaSafeCall(cudaFree(dX));
+            CudaSafeCall(cudaFree(dY));
+            CudaSafeCall(cudaFree(dW));
+            CudaSafeCall(cudaFree(dWcurr));
+        }
     }
 }

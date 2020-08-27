@@ -10,7 +10,7 @@ __global__ void vc(float *dA, float *dB, int N) {
 #endif
 
 extern "C" {
-#ifndef USE_LAMBDA    
+#ifndef USE_LAMBDA
     void LaunchVC(float* dA, float *dB, int N) {
         vc<<<ceil(((float)N)/1024), 1024>>>(dA, dB, N);
     }
@@ -18,5 +18,5 @@ extern "C" {
     void LaunchVC(float *dA, float *dB, int N) {
         call_gpu_functor(N, 1024, NULL, [=] __device__ (int i) { dA[i] = dB[i]; });
     }
-#endif    
+#endif
 }
