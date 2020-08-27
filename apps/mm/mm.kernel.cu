@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
 #include <assert.h>
 #ifdef __NVCC__
 #include <cublas_v2.h>
