@@ -96,7 +96,7 @@ extern "C" {
           exit(1);
       }
   }
-    
+
   void Free(void* devPtr) {
       CudaSafeCall(cudaFree(devPtr));
   }

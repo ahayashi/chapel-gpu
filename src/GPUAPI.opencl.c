@@ -18,7 +18,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-  
+
   const char *openclGetErrorString(cl_int error)
   {
     switch(error){
@@ -43,7 +43,7 @@ extern "C" {
     case -17: return "CL_LINK_PROGRAM_FAILURE";
     case -18: return "CL_DEVICE_PARTITION_FAILED";
     case -19: return "CL_KERNEL_ARG_INFO_NOT_AVAILABLE";
-      
+
     // compile-time errors
     case -30: return "CL_INVALID_VALUE";
     case -31: return "CL_INVALID_DEVICE_TYPE";
@@ -105,10 +105,10 @@ extern "C" {
         exit( -1 );
       }
 #endif
-    
+
     return;
   }
-  
+
   void GetDeviceCount(int *count) {
     cl_platform_id platforms[MAX_PLATFORM_ENTRIES];
     cl_uint num_platforms;
@@ -138,10 +138,10 @@ extern "C" {
       for (int i = 0; i < num_devices; i++) {
 	OpenCLSafeCall(clGetDeviceInfo(devices[i], CL_DEVICE_NAME, sizeof(buffer), buffer, NULL));
 	printf("GPUAPI: \tdevice[%d].NAME = %s\n", i, buffer);
-      }      
+      }
     }
   }
-  
+
   void GetDevice(int *device) {
 
   }
@@ -175,7 +175,7 @@ extern "C" {
           exit(1);
       }
   }
-    
+
   void Free(void* devPtr) {
   }
 #ifdef __cplusplus
