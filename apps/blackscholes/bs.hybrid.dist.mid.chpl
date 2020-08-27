@@ -4,6 +4,9 @@ use Time;
 /// GPUIterator
 ////////////////////////////////////////////////////////////////////////////////
 use GPUIterator;
+use GPUAPI;
+use BlockDist;
+use SysCTypes;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -36,7 +39,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   if (verbose) {
 	writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
   }
-  ref lrand = rand.localSlice(lo .. hi);  
+  ref lrand = rand.localSlice(lo .. hi);
   ref lput = put.localSlice(lo .. hi);
   ref lcall = call.localSlice(lo .. hi);
   if (verbose) { ProfilerStart(); }
@@ -89,7 +92,7 @@ proc main() {
   writeln("BlackScholes: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n);
   writeln("CPU ratio: ", CPUratio);
-  writeln("nGPUs: ", nGPUs);    
+  writeln("nGPUs: ", nGPUs);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
 

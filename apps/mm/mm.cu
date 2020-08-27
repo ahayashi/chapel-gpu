@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <assert.h>
+#ifdef __NVCC__
 #include <cublas_v2.h>
+#endif
 
 #define VERBOSE
 //#define PROF
@@ -87,12 +89,12 @@ __global__ void mm_tiled(float *dA, float *dB, float *dC, int DIM, int N, int GP
 	    sA[threadIdx.y][threadIdx.x] = dA[(it+threadIdx.y)*DIM + kt + threadIdx.x];
 	    sB[threadIdx.y][threadIdx.x] = dB[(kt+threadIdx.y)*DIM + jt + threadIdx.x];
 	    __syncthreads();
-	    
+
 	    // two 32x32 small shared (dB[it + 0:31][kt + 0:31], dC[kt+0:31][jt + 0:31]) at this point
 	    for (k = kt; k < kt+32; k++) {
 		sum += sA[i-it][k-kt] * sB[k-kt][j-jt];
 	    }
-	    
+
 	    __syncthreads();
 	}
 	dC[i*DIM+j] = sum;
@@ -108,7 +110,7 @@ extern "C" {
 	    printf("In mmCUDA\n");
 	    printf("\t GPUN: %d\n", GPUN);
 	    printf("\t range: %d..%d\n", start, end);
-#endif	
+#endif
 #ifdef PROF
 	    cudaEvent_t startCudaMallocEvent, endCudaMallocEvent;
 	    cudaEvent_t startCudaMemcpyH2DEvent, endCudaMemcpyH2DEvent;
@@ -126,7 +128,7 @@ extern "C" {
 
 #ifdef PROF
 	    CudaSafeCall(cudaEventRecord(startCudaMallocEvent));
-#endif	    
+#endif
 	    CudaSafeCall(cudaMalloc(&dA, sizeof(float) * GPUN));
 	    CudaSafeCall(cudaMalloc(&dB, sizeof(float) * N));
 	    CudaSafeCall(cudaMalloc(&dC, sizeof(float) * GPUN));
@@ -134,7 +136,7 @@ extern "C" {
 	    CudaSafeCall(cudaEventRecord(endCudaMallocEvent));
 	    CudaSafeCall(cudaEventSynchronize(endCudaMallocEvent));
 #endif
-	    
+
 #ifdef PROF
 	    CudaSafeCall(cudaEventRecord(startCudaMemcpyH2DEvent));
 #endif
@@ -144,7 +146,7 @@ extern "C" {
 	    CudaSafeCall(cudaEventRecord(endCudaMemcpyH2DEvent));
 	    CudaSafeCall(cudaEventSynchronize(endCudaMemcpyH2DEvent));
 #endif
-	    
+
 #ifdef PROF
 	    CudaSafeCall(cudaEventRecord(startCudaKernelEvent));
 #endif
@@ -155,11 +157,12 @@ extern "C" {
 		dim3 grid(ceil(sqrt(N)/32), ceil(sqrt(N)/32));
 		mm_tiled<<<grid, block>>>(dA, dB, dC, ceil(sqrt(N)), N, N);
 	    } else {
+#ifdef __NVCC__
 	        cublasHandle_t handle;
 #ifdef PROF
 		long long start = getCurrentTime();
-#endif	
-		cublasCreate(&handle);           
+#endif
+		cublasCreate(&handle);
 	        float alpha = 1.0F;
 		float beta = 0.0F;
 	        int lda = sqrt(N), ldb = sqrt(N), ldc = sqrt(N);
@@ -176,7 +179,8 @@ extern "C" {
 		long long end2 = getCurrentTime();
 		printf("cuBLAS finish: %lf msec\n", (float)(end2-start)/1000);
 #endif
-	    }	    
+#endif
+	    }
 	    CudaCheckError();
 #ifdef PROF
 	    CudaSafeCall(cudaEventRecord(endCudaKernelEvent));
@@ -208,7 +212,7 @@ extern "C" {
 	    //for (int i = 0; i < GPUN; i++) {
 	    //	printf("C[%d] = %lf\n", start+i, C[start+i]);
 	    //}
-	    
+
 	    CudaSafeCall(cudaFree(dA));
 	    CudaSafeCall(cudaFree(dB));
 	    CudaSafeCall(cudaFree(dC));

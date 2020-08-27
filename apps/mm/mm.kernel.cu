@@ -1,5 +1,7 @@
 #include <assert.h>
+#ifdef __NVCC__
 #include <cublas_v2.h>
+#endif
 
 __global__ void mm(float *dA, float *dB, float *dC, int DIM, int N, int GPUN) {
     int id = blockIdx.x * blockDim.x + threadIdx.x;
@@ -32,6 +34,7 @@ void LaunchMM(float *A, float *B, float *C, int N, int low, int hi, int GPUN, in
             assert(false);
         }
         else {
+#ifdef __NVCC__
             printf("Using cublas\n");
             cublasHandle_t handle;
 
@@ -41,6 +44,7 @@ void LaunchMM(float *A, float *B, float *C, int N, int low, int hi, int GPUN, in
             int lda = sqrt(N), ldb = sqrt(N), ldc = sqrt(N);
 
             cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, sqrt(N), GPUN/sqrt(N), sqrt(N), &alpha, B, ldb, A, lda, &beta, C, ldc);
+#endif
         }
     }
 }

@@ -12,9 +12,9 @@ HIP_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIHIP_static -L$(HIP_ROOT_DIR)/lib -lhip_h
 # OpenCL
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static -L./build -l$(TARGET).opencl --ldflags '-framework OpenCL'
+	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static --ldflags '-framework OpenCL'
 else
-	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static -L./build -l$(TARGET).opencl -L$(subst libOpenCL.so,,$(OpenCL_LIBRARIES)) -lOpenCL
+	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static -L$(subst libOpenCL.so,,$(OpenCL_LIBRARIES)) -lOpenCL
 endif
 
 # CPU
@@ -23,6 +23,8 @@ baseline: $(TARGET).baseline.chpl
 	chpl --fast $< -o $(TARGET).cpu.$@
 
 # CUDA
+
+cuda: cuda.gpu cuda.hybrid cuda.hybrid.dist cuda.hybrid.dist.lowmid cuda.hybrid.dist.mid
 
 build/lib$(TARGET).cuda.a: $(TARGET).cu
 	rm -rf build &&	mkdir build && cd build && cmake .. && make
@@ -41,6 +43,8 @@ cuda.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).cuda.a
 
 # HIP
 
+hip: hip.gpu hip.hybrid hip.hybrid.dist hip.hybrid.dist.lowmid hip.hybrid.dist.mid
+
 build/lib$(TARGET).hip.a: $(TARGET).cu
 	rm -rf build &&	mkdir build && cd build && cmake .. && make
 
@@ -58,12 +62,14 @@ hip.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).hip.a
 
 # OpenCL (MID and LOW-MID are not supported so far)
 
+opencl: opencl.gpu opencl.hybrid opencl.hybrid.dist
+
 build/lib$(TARGET).opencl.a: $(TARGET).opencl.c
 	rm -rf build &&	mkdir build && cd build && cmake .. && make
 
 opencl.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).opencl.a
-	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl -L./build -l$(TARGET).opencl $(OPNCL_LIBS) -o $(TARGET).$@
+	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl -L./build -l$(TARGET).opencl $(OPENCL_LIBS) -o $(TARGET).$@
 
 .PHONY: clean
 clean:
-	rm -rf ./build $(TARGET).cpu.baseline $(TARGET).cuda.* $(TARGET).hip.* $(TARGET).opencl.gpu $(TARGET).opencl.hybrid.*
+	rm -rf ./build $(TARGET).cpu.baseline $(TARGET).cuda.* $(TARGET).hip.* $(TARGET).opencl.gpu $(TARGET).opencl.hybrid*
