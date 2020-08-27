@@ -3,10 +3,10 @@ __kernel void mm(__global const float *A, __global const float *B, __global floa
     if (id <= GPUN) {
         int i = id / DIM;
         int j = id % DIM;
-        int sum = 0;
+        float sum = 0.0f;
         for (int k = 0; k < DIM; k++) {
             sum += A[i*DIM+k] * B[k*DIM+j];
         }
-        C[id] += sum;
+        C[id] = sum;
     }
 }
