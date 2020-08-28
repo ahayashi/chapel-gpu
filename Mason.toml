@@ -3,11 +3,13 @@
 name = "GPUIterator"
 version = "0.1.0"
 chplVersion = "1.16.0..1.22.1"
+tests = ["GPUIteratorRangeTest.chpl",
+         "GPUIteratorZipTest.chpl"]
+
+# Disable the use of low-level GPU API to build and run
+# examples and tests on non-GPU platforms
+compopts = "-sdisableMultiGPUs"
 
 [dependencies]
 
 
-[examples]
-examples = ["vc.chpl"]
-[examples.vc]
-compopts = "-sdisableMultiGPUs"
