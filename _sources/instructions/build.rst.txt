@@ -28,6 +28,9 @@ Instructions
 
    git clone https://github.com/ahayashi/chapel-gpu.git
 
+   .. note:: For now, please use the ``feature/explicit`` branch:
+             ``git fetch`` and then ``git checkout feature/explicit``.
+
 2. Build ``libGPUAPI`` library using ``cmake``
 
 .. code-block:: bash
