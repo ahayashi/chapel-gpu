@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Guide to Write GPU programs &mdash; Chapel-GPU 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="GPUIterator" href="../details/gpuiterator.html" />
+    <link rel="prev" title="Compiling and Running Applications" href="compile.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Chapel-GPU
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">QuickStart Instructions</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="build.html">Building Chapel-GPU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="write.html">Using Chapel-GPU</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="low.html">Writing LOW-level (GPUIterator Only) programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low-mid.html">Writing LOW-MID-level programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mid.html">Writing MID-level programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compile.html">Compiling and Running Applications</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Guide to Write GPU programs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#general-guidelines">General Guidelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#writing-gpu-program">Writing GPU program</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Technical Details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../details/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../details/gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">History</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../history/evolution.html">Chapel-GPU Evolution</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chapel-GPU</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="write.html">Using Chapel-GPU</a> &raquo;</li>
+        
+      <li>Guide to Write GPU programs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/instructions/guide.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="guide-to-write-gpu-programs">
+<h1>Guide to Write GPU programs<a class="headerlink" href="#guide-to-write-gpu-programs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="general-guidelines">
+<h2>General Guidelines<a class="headerlink" href="#general-guidelines" title="Permalink to this headline">¶</a></h2>
+<p>In general, GPU programs should include typical host and device operations including device memory (de)allocations, data transfers, and kernel invocations. Depending on the abstraction level you choose, some of these operations can be written in a Chapel-user-friendly way:</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Level</th>
+<th class="head">MID-level</th>
+<th class="head">LOW-MID-level</th>
+<th class="head">LOW-level</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Kernel Invocation</td>
+<td>CUDA/HIP</td>
+<td>CUDA/HIP</td>
+<td>CUDA/HIP/OpenCL</td>
+</tr>
+<tr class="row-odd"><td>Memory (de)allocations</td>
+<td>Chapel (MID)</td>
+<td>Chapel (LOW-MID)</td>
+<td>CUDA/HIP/OpenCL</td>
+</tr>
+<tr class="row-even"><td>Data transfers</td>
+<td>Chapel (MID)</td>
+<td>Chapel (LOW-MID)</td>
+<td>CUDA/HIP/OpenCL</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="mid.html#writing-mid-level-programs"><span class="std std-ref">Writing MID-level programs</span></a></li>
+<li><a class="reference internal" href="../api/gpuapi.html#mid-level-api-reference"><span class="std std-ref">MID-level API Reference</span></a></li>
+<li><a class="reference internal" href="low-mid.html#writing-low-mid-level-programs"><span class="std std-ref">Writing LOW-MID-level programs</span></a></li>
+<li><a class="reference internal" href="../api/gpuapi.html#low-mid-level-api-reference"><span class="std std-ref">LOW-MID-level API Reference</span></a></li>
+<li><a class="reference internal" href="low.html#writing-low-level-gpuiterator-only-programs"><span class="std std-ref">Writing LOW-level (GPUIterator Only) programs</span></a></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">LOW/LOW-MID/MID levels can interoperate with each other.</p>
+</div>
+</div>
+<div class="section" id="writing-gpu-program">
+<h2>Writing GPU program<a class="headerlink" href="#writing-gpu-program" title="Permalink to this headline">¶</a></h2>
+<p>The design and implementation of a CUDA/HIP/OpenCL program that is supposed to be called from the callback function is completely up to you. However, please be aware that it can be called multiple times (i.e., the number of GPUs per locale * the number of locales) as the GPUIterator automatically and implicitly handles multiple- GPUs and locales. We’d highly recommend writing your GPU program in a way that is 1) device neutral (no device setting call) and 2) flexibile to change in iteration spaces -i.e., <code class="docutils literal"><span class="pre">start</span></code> and <code class="docutils literal"><span class="pre">end</span></code>  (including data allocations and transfers).</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../details/gpuiterator.html" class="btn btn-neutral float-right" title="GPUIterator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="compile.html" class="btn btn-neutral float-left" title="Compiling and Running Applications" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2019, Rice University, 2019-2020, Georgia Institute of Technology
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

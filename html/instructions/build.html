@@ -1,0 +1,365 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Building Chapel-GPU &mdash; Chapel-GPU 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using Chapel-GPU" href="write.html" />
+    <link rel="prev" title="Chapel GPU Documentation" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Chapel-GPU
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">QuickStart Instructions</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Building Chapel-GPU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#instructions">Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="write.html">Using Chapel-GPU</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Technical Details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../details/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../details/gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">History</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../history/evolution.html">Chapel-GPU Evolution</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chapel-GPU</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Building Chapel-GPU</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/instructions/build.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="building-chapel-gpu">
+<h1>Building Chapel-GPU<a class="headerlink" href="#building-chapel-gpu" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Chapel: 1.22 or below. Detailed instructions for installing Chapel can be found: <a class="reference external" href="https://chapel-lang.org/docs/usingchapel/QUICKSTART.html">here</a>.</p>
+</li>
+<li><p class="first">GPU Compilers &amp; Runtimes: GPUIterator and GPUAPI require either of the following GPU programing environments.</p>
+<blockquote>
+<div><ul class="simple">
+<li>NVIDIA CUDA: Tested with 10.2</li>
+<li>AMD HIP: Tested with 2.8</li>
+<li>OpenCL: Tested with 2.2 and 1.2</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Build tools</p>
+<blockquote>
+<div><ul class="simple">
+<li>cmake: 3.8.0 or above</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">While <code class="docutils literal"><span class="pre">GPUIterator</span></code> works with OpenCL, <code class="docutils literal"><span class="pre">GPUAPI</span></code> with OpenCL is under developement.</p>
+</div>
+</div>
+<div class="section" id="instructions">
+<h2>Instructions<a class="headerlink" href="#instructions" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Clone the repository</li>
+</ol>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>git clone https://github.com/ahayashi/chapel-gpu.git
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li>Build <code class="docutils literal"><span class="pre">libGPUAPI</span></code> library using <code class="docutils literal"><span class="pre">cmake</span></code></li>
+</ol>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> chapel-gpu
+mkdir build
+<span class="nb">cd</span> build
+cmake ..
+make
+make install
+</pre></div>
+</div>
+<p>This produces the following files:</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="18%" />
+<col width="18%" />
+<col width="18%" />
+<col width="45%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">File</th>
+<th class="head">Type</th>
+<th class="head">Destination</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>env.sh</td>
+<td>Shell Script</td>
+<td><code class="docutils literal"><span class="pre">bin</span></code></td>
+<td>Sets environment variables.</td>
+</tr>
+<tr class="row-odd"><td>libGPUAPIX.so</td>
+<td>Shared Library</td>
+<td><code class="docutils literal"><span class="pre">lib</span></code></td>
+<td>X is eiher CUDA, HIP, or OpenCL.</td>
+</tr>
+<tr class="row-even"><td>libGPUAPIX_static.a</td>
+<td>Static Library</td>
+<td><code class="docutils literal"><span class="pre">lib</span></code></td>
+<td>A static version of libGPUAPI. Mainly used in this document.</td>
+</tr>
+<tr class="row-odd"><td>GPUAPI.h</td>
+<td>Header File</td>
+<td><code class="docutils literal"><span class="pre">include</span></code></td>
+<td>A header file that includes the declaration of GPUAPI functions.</td>
+</tr>
+<tr class="row-even"><td>lambda.h</td>
+<td>Header File</td>
+<td><code class="docutils literal"><span class="pre">include</span></code></td>
+<td>A header file that facilitates writing device lambdas.</td>
+</tr>
+<tr class="row-odd"><td>GPUIterator.chpl</td>
+<td>Chapel Source File</td>
+<td><code class="docutils literal"><span class="pre">modules</span></code></td>
+<td>The <code class="docutils literal"><span class="pre">GPUIterator</span></code> module</td>
+</tr>
+<tr class="row-even"><td>GPUAPI.chpl</td>
+<td>Chapel Source File</td>
+<td><code class="docutils literal"><span class="pre">modules</span></code></td>
+<td>The <code class="docutils literal"><span class="pre">GPUAPI</span></code> module</td>
+</tr>
+</tbody>
+</table>
+<p>By default, the libraries are installed into <code class="code docutils literal"><span class="pre">chapel-gpu/install</span></code>. If you wish to install it into your preferred directly, please type:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>cmake -DCMAKE_INSTALL_PREFIX<span class="o">=</span>path/to/your_preferred_directory ..
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>For CUDA Users</strong>: If CUDA is not found, make sure <code class="code docutils literal"><span class="pre">nvcc</span></code> is in your path or tell <code class="code docutils literal"><span class="pre">cmake</span></code> the path to <code class="code docutils literal"><span class="pre">nvcc</span></code>. For example: <code class="code docutils literal"><span class="pre">cmake</span> <span class="pre">CMAKE_CUDA_COMPILER=path_to/nvcc</span> <span class="pre">..</span></code></p>
+<p class="last"><strong>For AMD HIP Users</strong>: Chapel-GPU relies on <code class="code docutils literal"><span class="pre">hipify-perl</span></code> to convert CUDA programs to HIP programs internally. If you are pretty sure HIP is installed on your system, but <code class="code docutils literal"><span class="pre">cmake</span></code> complains <code class="code docutils literal"><span class="pre">hipify-perl</span></code> is not found, consider updating the following line in <code class="code docutils literal"><span class="pre">CMakeLists.txt</span></code>: <code class="code docutils literal"><span class="pre">if(EXISTS</span> <span class="pre">&quot;${HIP_ROOT_DIR}/hip/bin/hipify-perl&quot;)</span></code></p>
+</div>
+<ol class="arabic simple" start="3">
+<li>source <code class="docutils literal"><span class="pre">env.sh</span></code></li>
+</ol>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> ..
+<span class="nb">source</span> ./install/bin/env.sh
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line">This sets 1) <code class="docutils literal"><span class="pre">$CHPL_GPU_HOME</span></code>, and 2) environment variables related to CUDA/HIP/OpenCL installation directory, the latter of which can be referred when the user creates object files for thier GPU programs.</div>
+</div>
+<ol class="arabic simple" start="4">
+<li>Build and run a test program</li>
+</ol>
+<blockquote>
+<div>See <a class="reference internal" href="compile.html"><span class="doc">Compiling and running</span></a></div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="write.html" class="btn btn-neutral float-right" title="Using Chapel-GPU" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral float-left" title="Chapel GPU Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2019, Rice University, 2019-2020, Georgia Institute of Technology
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,430 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>GPUIterator &mdash; Chapel-GPU 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="GPUAPI" href="gpuapi.html" />
+    <link rel="prev" title="Guide to Write GPU programs" href="../instructions/guide.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Chapel-GPU
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">QuickStart Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../instructions/build.html">Building Chapel-GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../instructions/write.html">Using Chapel-GPU</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Technical Details</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GPUIterator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#why-gpuiterator">Why GPUIterator?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#further-readings">Further Readings</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">History</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../history/evolution.html">Chapel-GPU Evolution</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chapel-GPU</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>GPUIterator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/details/gpuiterator.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gpuiterator">
+<h1>GPUIterator<a class="headerlink" href="#gpuiterator" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>A primary goal of this module is to provide an appropriate interface between Chapel and accelerator programs such that expert accelerator programmers can explore different variants in a portable way (i.e., CPU-only, GPU-only, X% for CPU + Y% for GPU on a single or multiple CPU+GPU node(s)). To address these challenges, here we introduce a Chapel module, <code class="docutils literal"><span class="pre">GPUIterator</span></code>, which facilitates invoking a user-written GPU program from Chapel. Since <a class="reference external" href="https://chapel-lang.org/docs/users-guide/datapar/forall.html">Chapel’s data-parallel loops</a> (<code class="docutils literal"><span class="pre">forall</span></code>) fit well with GPU execution, the <code class="docutils literal"><span class="pre">GPUIterator</span></code> is designed to be invoked in a <code class="docutils literal"><span class="pre">forall</span></code> loop. Consider the following <code class="docutils literal"><span class="pre">STREAM</span></code> code:</p>
+<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">forall</span> <span class="nx">i</span> <span class="kd">in</span> <span class="mi">1</span><span class="o">..</span><span class="nx">n</span> <span class="p">{</span>
+    <span class="nx">A</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">=</span> <span class="nx">B</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">+</span> <span class="nx">alpha</span> <span class="o">*</span> <span class="nx">C</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Assuming a GPU version of <code class="docutils literal"><span class="pre">STREAM</span></code> is ready (<code class="docutils literal"><span class="pre">streamCUDA</span></code> below), the user can wrap the original iteration space in <code class="docutils literal"><span class="pre">GPU()</span></code> with two additional arguments: <code class="docutils literal"><span class="pre">GPUCallBack</span></code> is a callback function that is invoked after the module has computed a subrange for the GPU portion by using <code class="docutils literal"><span class="pre">CPUPercent</span></code>:</p>
+<div class="highlight-chapel"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">// A GPUIterator version</span>
+<span class="k">extern</span> <span class="k">proc</span> <span class="nf">streamCUDA</span><span class="p">(</span><span class="nx">A</span><span class="p">:</span> <span class="p">[]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="nx">B</span><span class="p">:[]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="nx">C</span><span class="p">:[]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span>
+                       <span class="nx">alpha</span><span class="p">:</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">GPUCallBack</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// call the GPU program with a range of lo..hi</span>
+  <span class="nx">streamCUDA</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">C</span><span class="p">,</span> <span class="nx">alpha</span><span class="p">,</span> <span class="nx">lo</span><span class="p">,</span> <span class="nx">hi</span><span class="p">,</span> <span class="nx">N</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="nx">CPUPercent</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span> <span class="c1">// CPU 50% + GPU 50% in this case</span>
+<span class="k">forall</span> <span class="nx">i</span> <span class="kd">in</span> <span class="nx">GPU</span><span class="p">(</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">,</span> <span class="nx">GPUCallBack</span><span class="p">,</span> <span class="nx">CPUPercent</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">A</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">=</span> <span class="nx">B</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">+</span> <span class="nx">alpha</span> <span class="o">*</span> <span class="nx">C</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>It is worth noting that <code class="docutils literal"><span class="pre">GPUIterator</span></code> supports multi-GPUs execution and <a class="reference external" href="https://chapel-lang.org/docs/users-guide/locality/compilingAndExecutingMultiLocalePrograms.html">multi-locale execution</a>. For multi-GPUs execution, the module automatically detects the numbers of GPUs per node (or accept a user-specified number), and invokes the callback function for each GPU, which can be done without any modification to the code above. For multi-locale execution, the iterator accepts a <a class="reference external" href="https://chapel-lang.org/docs/primers/distributions.html#block-and-distribution-basics">block distributed domain</a>, which allows the user to run the code above on multiple CPUs+GPUs nodes with minimal modifications.</p>
+</div>
+<div class="section" id="why-gpuiterator">
+<h2>Why GPUIterator?<a class="headerlink" href="#why-gpuiterator" title="Permalink to this headline">¶</a></h2>
+<p>Chapel offers <a class="reference external" href="https://chapel-lang.org/docs/master/technotes/extern.html">the C interoperability feature</a>, which allows the user to invoke C/C++ functions from their Chapel programs. In the context of GPU programming in Chapel, the user typically prepares a GPU version of a <code class="docutils literal"><span class="pre">forall</span></code> loop written in CUDA/HIP/OpenCL and invokes it using the interoperability feature. For example, consider the following baseline <code class="docutils literal"><span class="pre">forall</span></code> implementation that performs <code class="docutils literal"><span class="pre">STREAM</span></code>:</p>
+<div class="highlight-chapel"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">// Chapel file</span>
+<span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">B</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">C</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">alpha</span><span class="p">:</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="o">=</span> <span class="mf">3.0</span><span class="p">;</span>
+<span class="k">forall</span> <span class="nx">i</span> <span class="kd">in</span> <span class="mi">1</span><span class="o">..</span><span class="nx">n</span> <span class="p">{</span>
+  <span class="nx">A</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">=</span> <span class="nx">B</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">+</span> <span class="nx">alpha</span> <span class="o">*</span> <span class="nx">C</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Assuming <code class="docutils literal"><span class="pre">streamCUDA()</span></code>, which is a full CUDA/HIP/OpenCL implementation of the <code class="docutils literal"><span class="pre">forall</span></code>, is available, here is what the GPU version looks like:</p>
+<div class="highlight-chapel"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">// Chapel file</span>
+<span class="c1">// Declare an external C/C++ function which performs STREAM on GPUs</span>
+<span class="k">extern</span> <span class="k">proc</span> <span class="nf">streamCUDA</span><span class="p">(</span><span class="nx">A</span><span class="p">:</span> <span class="p">[]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="nx">B</span><span class="p">:[]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="nx">C</span><span class="p">:[]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span>
+                       <span class="nx">alpha</span><span class="p">:</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">B</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">C</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">alpha</span><span class="p">:</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+<span class="nx">streamCUDA</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">C</span><span class="p">,</span> <span class="nx">alpha</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">n</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-c"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">// Separate C file</span>
+<span class="kt">void</span> <span class="nf">streamCUDA</span><span class="p">(</span><span class="kt">float</span> <span class="o">*</span><span class="n">A</span><span class="p">,</span> <span class="kt">float</span> <span class="o">*</span><span class="n">B</span><span class="p">,</span> <span class="kt">float</span> <span class="o">*</span><span class="n">C</span><span class="p">,</span>
+                <span class="kt">float</span> <span class="n">alpha</span><span class="p">,</span> <span class="kt">int</span> <span class="n">start</span><span class="p">,</span> <span class="kt">int</span> <span class="n">end</span><span class="p">,</span> <span class="kt">int</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+<span class="c1">// A full GPU implementation of STREAM (CUDA/HIP/OpenCL)</span>
+<span class="c1">// 1. device memory allocations</span>
+<span class="c1">// 2. host-to-device data transfers</span>
+<span class="c1">// 3. GPU kernel compilations (if needed)</span>
+<span class="c1">// 4. GPU kernel invocations</span>
+<span class="c1">// 5. device-to-host data transfers</span>
+<span class="c1">// 6. clean up</span>
+<span class="c1">// Note: A[0] and B[0] here corresponds to</span>
+<span class="c1">// A(1) and B(1) in the Chapel part respectively</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The key difference is that the original <code class="docutils literal"><span class="pre">forall</span></code> loop is replaced with the function call to the native function that includes typical host and device operations including device memory (de)allocations, data transfers, and kernel invocations.</p>
+<p>Unfortunately, the source code is not very portable particularly when the user wants to explore different configurations to get higher performance. One scenario is that, since GPUs are not always faster than CPUs (and vice versa), the user has to be juggling <code class="docutils literal"><span class="pre">forall</span></code> with <code class="docutils literal"><span class="pre">streamCUDA()</span></code> depending on the data size and the complexity of computations (e.g., by commenting in/out each version).</p>
+<p>One intuitive workaround would be to put an <code class="docutils literal"><span class="pre">if</span></code> statement to decide whether to use which version (CPUs or GPUs):</p>
+<div class="highlight-chapel"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="nx">cond</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">forall</span> <span class="nx">i</span> <span class="kd">in</span> <span class="mi">1</span><span class="o">..</span><span class="nx">n</span> <span class="p">{</span> <span class="c1">// STREAM }</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="nx">streamCUDA</span><span class="p">(</span><span class="o">..</span><span class="p">.);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>However, this raises another problem: it is still not very portable when the user wants to do 1) multi-locale CPU+GPU execution, and 2) advanced workload distributions such as hybrid execution of the CPU and GPU versions. Specifically, WITHOUT the module, the user has to write the following code:</p>
+<div class="highlight-chapel"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">// WITHOUT the GPUIterator module (no hybrid execution)</span>
+<span class="c1">// suppose D is a block distributed domain</span>
+<span class="k">if</span> <span class="p">(</span><span class="nx">cond</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">forall</span> <span class="nx">i</span> <span class="kd">in</span> <span class="nx">D</span> <span class="p">{</span> <span class="o">..</span><span class="p">.</span> <span class="p">}</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="k">coforall</span> <span class="nx">loc</span> <span class="kd">in</span> <span class="nx">Locales</span> <span class="p">{</span>
+    <span class="k">on</span> <span class="nx">loc</span> <span class="p">{</span>
+      <span class="k">coforall</span> <span class="nx">GPUID</span> <span class="kd">in</span> <span class="mi">0</span><span class="o">..#</span><span class="nx">nGPUs</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">lo</span> <span class="o">=</span> <span class="o">..</span><span class="p">.;</span> <span class="c1">// needs to be computed manually</span>
+        <span class="kd">var</span> <span class="nx">hi</span> <span class="o">=</span> <span class="o">..</span><span class="p">.;</span> <span class="c1">// needs to be computed manually</span>
+        <span class="kd">var</span> <span class="nx">localA</span> <span class="o">=</span> <span class="nx">A</span><span class="p">.</span><span class="nx">localSlice</span><span class="p">(</span><span class="nx">lo</span><span class="o">..</span><span class="nx">hi</span><span class="p">);</span>
+        <span class="o">..</span><span class="p">.</span>
+        <span class="c1">// GPUID needs to be manually set before streamCUDA() is called</span>
+        <span class="nx">streamCUDA</span><span class="p">(</span><span class="nx">localA</span><span class="p">,</span> <span class="o">..</span><span class="p">.);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>WITH the module, again, the code is much simpler and more portable:</p>
+<div class="highlight-chapel"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">// WITH the GPUIterator module</span>
+<span class="c1">// suppose D is a block distributed domain</span>
+<span class="kd">var</span> <span class="nx">GPUCallBack</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// call the GPU program with a range of lo..hi</span>
+  <span class="c1">// lo..hi is automatically computed</span>
+  <span class="c1">// the module internally and automatically sets GPUID</span>
+  <span class="nx">streamCUDA</span><span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">localSlice</span><span class="p">(</span><span class="nx">lo</span><span class="o">..</span><span class="nx">hi</span><span class="p">),</span> <span class="o">..</span><span class="p">.);</span>
+<span class="p">};</span>
+<span class="nx">CPUPercent</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span> <span class="c1">// CPU 50% + GPU 50% in this case</span>
+<span class="k">forall</span> <span class="nx">i</span> <span class="kd">in</span> <span class="nx">GPU</span><span class="p">(</span><span class="nx">D</span><span class="p">,</span> <span class="nx">GPUCallBack</span><span class="p">,</span> <span class="nx">CPUPercent</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">A</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">=</span> <span class="nx">B</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">+</span> <span class="nx">alpha</span> <span class="o">*</span> <span class="nx">C</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="further-readings">
+<h2>Further Readings<a class="headerlink" href="#further-readings" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>GPUIterator: bridging the gap between Chapel and GPU platforms. Akihiro Hayashi, Sri Raj Paul, Vivek Sarkar, The ACM SIGPLAN 6th Annual Chapel Implementers and Users Workshop (CHIUW), June 2019. (co-located with PLDI2019/ACM FCRC2019) <a class="reference external" href="https://dl.acm.org/doi/10.1145/3329722.3330142">DOI</a>.</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gpuapi.html" class="btn btn-neutral float-right" title="GPUAPI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../instructions/guide.html" class="btn btn-neutral float-left" title="Guide to Write GPU programs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2019, Rice University, 2019-2020, Georgia Institute of Technology
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

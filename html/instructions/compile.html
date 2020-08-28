@@ -1,0 +1,413 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Compiling and Running Applications &mdash; Chapel-GPU 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Guide to Write GPU programs" href="guide.html" />
+    <link rel="prev" title="Writing MID-level programs" href="mid.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Chapel-GPU
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">QuickStart Instructions</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="build.html">Building Chapel-GPU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="write.html">Using Chapel-GPU</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="low.html">Writing LOW-level (GPUIterator Only) programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="low-mid.html">Writing LOW-MID-level programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mid.html">Writing MID-level programs</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Compiling and Running Applications</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#compiling-applications">Compiling Applications</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-applications">Running Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guide.html">Guide to Write GPU programs</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Technical Details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../details/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../details/gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">History</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../history/evolution.html">Chapel-GPU Evolution</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chapel-GPU</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="write.html">Using Chapel-GPU</a> &raquo;</li>
+        
+      <li>Compiling and Running Applications</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/instructions/compile.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="compiling-and-running-applications">
+<h1>Compiling and Running Applications<a class="headerlink" href="#compiling-and-running-applications" title="Permalink to this headline">¶</a></h1>
+<p>The repository has several example applications in <code class="docutils literal"><span class="pre">chapel-gpu/example</span></code> and <code class="docutils literal"><span class="pre">chapel-gpu/apps</span></code> directory, most of which has a distributed version:</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Benchmark</th>
+<th class="head">Location</th>
+<th class="head">Description</th>
+<th class="head">Note</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Vector Copy</td>
+<td><code class="docutils literal"><span class="pre">example</span></code> and <code class="docutils literal"><span class="pre">apps/vector_copy</span></code></td>
+<td>A simple vector kernel</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>STREAM</td>
+<td><code class="docutils literal"><span class="pre">apps/stream</span></code></td>
+<td><cite>A = B + alpha * C</cite></td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>BlackScholes</td>
+<td><code class="docutils literal"><span class="pre">apps/blackscholes</span></code></td>
+<td>The Black-Scholes Equation</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>Logistic Regression</td>
+<td><code class="docutils literal"><span class="pre">apps/logisticregression</span></code></td>
+<td>A classification algorithm</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>Matrix Multiplication</td>
+<td><code class="docutils literal"><span class="pre">apps/mm</span></code></td>
+<td>Matrix-Matrix Multiply</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>PageRank</td>
+<td><code class="docutils literal"><span class="pre">apps/mm</span></code></td>
+<td>The pagerank algorithm</td>
+<td>WIP</td>
+</tr>
+<tr class="row-even"><td>N-Queens</td>
+<td>WIP</td>
+<td>The n-queens problem</td>
+<td>WIP</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This section assumes the Chapel-GPU components are already installed in <code class="docutils literal"><span class="pre">$CHPL_GPU_HOME</span></code>. If you have not done so please see <a class="reference internal" href="build.html#building-chapel-gpu"><span class="std std-ref">Building Chapel-GPU</span></a>.</p>
+</div>
+<div class="section" id="compiling-applications">
+<h2>Compiling Applications<a class="headerlink" href="#compiling-applications" title="Permalink to this headline">¶</a></h2>
+<p>The example applications in <code class="docutils literal"><span class="pre">chapel-gpu/example</span></code> and <code class="docutils literal"><span class="pre">chapel-gpu/apps</span></code> directory can be build by just doing <code class="docutils literal"><span class="pre">make</span> <span class="pre">X</span></code>, where <code class="docutils literal"><span class="pre">X</span></code> is either <code class="docutils literal"><span class="pre">cuda</span></code>, <code class="docutils literal"><span class="pre">hip</span></code>, or <code class="docutils literal"><span class="pre">opencl</span></code>. Please be sure to <code class="docutils literal"><span class="pre">source</span></code> the setting script before doing so.</p>
+<ol class="arabic simple">
+<li>Set environment variables</li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">source</span> <span class="nv">$CHPL_GPU_HOME</span>/bin/env.sh
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic" start="2">
+<li><p class="first">Compile</p>
+<ul>
+<li><p class="first">Example 1: <code class="docutils literal"><span class="pre">chapel-gpu/example</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/example
+make cuda
+or
+make hip
+or
+make opencl
+</pre></div>
+</div>
+</li>
+<li><p class="first">Example 2: <code class="docutils literal"><span class="pre">chapel-gpu/apps/stream</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/apps/stream
+make cuda
+or
+make hip
+or
+make opencl
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A baseline implementation for CPUs can be built by doing <code class="docutils literal"><span class="pre">make</span> <span class="pre">baseline</span></code>.</p>
+</div>
+</li>
+<li><p class="first">Check the generated executables</p>
+<p>For example, <code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda</span></code> in <code class="docutils literal"><span class="pre">apps/vector_copy</span></code> generates the following files:</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="20%" />
+<col width="40%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+<th class="head">Individual make command</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">vc.baseline</span></code></td>
+<td>A baseline implementation for CPUs.</td>
+<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">baseline</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">vc.cuda.gpu</span></code></td>
+<td>A GPU-only implmentation w/o the GPUIterator.</td>
+<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.gpu</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">vc.cuda.hybrid</span></code></td>
+<td>The GPUIterator implemenation (single-locale).</td>
+<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.hybrid</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">vc.cuda.hybrid.dist</span></code></td>
+<td>The GPUIterator implemenation (multi-locale).</td>
+<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">vc.cuda.hybrid.dist.lowmid</span></code></td>
+<td>The LOW-MID implemenation (multi-locale).</td>
+<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist.lowmid</span></code></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">vc.cuda.hybrid.dist.mid</span></code></td>
+<td>The MID implementation (multi-locale).</td>
+<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist.mid</span></code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">If you want to compile a specific variant, please do <code class="docutils literal"><span class="pre">make</span> <span class="pre">X.Y</span></code>, where <code class="docutils literal"><span class="pre">X</span></code> is either <code class="docutils literal"><span class="pre">cuda</span></code>, <code class="docutils literal"><span class="pre">hip</span></code>, or <code class="docutils literal"><span class="pre">opencl</span></code>, and <code class="docutils literal"><span class="pre">Y</span></code> is either <code class="docutils literal"><span class="pre">gpu</span></code>, <code class="docutils literal"><span class="pre">hybrid</span></code>, <code class="docutils literal"><span class="pre">hybrid.dist</span></code>, <code class="docutils literal"><span class="pre">hybrid.dist.lowmid</span></code>, or <code class="docutils literal"><span class="pre">hybrid.dist.mid</span></code>. Please also see the third column above. Also, the LOW-MID and MID variants with OpenCL are currently not supported.</p>
+</div>
+</li>
+</ol>
+<blockquote>
+<div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <code class="docutils literal"><span class="pre">Makefile</span></code> internally uses <code class="docutils literal"><span class="pre">cmake</span></code> to generate a static library from a GPU source program (<code class="docutils literal"><span class="pre">vc.cu</span></code> in this case)</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="running-applications">
+<h2>Running Applications<a class="headerlink" href="#running-applications" title="Permalink to this headline">¶</a></h2>
+<p>Once you have compiled a Chapel-GPU program, you can run it from the command-line:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./vc.cuda.hybrid
+</pre></div>
+</div>
+<p>Also, many of the example applications accepts the <code class="docutils literal"><span class="pre">--n</span></code> option, which changes input size, the <code class="docutils literal"><span class="pre">--CPUratio</span></code> (or <code class="docutils literal"><span class="pre">--CPUPercent</span></code>) option, which controls the percentage of an iteration space will be executed on CPUs, and the <code class="docutils literal"><span class="pre">--output</span></code> option, which outputs the result arrays. For example:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>./vc.cuda.hybrid --n<span class="o">=</span><span class="m">256</span> --CPUratio<span class="o">=</span><span class="m">50</span> --output<span class="o">=</span><span class="m">1</span>
+</pre></div>
+</div>
+<p>For multi-locale execution, please refer to <a class="reference external" href="https://chapel-lang.org/docs/usingchapel/QUICKSTART.html#using-chapel-in-multi-locale-mode">this document</a>.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="guide.html" class="btn btn-neutral float-right" title="Guide to Write GPU programs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="mid.html" class="btn btn-neutral float-left" title="Writing MID-level programs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2019, Rice University, 2019-2020, Georgia Institute of Technology
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

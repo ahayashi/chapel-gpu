@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Chapel GPU Documentation &mdash; Chapel-GPU 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Building Chapel-GPU" href="instructions/build.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home" alt="Documentation Home"> Chapel-GPU
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">QuickStart Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="instructions/build.html">Building Chapel-GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="instructions/write.html">Using Chapel-GPU</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Technical Details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="details/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="details/gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">History</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="history/evolution.html">Chapel-GPU Evolution</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Chapel-GPU</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Chapel GPU Documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="chapel-gpu-documentation">
+<h1>Chapel GPU Documentation<a class="headerlink" href="#chapel-gpu-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This document is mostly complete, but still under internal review. If you wish to try Chapel-GPU right now, please use <a class="reference external" href="https://github.com/ahayashi/chapel-gpu/tree/feature/explicit">the feature/explicit branch</a>. We’ll soon release version 0.2.0, which includes all the features described in this document, and update <a class="reference external" href="https://github.com/ahayashi/chapel-gpu">the master branch</a> accordingly.</p>
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This document describes the following two Chapel modules that facilitate GPU programming in Chapel:</p>
+<ul>
+<li><p class="first"><cite>GPUIterator</cite>: A Chapel iterator that facilitates invoking user-written GPU programs (e.g., CUDA/HIP/OpenCL) from Chapel programs. It is also designed to easily perform hybrid and/or distributed execution - i.e., CPU-only, GPU-only, X% for CPU + Y% for GPU on a single or multiple CPU+GPU node(s), which helps the user to explore the best configuration.</p>
+</li>
+<li><p class="first"><cite>GPUAPI</cite>: Chapel-level GPU API that allows the user to perform basic operations such as GPU memory (de)allocations, device-to-host/host-to-device transfers, and so on. This module can be used either standalone or with the GPUIterator module. Currently, the following two tiers of API are provided:</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><cite>MID-level</cite>: Provides Chapel user-friendly GPU API functions.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Example: <code class="code chapel docutils literal"><span class="keyword declaration"><span class="pre">var</span></span> <span class="name other"><span class="pre">ga</span></span> <span class="operator"><span class="pre">=</span></span> <span class="name other"><span class="pre">new</span></span> <span class="name other"><span class="pre">GPUArray</span></span><span class="punctuation"><span class="pre">(</span></span><span class="name other"><span class="pre">A</span></span><span class="punctuation"><span class="pre">);</span></span></code></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first"><cite>LOW-MID-level</cite>: Provides wrapper functions for raw GPU API functions</p>
+<blockquote>
+<div><ul class="simple">
+<li>Example: <code class="code chapel docutils literal"><span class="keyword declaration"><span class="pre">var</span></span> <span class="name other"><span class="pre">ga</span></span><span class="punctuation"><span class="pre">:</span></span> <span class="name other"><span class="pre">c_void_ptr</span></span> <span class="operator"><span class="pre">=</span></span> <span class="name other"><span class="pre">Malloc</span></span><span class="punctuation"><span class="pre">(</span></span><span class="name other"><span class="pre">sizeInBytes</span></span><span class="punctuation"><span class="pre">);</span></span></code></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>Also, in this document, for categorization purposes, the term <cite>LOW-level</cite> is referred to a GPUIterator only version, where the GPUIterator is only used for invoking raw GPU programs in which there is no Chapel-level abstraction.</p>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">QuickStart Instructions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="instructions/build.html">Building Chapel-GPU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="instructions/build.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions/build.html#instructions">Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="instructions/write.html">Using Chapel-GPU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="instructions/low.html">Writing LOW-level (GPUIterator Only) programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions/low-mid.html">Writing LOW-MID-level programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions/mid.html">Writing MID-level programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions/compile.html">Compiling and Running Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions/guide.html">Guide to Write GPU programs</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Technical Details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="details/gpuiterator.html">GPUIterator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="details/gpuiterator.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="details/gpuiterator.html#why-gpuiterator">Why GPUIterator?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="details/gpuiterator.html#further-readings">Further Readings</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="details/gpuapi.html">GPUAPI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="details/gpuapi.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="details/gpuapi.html#further-readings">Further Readings</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/gpuapi.html">GPUAPI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/gpuapi.html#mid-level-api-reference">MID-level API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/gpuapi.html#low-mid-level-api-reference">LOW-MID-level API Reference</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">History</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="history/evolution.html">Chapel-GPU Evolution</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="history/evolution.html#version-0-2-0-august-2020">version 0.2.0, August, 2020</a></li>
+<li class="toctree-l2"><a class="reference internal" href="history/evolution.html#version-0-1-0-july-2019">version 0.1.0, July, 2019</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="instructions/build.html" class="btn btn-neutral float-right" title="Building Chapel-GPU" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2019, Rice University, 2019-2020, Georgia Institute of Technology
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
