@@ -1,20 +1,21 @@
 CHPL_GPU_MODULES=-M $(CHPL_GPU_HOME)/modules $(CHPL_GPU_HOME)/include/GPUAPI.h
 CHPL_FLAGS=--fast $(CHPL_GPU_MODULES)
+CHPL_GPU_LIB_PATH=-L$(CHPL_GPU_HOME)/lib -L$(CHPL_GPU_HOME)/lib64
 
 # CUDA
 ifeq ($(USE_CUBLAS), yes)
   CUBLAS_LIB=-lcublas
 endif
-CUDA_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPICUDA_static -L$(CUDA_ROOT_DIR)/lib -lcudart $(CUBLAS_LIB)
+CUDA_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPICUDA_static -L$(CUDA_ROOT_DIR)/lib -lcudart $(CUBLAS_LIB)
 # HIP
-HIP_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIHIP_static -L$(HIP_ROOT_DIR)/lib -lhip_hcc
+HIP_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPIHIP_static -L$(HIP_ROOT_DIR)/lib -lhip_hcc
 
 # OpenCL
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static --ldflags '-framework OpenCL'
+	OPENCL_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPIOPENCL_static --ldflags '-framework OpenCL'
 else
-	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static -L$(subst libOpenCL.so,,$(OpenCL_LIBRARIES)) -lOpenCL
+	OPENCL_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPIOPENCL_static -L$(subst libOpenCL.so,,$(OpenCL_LIBRARIES)) -lOpenCL
 endif
 
 # CPU
