@@ -10,6 +10,8 @@
 #include <CL/cl.h>
 #endif
 
+#undef PROF
+
 #define MAX_SOURCE_SIZE (0x100000)
 
 #ifdef __cplusplus
@@ -53,8 +55,9 @@ extern "C" {
         cl_device_id device_id = device_ids[did];
         size_t sret;
         clGetDeviceInfo(device_id, CL_DEVICE_NAME, sizeof(str), str, &sret);
+#ifdef PROF
 		printf("clGetDeviceInfo = %ld, GPU %s\n", sret, str);
-
+#endif
         // Create an OpenCL context
         cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
         if (ret != CL_SUCCESS) {
@@ -140,6 +143,7 @@ extern "C" {
         if (ret != CL_SUCCESS) {
             printf("%s\n", openclGetErrorString(ret));
         }
+#if PROF
         cl_ulong time_start;
         cl_ulong time_end;
 
@@ -156,6 +160,7 @@ extern "C" {
         clGetEventProfilingInfo(d2h_event, CL_PROFILING_COMMAND_START, sizeof(time_start), &time_start, NULL);
         clGetEventProfilingInfo(d2h_event, CL_PROFILING_COMMAND_END, sizeof(time_end), &time_end, NULL);
         printf("D2H time: %lf seconds \n", (time_end-time_start) / 1000000000.0);
+#endif
     }
 #ifdef __cplusplus
 }

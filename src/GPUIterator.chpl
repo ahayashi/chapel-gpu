@@ -316,6 +316,78 @@ module GPUIterator {
       }
     }
 
+    // leader (domain)
+    iter GPU(param tag: iterKind,
+             D: domain(1),
+             GPUWrapper,
+             CPUPercent: int = 0
+             )
+      where tag == iterKind.leader {
+
+      if (debugGPUIterator) then
+	    writeln("[DEBUG GPUITERATOR] In GPUIterator (leader range)");
+
+      var r = D.low..D.high;
+      const (CPURange, GPURange) = computeSubranges(r, CPUPercent);
+      for i in createTaskAndYield(tag, r, CPURange, GPURange, GPUWrapper) {
+        yield i;
+      }
+    }
+
+    // follower (domain)
+    iter GPU(param tag: iterKind,
+             D: domain(1),
+             GPUWrapper,
+             CPUPercent: int = 0,
+             followThis
+             )
+      where tag == iterKind.follower
+      && followThis.size == 1 {
+
+      // index-neutral
+      const (followInds,) = followThis;
+      const lowBasedIters = followInds.translate(D.low);
+
+      if (debugGPUIterator) {
+        writeln("[DEBUG GPUITERATOR] GPUIterator (follower)");
+        writeln("[DEBUG GPUITERATOR] Follower received ", followThis, " as work chunk; shifting to ",
+                lowBasedIters);
+      }
+
+      for i in lowBasedIters do
+        yield i;
+    }
+
+    // standalone (domain)
+    iter GPU(param tag: iterKind,
+             D: domain(1),
+             GPUWrapper,
+             CPUPercent: int = 0
+             )
+  	  where tag == iterKind.standalone {
+
+      if (debugGPUIterator) then
+	    writeln("[DEBUG GPUITERATOR] In GPUIterator (standalone)");
+
+      var r = D.low..D.high;
+      const (CPURange, GPURange) = computeSubranges(r, CPUPercent);
+      for i in createTaskAndYield(tag, r, CPURange, GPURange, GPUWrapper) {
+        yield i;
+      }
+    }
+
+    // serial iterators (domain)
+    iter GPU(D: domain(1),
+             GPUWrapper,
+             CPUPercent: int = 0
+             ) {
+      if (debugGPUIterator) then
+        writeln("[DEBUG GPUITERATOR] In GPUIterator (serial)");
+
+      for i in D do
+        yield i;
+    }
+
     // leader (range)
     iter GPU(param tag: iterKind,
              r: range(?),
