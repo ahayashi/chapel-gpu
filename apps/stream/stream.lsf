@@ -1,0 +1,31 @@
+#!/bin/bash
+#BSUB -P GEN010sollve
+#BSUB -W 0:30
+#BSUB -nnodes 8
+#BSUB -alloc_flags smt1
+##BSUB -alloc_flags gpumps
+#BSUB -J ST
+#BSUB -o ST.%J
+#BSUB -e ST.%J
+
+cd /ccs/home/ahayashi/chiuw2020/chapel-1.20.0
+source ./chiuw2020.sh
+
+cd /ccs/home/ahayashi/chiuw2020/chapel-gpu/apps/stream
+
+N=1073741824
+
+for nodes in 1 2 4 8;
+do
+    echo "nTasks: " $nodes
+    echo "[LOW]"
+    for ratio in 100 0;
+    do
+        echo "CPUratio:" $ratio
+	    jsrun -n $nodes -a 1 -c 42 -g 1 -b rs ./stream.hybrid.dist_real -nl $nodes --n=$N --numTrials=10 --CPUratio=$ratio -v
+    done
+    echo "[LOWMID]"
+	jsrun -n $nodes -a 1 -c 42 -g 1 -b rs ./stream.hybrid.dist.lowmid_real -nl $nodes --n=$N --numTrials=10 --CPUratio=0 -v
+    echo "[MID]"
+	jsrun -n $nodes -a 1 -c 42 -g 1 -b rs ./stream.hybrid.dist.mid_real -nl $nodes --n=$N --numTrials=10 --CPUratio=0 -v
+done

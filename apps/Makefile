@@ -1,69 +1,75 @@
-# Flags for the Chapel compiler
-CHPLFLAGS=--fast
-CHPLMODULE=../../src
+CHPL_GPU_MODULES=-M $(CHPL_GPU_HOME)/modules $(CHPL_GPU_HOME)/include/GPUAPI.h
+CHPL_FLAGS=--fast $(CHPL_GPU_MODULES)
 
-# For CUDA
-CUDALIBSFLAGS=-L/usr/local/cuda/lib64 -lcudart -lcuda
-#CUDALIBSFLAGS=-L/opt/apps/software/Compiler/GCC/6.4.0/CUDA/8.0.61/lib -lcudart -lcublas
-NVCCFLAGS=-O3 -arch sm_37 -std=c++11
+# CUDA
+ifeq ($(USE_CUBLAS), yes)
+  CUBLAS_LIB=-lcublas
+endif
+CUDA_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPICUDA_static -L$(CUDA_ROOT_DIR)/lib -lcudart $(CUBLAS_LIB)
+# HIP
+HIP_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIHIP_static -L$(HIP_ROOT_DIR)/lib -lhip_hcc
 
-# For OpenCL
-OCLLIBSFLAGS=-framework OpenCL
-OCLFLAGS=-framework OpenCL
+# OpenCL
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static --ldflags '-framework OpenCL'
+else
+	OPENCL_LIBS=-L$(CHPL_GPU_HOME)/lib -lGPUAPIOPENCL_static -L$(subst libOpenCL.so,,$(OpenCL_LIBRARIES)) -lOpenCL
+endif
 
-# For HIP
-ROCM_HOME=/opt/rocm
-HIP_HOME=$(ROCM_HOME)/hip
-HIPLIBSFLAGS=-L$(ROCM_HOME)/lib -lhip_hcc
+# CPU
 
-all: baseline cudagpu cudahybrid cudahybrid.dist
-
-$(TARGET).o: $(TARGET).cu
-	nvcc $(NVCCFLAGS) -c $^
-
-$(TARGET).opencl.o: $(TARGET).opencl.c
-	gcc -O3 -Wall $(OCLFLAGS) -c $^
-
-.PHONY: baseline
 baseline: $(TARGET).baseline.chpl
-	chpl $(CHPLFLAGS) $(TARGET).baseline.chpl
+	chpl --fast $< -o $(TARGET).cpu.$@
 
-.PHONY: blas
-blas:
-	chpl $(CHPLFLAGS) $(TARGET).blas.chpl 
+# CUDA
 
-.PHONY: cudagpu
-cudagpu: $(TARGET).o $(TARGET).gpu.chpl
-	chpl $(CHPLFLAGS) $(TARGET).o $(TARGET).gpu.chpl $(CUDALIBSFLAGS)
+cuda: cuda.gpu cuda.hybrid cuda.hybrid.dist cuda.hybrid.dist.lowmid cuda.hybrid.dist.mid
 
-.PHONY: cudahybrid
-cudahybrid: $(TARGET).o $(TARGET).hybrid.chpl
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(TARGET).hybrid.chpl $(CUDALIBSFLAGS)
+build/lib$(TARGET).cuda.a: $(TARGET).cu
+	rm -rf build &&	mkdir build && cd build && cmake .. && make
 
-.PHONY: cudahybrid.dist
-cudahybrid.dist: $(TARGET).o $(TARGET).hybrid.dist.chpl
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).o $(TARGET).hybrid.dist.chpl $(CUDALIBSFLAGS)
+build/lib$(TARGET).kernel.cuda.a: $(TARGET).kernel.cu
+	rm -rf build &&	mkdir build && cd build && cmake .. && make
 
-.PHONY: openclgpu
-oclgpu: $(TARGET).opencl.o $(TARGET).gpu.chpl
-	chpl $(CHPLFLAGS) $(TARGET).opencl.o $(TARGET).gpu.chpl --ldflags $(OCLLIBSFLAGS)
+cuda.%.mid: $(TARGET).%.mid.chpl $(TARGET).kernel.h build/lib$(TARGET).kernel.cuda.a
+	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.mid.chpl -L./build -l$(TARGET).kernel.cuda $(CUDA_LIBS) -o $(TARGET).$@
 
-.PHONY: openclhybrid
-oclhybrid: $(TARGET).opencl.o $(TARGET).hybrid.chpl
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).opencl.o $(TARGET).hybrid.chpl --ldflags $(OCLLIBSFLAGS)
+cuda.%.lowmid: $(TARGET).%.lowmid.chpl $(TARGET).kernel.h build/lib$(TARGET).kernel.cuda.a
+	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.lowmid.chpl -L./build -l$(TARGET).kernel.cuda $(CUDA_LIBS) -o $(TARGET).$@
 
-.PHONY: hipgpu
-hipgpu: $(TARGET).cu $(TARGET).gpu.chpl
-	$(HIP_HOME)/bin/hipify-perl $(TARGET).cu > $(TARGET).hip.cpp
-	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c $(TARGET).hip.cpp -fno-gpu-rdc
-	chpl $(CHPLFLAGS) $(TARGET).hip.o $(TARGET).gpu.chpl --ldflags $(HIPLIBSFLAGS)
+cuda.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).cuda.a
+	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl -L./build -l$(TARGET).cuda $(CUDA_LIBS) -o $(TARGET).$@
 
-.PHONY: hiphybrid
-hiphybrid: $(TARGET).cu $(TARGET).hybrid.chpl
-	$(HIP_HOME)/bin/hipify-perl $(TARGET).cu > $(TARGET).hip.cpp
-	$(HIP_HOME)/bin/hipcc -O3 -Wall -fPIC -c $(TARGET).hip.cpp -fno-gpu-rdc
-	chpl -M $(CHPLMODULE) $(CHPLFLAGS) $(TARGET).hip.o $(TARGET).hybrid.chpl --ldflags $(HIPLIBSFLAGS)
+# HIP
+
+hip: hip.gpu hip.hybrid hip.hybrid.dist hip.hybrid.dist.lowmid hip.hybrid.dist.mid
+
+build/lib$(TARGET).hip.a: $(TARGET).cu
+	rm -rf build &&	mkdir build && cd build && cmake .. && make
+
+build/lib$(TARGET).kernel.hip.a: $(TARGET).kernel.cu
+	rm -rf build &&	mkdir build && cd build && cmake .. && make
+
+hip.%.mid: $(TARGET).%.mid.chpl $(TARGET).kernel.h  build/lib$(TARGET).kernel.hip.a
+	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.mid.chpl -L./build -l$(TARGET).kernel.hip $(HIP_LIBS) -o $(TARGET).$@
+
+hip.%.lowmid: $(TARGET).%.lowmid.chpl $(TARGET).kernel.h build/lib$(TARGET).kernel.hip.a
+	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.lowmid.chpl -L./build -l$(TARGET).kernel.hip $(HIP_LIBS) -o $(TARGET).$@
+
+hip.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).hip.a
+	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl -L./build -l$(TARGET).hip $(HIP_LIBS) -o $(TARGET).$@
+
+# OpenCL (MID and LOW-MID are not supported so far)
+
+opencl: opencl.gpu opencl.hybrid opencl.hybrid.dist
+
+build/lib$(TARGET).opencl.a: $(TARGET).opencl.c
+	rm -rf build &&	mkdir build && cd build && cmake .. && make
+
+opencl.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).opencl.a
+	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl -L./build -l$(TARGET).opencl $(OPENCL_LIBS) -o $(TARGET).$@
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET).baseline $(TARGET).gpu $(TARGET).hybrid $(TARGET).hybrid.dist $(TARGET).o *_real
+	rm -rf ./build $(TARGET).cpu.baseline $(TARGET).cuda.* $(TARGET).hip.* $(TARGET).opencl.gpu $(TARGET).opencl.hybrid*

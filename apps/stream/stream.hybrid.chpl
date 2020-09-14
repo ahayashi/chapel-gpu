@@ -9,7 +9,7 @@ use GPUIterator;
 /// Runtime Options
 ////////////////////////////////////////////////////////////////////////////////
 config const n = 32: int;
-config const CPUPercent = 0: int;
+config const CPUratio = 0: int;
 config const numTrials = 1: int;
 config const output = 0: int;
 config const alpha = 3.0: real(32);
@@ -76,7 +76,7 @@ proc printLocaleInfo() {
 proc main() {
   writeln("Stream: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n);
-  writeln("CPU ratio: ", CPUPercent);
+  writeln("CPU ratio: ", CPUratio);
   writeln("alpha: ", alpha);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
@@ -85,13 +85,13 @@ proc main() {
 
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
-	for i in 1..n {
+	forall i in 1..n {
       B(i) = i: real(32);
       C(i) = 2*i: real(32);
 	}
 
 	const startTime = getCurrentTime();
-	forall i in GPU(1..n, CUDAWrapper, CPUPercent) {
+	forall i in GPU(1..n, CUDAWrapper, CPUratio) {
       A(i) = B(i) + alpha * C(i);
 	}
 	execTimes(trial) = getCurrentTime() - startTime;

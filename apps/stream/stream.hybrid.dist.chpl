@@ -4,6 +4,7 @@ use Time;
 /// GPUIterator
 ////////////////////////////////////////////////////////////////////////////////
 use GPUIterator;
+use BlockDist;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -81,6 +82,7 @@ proc main() {
   writeln("Stream: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n);
   writeln("CPU ratio: ", CPUratio);
+  writeln("nGPUs: ", nGPUs);
   writeln("alpha: ", alpha);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
@@ -89,7 +91,7 @@ proc main() {
 
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
-	for i in 1..n {
+	forall i in D {
       B(i) = i: real(32);
       C(i) = 2*i: real(32);
 	}

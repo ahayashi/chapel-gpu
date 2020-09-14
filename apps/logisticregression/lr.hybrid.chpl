@@ -11,8 +11,8 @@ use GPUIterator;
 config const nFeatures = 32: int;
 config const nSamples = 32: int;
 config const nIters = 32: int;
-config const CPUPercent1 = 0: int;
-config const CPUPercent2 = 0: int;
+config const CPUratio1 = 0: int;
+config const CPUratio2 = 0: int;
 config const numTrials = 1: int;
 config const output = 0: int;
 config param verbose = false;
@@ -48,7 +48,7 @@ proc CUDAWrapper2(lo: int, hi: int, N: int) {
   if (verbose) {
 	writeln("In CUDAWrapper2(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
   }
-  lrCUDA2(X, Y, W, Wcurr, alpha, nSamples, nFeatures, lo, hi, N);
+  lrCUDA2(X, Y, W, Wcurr, alpha, nSamples, nFeatures, lo+1, hi+1, N);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,8 +88,8 @@ proc printLocaleInfo() {
 proc main() {
   writeln("Logistic Regression: CPU/GPU Execution (using GPUIterator)");
   writeln("nSamples :", nSamples, " nFeatures :",  nFeatures);
-  writeln("CPU Percent1: ", CPUPercent1);
-  writeln("CPU Percent2: ", CPUPercent2);
+  writeln("CPU Percent1: ", CPUratio1);
+  writeln("CPU Percent2: ", CPUratio2);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
 
@@ -97,26 +97,42 @@ proc main() {
 
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
-	for i in 1..nFeatures {
-      W(i) = 0: real(32);
-	}
-	for i in 1..nSamples {
-      Y(i) = (i % 2): real(32);
-      for j in 1..nFeatures {
-		if (j != 0) {
-          X(i, j) = (i % 2): real(32);
-		} else {
-          X(i, j) = 1;
-		}
+    if (false) {
+      for i in 1..nFeatures {
+        W(i) = 0: real(32);
       }
-	}
+      for i in 1..nSamples {
+        Y(i) = (i % 2): real(32);
+        for j in 1..nFeatures {
+          if (j != 0) {
+            X(i, j) = (i % 2): real(32);
+          } else {
+            X(i, j) = 1;
+          }
+        }
+      }
+    } else {
+      forall i in 1..nFeatures {
+        W(i) = 0: real(32);
+      }
+      for i in 1..nSamples {
+        Y(i) = i: real(32);
+        for j in 1..nFeatures {
+          if (j != 0) {
+            X(i, j) = j: real(32);
+          } else {
+            X(i, j) = j : real(32);
+          }
+        }
+      }
+    }
 
 	const startTime = getCurrentTime();
 	for ite in 1..nIters {
-      forall i in GPU(1..nFeatures, CUDAWrapper1, CPUPercent1) {
+      forall i in GPU(1..nFeatures, CUDAWrapper1, CPUratio1) {
 		Wcurr(i) = W(i);
       }
-      forall i in GPU(1..nFeatures, CUDAWrapper2, CPUPercent2) {
+      forall i in GPU(1..nFeatures, CUDAWrapper2, CPUratio2) {
 		var err = 0: real(32);
 		for s in 1..nSamples {
           var arg = 0: real(32);

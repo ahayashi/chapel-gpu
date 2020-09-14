@@ -22,6 +22,6 @@ do
     ./vc.gpu -nl 1 --n=$N --numTrials=10
     for ratio in 0 25 50 75 100;
     do
-	./vc.hybrid -nl 1 --n=$N --numTrials=10 --CPUPercent=$ratio
+	./vc.hybrid -nl 1 --n=$N --numTrials=10 --CPUratio=$ratio
     done
 done

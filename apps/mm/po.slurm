@@ -22,20 +22,20 @@ do
 
     for ratio in 0 25 50 75 100;
     do
-	./mm.hybrid -nl 1 --n=2048 --tiled=0 --numTrials=10 --CPUPercent=$ratio
+	./mm.hybrid -nl 1 --n=2048 --tiled=0 --numTrials=10 --CPUratio=$ratio
     done
 
     ./mm.gpu -nl 1 --n=2048 --tiled=1 --numTrials=10
 
     for ratio in 0 25 50 75 100;
     do
-	./mm.hybrid -nl 1 --n=2048 --tiled=1 --numTrials=10 --CPUPercent=$ratio
+	./mm.hybrid -nl 1 --n=2048 --tiled=1 --numTrials=10 --CPUratio=$ratio
     done
 
     ./mm.gpu -nl 1 --n=2048 --tiled=2 --numTrials=10
 
     for ratio in 0 25 50 75 100;
     do
-	./mm.hybrid -nl 1 --n=2048 --tiled=2 --numTrials=10 --CPUPercent=$ratio
+	./mm.hybrid -nl 1 --n=2048 --tiled=2 --numTrials=10 --CPUratio=$ratio
     done
 done
