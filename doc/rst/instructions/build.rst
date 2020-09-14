@@ -46,7 +46,7 @@ This produces the following files:
    :widths: 20, 20, 20, 50
 
    env.sh, Shell Script, ``bin``, Sets environment variables.
-   libGPUAPIX.so, Shared Library, ``lib``, "X is eiher CUDA, HIP, or OpenCL."
+   libGPUAPIX.so, Shared Library, ``lib``, "X is either CUDA, HIP, or OpenCL."
    libGPUAPIX_static.a, Static Library, ``lib``, "A static version of libGPUAPI. Mainly used in this document."
    GPUAPI.h, Header File, ``include``, "A header file that includes the declaration of GPUAPI functions."
    lambda.h, Header File, ``include``, "A header file that facilitates writing device lambdas."
