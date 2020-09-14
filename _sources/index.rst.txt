@@ -4,8 +4,6 @@
 Chapel GPU Documentation
 ================================
 
-.. note:: This document is mostly complete, but still under internal review. If you wish to try Chapel-GPU right now, please use `the feature/explicit branch <https://github.com/ahayashi/chapel-gpu/tree/feature/explicit>`_. We'll soon release version 0.2.0, which includes all the features described in this document, and update `the master branch <https://github.com/ahayashi/chapel-gpu>`_ accordingly.
-
 Overview
 --------
 This document describes the following two Chapel modules that facilitate GPU programming in Chapel:
