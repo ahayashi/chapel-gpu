@@ -83,6 +83,18 @@ extern "C" {
     CudaSafeCall(cudaMalloc(devPtr, size));
   }
 
+  void MallocPtr(void*** devPtr, size_t size) {
+    CudaSafeCall(cudaMalloc(devPtr, size));
+  }
+
+  void MallocPtrPtr(void**** devPtr, size_t size) {
+    CudaSafeCall(cudaMalloc(devPtr, size));
+  }
+
+  void MallocPitch(void** devPtr, size_t* pitch, size_t width, size_t height) {
+    CudaSafeCall(cudaMallocPitch(devPtr, pitch, width, height));
+  }
+
   void Memcpy(void* dst, void* src, size_t count, int kind) {
       switch (kind) {
       case 0:
@@ -90,6 +102,20 @@ extern "C" {
           break;
       case 1:
           CudaSafeCall(cudaMemcpy(dst, src, count, cudaMemcpyDeviceToHost));
+          break;
+      default:
+          printf("Fatal: Wrong Memcpy kind!\n");
+          exit(1);
+      }
+  }
+
+  void Memcpy2D(void* dst, size_t dpitch, void* src, size_t spitch, size_t width, size_t height, int kind) {
+      switch (kind) {
+      case 0:
+          CudaSafeCall(cudaMemcpy2D(dst, dpitch, src, spitch, width, height, cudaMemcpyHostToDevice));
+          break;
+      case 1:
+          CudaSafeCall(cudaMemcpy2D(dst, dpitch, src, spitch, width, height, cudaMemcpyDeviceToHost));
           break;
       default:
           printf("Fatal: Wrong Memcpy kind!\n");

@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2019, Rice University
  * Copyright (c) 2019, Georgia Institute of Technology
@@ -17,6 +18,7 @@
 
 module GPUAPI {
     use SysCTypes;
+    use CPtr;
 
     config param debugGPUAPI = false;
 
@@ -29,81 +31,139 @@ module GPUAPI {
 
     extern proc DeviceSynchronize();
 
+    // cudaMalloc
     extern proc Malloc(ref devPtr: c_void_ptr, size: size_t);
+    extern proc MallocPtr(ref devPtr: c_ptr(c_void_ptr), size: size_t);
+    extern proc MallocPtrPtr(ref devPtr: c_ptr(c_ptr(c_void_ptr)), size: size_t);
+    inline proc Malloc(ref devPtr: c_ptr(c_void_ptr), size: size_t) { MallocPtr(devPtr, size); };
+    inline proc Malloc(ref devPtr: c_ptr(c_ptr(c_void_ptr)), size: size_t) { MallocPtrPtr(devPtr, size); };
+
+    // cudaMallocPitch
+    extern proc MallocPitch(ref devPtr: c_void_ptr, ref pitch: size_t, width: size_t, height: size_t);
+
     extern proc Memcpy(dst: c_void_ptr, src: c_void_ptr, count: size_t, kind: int);
+    extern proc Memcpy2D(dst: c_void_ptr, dpitch: size_t, src: c_void_ptr, spitch: size_t, width: size_t, height: size_t, kind: int);
     extern proc Free(devPtr: c_void_ptr);
 
     class GPUArray {
-      var h2d: bool;
-      var d2h: bool;
       var devPtr: c_void_ptr;
       var hosPtr: c_void_ptr;
       var size: size_t;
       var sizeInBytes: size_t;
+      var pitch: size_t;
 
       proc init(ref arr) {
-        // Properties
-        this.h2d = true;
-        this.d2h = true;
         // Low-level info
         this.devPtr = nil;
         this.hosPtr = c_ptrTo(arr);
         // size info
         size = arr.size: size_t;
         sizeInBytes = (((arr.size: size_t) * c_sizeof(arr.eltType)) : size_t);
+        if (arr.rank == 2) {
+            pitch = arr.domain.dim(1).size:size_t * c_sizeof(arr.eltType);
+        }
         this.complete();
         // allocation
         Malloc(devPtr, sizeInBytes);
         if (debugGPUAPI) { writeln("malloc'ed: ", devPtr, " sizeInBytes: ", sizeInBytes); }
       }
 
-      proc toDevice() {
-        if (this.h2d) {
+      inline proc toDevice() {
           Memcpy(this.dPtr(), this.hPtr(), this.sizeInBytes, 0);
           if (debugGPUAPI) { writeln("h2d : ", this.hPtr(), " -> ", this.dPtr(), " transBytes: ", this.sizeInBytes); }
-        } else {
-          if (debugGPUAPI) { writeln("h2d ignored"); }
-        }
       }
 
-      proc fromDevice() {
-        if (this.d2h) {
+      inline proc fromDevice() {
           Memcpy(this.hPtr(), this.dPtr(), this.sizeInBytes, 1);
           if (debugGPUAPI) { writeln("d2h : ", this.dPtr(), " -> ", this.hPtr(), " transBytes: ", this.sizeInBytes); }
-        } else {
-          if (debugGPUAPI) { writeln("d2h ignored"); }
-        }
       }
 
-      proc free() {
+      inline proc free() {
         Free(this.dPtr());
         if (debugGPUAPI) { writeln("free : ", this.dPtr()); }
       }
 
-      proc dPtr(): c_void_ptr {
+      inline proc dPtr(): c_void_ptr {
         return devPtr;
       }
 
-      proc hPtr(): c_void_ptr {
+      inline proc hPtr(): c_void_ptr {
         return hosPtr;
       }
     }
 
-    proc toDevice(args: GPUArray ...?n) {
+    inline proc toDevice(args: GPUArray ...?n) {
       for ga in args {
         ga.toDevice();
       }
     }
 
-    proc fromDevice(args: GPUArray ...?n) {
+    inline proc fromDevice(args: GPUArray ...?n) {
       for ga in args {
         ga.fromDevice();
       }
     }
 
-    proc free(args: GPUArray ...?n) {
+    inline proc free(args: GPUArray ...?n) {
       for ga in args {
         ga.free();
+      }
+    }
+
+    class GPUJaggedArray {
+      var devPtr: c_ptr(c_void_ptr);
+      var nRows: int;
+      var hosPtrs: [0..#nRows] c_void_ptr;
+      var devPtrs: [0..#nRows] c_void_ptr;
+      var elemSizes: [0..#nRows] size_t;
+      var size: size_t;
+      var sizeInBytes: size_t;
+
+      proc init(args) {
+        this.nRows = 0;
+        for i in args {
+            this.nRows = this.nRows + 1;
+        }
+        this.complete();
+        var idx = 0;
+        for i in args {
+          const elemSize = i.size:size_t * c_sizeof(i.eltType);
+          Malloc(this.devPtrs[idx], elemSize);
+          this.hosPtrs[idx] = c_ptrTo(i);
+          this.elemSizes[idx] = elemSize;
+          idx = idx + 1;
+        }
+        Malloc(this.devPtr, nRows:size_t * c_sizeof(c_ptr(c_void_ptr)));
+      }
+
+      proc init(args ...?n) where n>=2 {
+        this.nRows = n;
+        this.complete();
+        var idx: int = 0;
+        for arg in args {
+          var array = [i in arg] i;
+          const elemSize = array.size: size_t * c_sizeof(array.eltType);
+          Malloc(this.devPtrs[idx], elemSize);
+          this.hosPtrs[idx] = c_ptrTo(array);
+          this.elemSizes[idx] = elemSize;
+          // temporary
+          Memcpy(this.devPtrs[idx], this.hosPtrs[idx], elemSizes[idx], 0);
+          idx = idx + 1;
+        }
+        Malloc(this.devPtr, nRows:size_t * c_sizeof(c_ptr(c_void_ptr)));
+        Memcpy(this.devPtr, c_ptrTo(this.devPtrs), nRows:size_t * c_sizeof(c_ptr(c_void_ptr)), 0);
+        //toDevice();
+      }
+
+      inline proc toDevice() {
+        for i in 0..#nRows {
+          Memcpy(this.devPtrs[i], this.hosPtrs[i], elemSizes[i], 0);
+        }
+        Memcpy(this.devPtr, c_ptrTo(this.devPtrs), nRows:size_t * c_sizeof(c_ptr(c_void_ptr)), 0);
+      }
+
+      inline proc dPtr(): c_ptr(c_void_ptr) {
+        return devPtr;
       }
     }
 }
