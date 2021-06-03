@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html4" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Writing MID-LOW-level programs &mdash; Chapel-GPU 0.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'0.2',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Writing MID-level programs" href="mid.html" />
+    <link rel="prev" title="Writing LOW-level (GPUIterator Only) programs" href="low.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Chapel-GPU
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">QuickStart Instructions</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="build.html">Building Chapel-GPU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="write.html">Using Chapel-GPU</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="low.html">Writing LOW-level (GPUIterator Only) programs</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Writing MID-LOW-level programs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mid-low-level-api">MID-LOW-level API</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mid.html">Writing MID-level programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compile.html">Compiling and Running Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide.html">Guide to Write GPU programs</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Technical Details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../details/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../details/gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/gpuiterator.html">GPUIterator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/gpuapi.html">GPUAPI</a></li>
+</ul>
+<p class="caption"><span class="caption-text">History</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../history/evolution.html">Chapel-GPU Evolution</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chapel-GPU</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="write.html">Using Chapel-GPU</a> &raquo;</li>
+        
+      <li>Writing MID-LOW-level programs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/instructions/mid-low.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="writing-mid-low-level-programs">
+<h1>Writing MID-LOW-level programs<a class="headerlink" href="#writing-mid-low-level-programs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="mid-low-level-api">
+<h2>MID-LOW-level API<a class="headerlink" href="#mid-low-level-api" title="Permalink to this headline">¶</a></h2>
+<p>The biggest motivation for introducing <code class="docutils literal"><span class="pre">MID-LOW</span></code> and <code class="docutils literal"><span class="pre">MID</span></code> -level GPU API is moving some of low-level GPU operations to the Chapel-level. Consider the following GPU callback function and C function:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">vc.hybrid.chpl</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="c1">// lo, hi, and N are automatically computed by the GPUIterator</span>
+<span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">vcCUDA</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">lo</span><span class="p">,</span> <span class="nx">hi</span><span class="p">,</span> <span class="nx">N</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">vc.cu</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="highlight-c"><div class="highlight"><pre><span></span><span class="k">extern</span> <span class="s">&quot;C&quot;</span> <span class="p">{</span>
+  <span class="kt">void</span> <span class="n">vcCUDA</span><span class="p">(</span><span class="kt">float</span><span class="o">*</span> <span class="n">A</span><span class="p">,</span> <span class="kt">float</span> <span class="o">*</span><span class="n">B</span><span class="p">,</span> <span class="kt">int</span> <span class="n">start</span><span class="p">,</span> <span class="kt">int</span> <span class="n">end</span><span class="p">,</span> <span class="kt">int</span> <span class="n">GPUN</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">float</span> <span class="o">*</span><span class="n">dA</span><span class="p">,</span> <span class="o">*</span><span class="n">dB</span><span class="p">;</span>
+    <span class="n">cudaMalloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dA</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span> <span class="o">*</span> <span class="n">GPUN</span><span class="p">);</span>
+    <span class="n">cudaMalloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dB</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span> <span class="o">*</span> <span class="n">GPUN</span><span class="p">);</span>
+    <span class="n">cudaMemcpy</span><span class="p">(</span><span class="n">dB</span><span class="p">,</span> <span class="n">B</span> <span class="o">+</span> <span class="n">start</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span> <span class="o">*</span> <span class="n">GPUN</span><span class="p">,</span> <span class="n">cudaMemcpyHostToDevice</span><span class="p">);</span>
+    <span class="n">vc</span><span class="o">&lt;&lt;&lt;</span><span class="n">ceil</span><span class="p">(((</span><span class="kt">float</span><span class="p">)</span><span class="n">GPUN</span><span class="p">)</span><span class="o">/</span><span class="mi">1024</span><span class="p">),</span> <span class="mi">1024</span><span class="o">&gt;&gt;&gt;</span><span class="p">(</span><span class="n">dA</span><span class="p">,</span> <span class="n">dB</span><span class="p">,</span> <span class="n">GPUN</span><span class="p">);</span>
+    <span class="n">cudaDeviceSynchronize</span><span class="p">();</span>
+    <span class="n">cudaMemcpy</span><span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="n">start</span><span class="p">,</span> <span class="n">dA</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span> <span class="o">*</span> <span class="n">GPUN</span><span class="p">,</span> <span class="n">cudaMemcpyDeviceToHost</span><span class="p">);</span>
+    <span class="n">cudaFree</span><span class="p">(</span><span class="n">dA</span><span class="p">);</span>
+    <span class="n">cudaFree</span><span class="p">(</span><span class="n">dB</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>At the MID-LOW-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation, 2) device synchronization, and 3) data transfer can be written in Chapel. However, it’s worth noting that this level of abstraction only provides thin wrapper functions for the CUDA/HIP/OpenCL-level API functions, which requires you to directly manipulate C types like <code class="docutils literal"><span class="pre">c_void_ptr</span></code> and so on. The MID-LOW is helpful particularly when you want to fine-tune the use of GPU API, but still want to stick with Chapel. Here is an example program written with the MID-LOW-level API:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">vc.hybrid.chpl</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">dA</span><span class="p">,</span> <span class="nx">dB</span><span class="p">:</span> <span class="nx">c_void_ptr</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">size</span><span class="p">:</span> <span class="nx">size_t</span> <span class="o">=</span> <span class="p">(</span><span class="nx">lA</span><span class="p">.</span><span class="nx">size</span><span class="p">:</span><span class="nx">size_t</span> <span class="o">*</span> <span class="nx">c_sizeof</span><span class="p">(</span><span class="nx">lA</span><span class="p">.</span><span class="nx">eltType</span><span class="p">));</span>
+  <span class="nx">Malloc</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="nx">size</span><span class="p">);</span>
+  <span class="nx">Malloc</span><span class="p">(</span><span class="nx">dB</span><span class="p">,</span> <span class="nx">size</span><span class="p">);</span>
+  <span class="nx">Memcpy</span><span class="p">(</span><span class="nx">dB</span><span class="p">,</span> <span class="nx">c_ptrTo</span><span class="p">(</span><span class="nx">lB</span><span class="p">),</span> <span class="nx">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="nx">LaunchVC</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="nx">dB</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="nx">size_t</span><span class="p">);</span>
+  <span class="nx">DeviceSynchronize</span><span class="p">();</span>
+  <span class="nx">Memcpy</span><span class="p">(</span><span class="nx">c_ptrTo</span><span class="p">(</span><span class="nx">lA</span><span class="p">),</span> <span class="nx">dA</span><span class="p">,</span> <span class="nx">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="nx">Free</span><span class="p">(</span><span class="nx">dA</span><span class="p">);</span>
+  <span class="nx">Free</span><span class="p">(</span><span class="nx">dB</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">The MID-LOW-level API can interoperate with the MID-level API.</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../api/gpuapi.html#mid-low-level-api-reference"><span class="std std-ref">MID-LOW-level API Reference</span></a></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="mid.html" class="btn btn-neutral float-right" title="Writing MID-level programs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="low.html" class="btn btn-neutral float-left" title="Writing LOW-level (GPUIterator Only) programs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2019, Rice University, 2019-2020, Georgia Institute of Technology
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
