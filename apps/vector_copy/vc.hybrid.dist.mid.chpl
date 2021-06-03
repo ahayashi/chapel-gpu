@@ -7,6 +7,7 @@ use GPUIterator;
 use GPUAPI;
 use BlockDist;
 use SysCTypes;
+use CPtr;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -50,7 +51,6 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   LaunchVC(dA.dPtr(), dB.dPtr(), N: size_t);
   DeviceSynchronize();
   dA.fromDevice();
-  free(dA, dB);
   if (verbose) { ProfilerStop(); }
 }
 

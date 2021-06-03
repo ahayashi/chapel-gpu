@@ -7,6 +7,7 @@ use GPUIterator;
 use GPUAPI;
 use BlockDist;
 use SysCTypes;
+use CPtr;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -15,7 +16,6 @@ config const n = 32: int;
 config const CPUratio = 0: int;
 config const numTrials = 1: int;
 config const output = 0: int;
-config const alpha = 3.0: real(32);
 config param verbose = false;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -27,12 +27,11 @@ config param verbose = false;
 var D: domain(1) dmapped Block(boundingBox = {1..n}) = {1..n};
 var A: [D] real(32);
 var B: [D] real(32);
-var C: [D] real(32);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc LaunchStream(A: c_void_ptr, B: c_void_ptr, C: c_void_ptr, alpha: c_float, N: size_t);
+extern proc LaunchVC(A: c_void_ptr, B: c_void_ptr, N: size_t);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
@@ -41,32 +40,22 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
     var device, count: int(32);
     GetDevice(device);
     GetDeviceCount(count);
-    writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, "), GPU", device, " of ", count, " @", here);
+	writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, "), GPU", device, " of ", count, " @", here);
   }
-
   ref lA = A.localSlice(lo .. hi);
   ref lB = B.localSlice(lo .. hi);
-  ref lC = C.localSlice(lo .. hi);
-  //writeln("localSlice Size:", lA.size);
   if (verbose) { ProfilerStart(); }
-  var dA, dB, dC: c_void_ptr;
+  var dA, dB: c_void_ptr;
   var size: size_t = (lA.size:size_t * c_sizeof(lA.eltType));
   Malloc(dA, size);
   Malloc(dB, size);
-  Malloc(dC, size);
-
   Memcpy(dB, c_ptrTo(lB), size, 0);
-  Memcpy(dC, c_ptrTo(lC), size, 0);
-  LaunchStream(dA, dB, dC, alpha, N: size_t);
+  LaunchVC(dA, dB, N: size_t);
   DeviceSynchronize();
   Memcpy(c_ptrTo(lA), dA, size, 1);
-
   Free(dA);
   Free(dB);
-  Free(dC);
   if (verbose) { ProfilerStop(); }
-
-  //streamCUDA(lA, lB, lC, alpha, 0, hi-lo, N);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -104,11 +93,10 @@ proc printLocaleInfo() {
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
 proc main() {
-  writeln("Stream: CPU/GPU Execution (using GPUIterator)");
+  writeln("Vector Copy: CPU/GPU Execution (using GPUIterator)");
   writeln("Size: ", n);
   writeln("CPU ratio: ", CPUratio);
   writeln("nGPUs: ", nGPUs);
-  writeln("alpha: ", alpha);
   writeln("nTrials: ", numTrials);
   writeln("output: ", output);
 
@@ -117,19 +105,19 @@ proc main() {
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
 	forall i in D {
+      A(i) = 0: real(32);
       B(i) = i: real(32);
-      C(i) = 2*i: real(32);
 	}
 
 	const startTime = getCurrentTime();
 	forall i in GPU(D, CUDAWrapper, CPUratio) {
-      A(i) = B(i) + alpha * C(i);
+      A(i) = B(i);
 	}
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
       writeln(A);
       for i in 1..n {
-        if(A(i) != B(i) + alpha * C(i)) {
+        if (A(i) != B(i)) {
           writeln("Verification Error");
           exit();
         }

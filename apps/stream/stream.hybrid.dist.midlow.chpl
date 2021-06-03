@@ -1,12 +1,14 @@
 use Time;
-use ReplicatedDist;
+
 ////////////////////////////////////////////////////////////////////////////////
 /// GPUIterator
 ////////////////////////////////////////////////////////////////////////////////
 use GPUIterator;
 use GPUAPI;
 use BlockDist;
+use SysBasic;
 use SysCTypes;
+use CPtr;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -14,8 +16,8 @@ use SysCTypes;
 config const n = 32: int;
 config const CPUratio = 0: int;
 config const numTrials = 1: int;
-config const tiled = 0;
 config const output = 0: int;
+config const alpha = 3.0: real(32);
 config param verbose = false;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -24,54 +26,49 @@ config param verbose = false;
 // For now, these arrays are global so the arrays can be seen from CUDAWrapper
 // TODO: Explore the possiblity of declaring the arrays and CUDAWrapper
 //       in the main proc (e.g., by using lambdas)
-const S = {1..n, 1..n};
-const RS = S dmapped Replicated();
-var D: domain(1) dmapped Block(boundingBox = {1..n*n}) = {1..n*n};
-
+var D: domain(1) dmapped Block(boundingBox = {1..n}) = {1..n};
 var A: [D] real(32);
-var B: [RS] real(32);
+var B: [D] real(32);
 var C: [D] real(32);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc LaunchMM(A: c_void_ptr, B: c_void_ptr, C: c_void_ptr, N: int, lo:int, hi:int, GPUN: int, tiled: int);
+extern proc LaunchStream(A: c_void_ptr, B: c_void_ptr, C: c_void_ptr, alpha: c_float, N: size_t);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
 proc CUDAWrapper(lo: int, hi: int, N: int) {
   if (verbose) {
-	writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
+    var device, count: int(32);
+    GetDevice(device);
+    GetDeviceCount(count);
+    writeln("In CUDAWrapper(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, "), GPU", device, " of ", count, " @", here);
   }
-  //if(tiled) {
-  //  assert(N/n>=32 && (N/n)%32==0, "should use multiples of 32 rows in GPU when tiled");
-  //}
-  assert(N%n == 0, "should offload full rows to GPU");
-  ref lA = A.localSlice(lo .. hi);
-  ref lC = C.localSlice(lo .. hi);
-  assert(lA.size == lC.size);
 
+  ref lA = A.localSlice(lo .. hi);
+  ref lB = B.localSlice(lo .. hi);
+  ref lC = C.localSlice(lo .. hi);
+  //writeln("localSlice Size:", lA.size);
   if (verbose) { ProfilerStart(); }
   var dA, dB, dC: c_void_ptr;
+  var size: size_t = (lA.size:size_t * c_sizeof(lA.eltType));
+  Malloc(dA, size);
+  Malloc(dB, size);
+  Malloc(dC, size);
 
-  //writeln("lA.size: ", lA.size, " B.size: ", B.size);
-  Malloc(dA, lA.size:size_t * c_sizeof(lA.eltType));
-  Malloc(dB, B.size:size_t  * c_sizeof(B.eltType));
-  Malloc(dC, lC.size:size_t * c_sizeof(lC.eltType));
-
-  Memcpy(dA, c_ptrTo(lA), lA.size:size_t * c_sizeof(lA.eltType), 0);
-  Memcpy(dB, c_ptrTo(B),  B.size:size_t  * c_sizeof(B.eltType),  0);
-
-  LaunchMM(dA, dB, dC, n*n, 0, hi-lo, N, tiled);
+  Memcpy(dB, c_ptrTo(lB), size, 0);
+  Memcpy(dC, c_ptrTo(lC), size, 0);
+  LaunchStream(dA, dB, dC, alpha, N: size_t);
   DeviceSynchronize();
-  Memcpy(c_ptrTo(lC), dC, lC.size:size_t * c_sizeof(lC.eltType), 1);
+  Memcpy(c_ptrTo(lA), dA, size, 1);
 
   Free(dA);
   Free(dB);
   Free(dC);
   if (verbose) { ProfilerStop(); }
 
-  //mmCUDA(lA, B, lC, n*n, 0, hi-lo, N, tiled);
+  //streamCUDA(lA, lB, lC, alpha, 0, hi-lo, N);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,43 +106,37 @@ proc printLocaleInfo() {
 /// Chapel main
 ////////////////////////////////////////////////////////////////////////////////
 proc main() {
-  writeln("Matrix Multiplication: CPU/GPU Execution (using GPUIterator)");
-  writeln("Size: ", n, "x", n);
+  writeln("Stream: CPU/GPU Execution (using GPUIterator)");
+  writeln("Size: ", n);
   writeln("CPU ratio: ", CPUratio);
   writeln("nGPUs: ", nGPUs);
+  writeln("alpha: ", alpha);
   writeln("nTrials: ", numTrials);
-  writeln("tiled: ", tiled);
   writeln("output: ", output);
 
   printLocaleInfo();
 
   var execTimes: [1..numTrials] real;
   for trial in 1..numTrials {
-    coforall loc in Locales do on loc {
-      forall i in 1..n {
-        forall j in 1..n {
-          var e: int = (i-1)*n+(j-1)+1;
-          A(e) = (i*1.0/1000): real(32);
-          B(i, j) = (i*1.0/1000): real(32);
-          C(e) = 0: real(32);
-        }
-      }
-    }
+	forall i in D {
+      B(i) = i: real(32);
+      C(i) = 2*i: real(32);
+	}
 
 	const startTime = getCurrentTime();
-	// TODO: Consider using a 2D iterator
-	forall e in GPU(D, CUDAWrapper, CPUratio) {
-      var i: int = (e - 1) / n + 1;
-      var j: int = (e - 1) % n + 1;
-      var sum: real(32) = C(e);
-      for k in 1..n {
-		sum += A((i-1)*n+k) * B(k, j);
-      }
-      C(e) = sum;
+	forall i in GPU(D, CUDAWrapper, CPUratio) {
+      A(i) = B(i) + alpha * C(i);
 	}
 	execTimes(trial) = getCurrentTime() - startTime;
 	if (output) {
-      writeln(reshape(C, {1..n, 1..n}));
+      writeln(A);
+      for i in 1..n {
+        if(A(i) != B(i) + alpha * C(i)) {
+          writeln("Verification Error");
+          exit();
+        }
+      }
+      writeln("Verified");
 	}
   }
   printResults(execTimes);

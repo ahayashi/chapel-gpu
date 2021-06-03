@@ -52,7 +52,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
 	writeln("In CUDAWrapper2(), launching the CUDA kernel with a range of ", lo, "..", hi, " (Size: ", N, ")");
   }
   ref lW = W.localSlice(lo .. hi);
-  lrCUDA2(X, Y, lW, Wcurr, alpha, nSamples, nFeatures, lo, hi, N);
+  lrCUDA2(X.replicand(here), Y.replicand(here), lW, Wcurr.replicand(here), alpha, nSamples, nFeatures, lo, hi, N);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

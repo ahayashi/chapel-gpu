@@ -47,7 +47,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   assert(N%n == 0, "should offload full rows to GPU");
   ref lA = A.localSlice(lo .. hi);
   ref lC = C.localSlice(lo .. hi);
-  mmCUDA(lA, B, lC, n*n, 0, hi-lo, N, tiled);
+  mmCUDA(lA, B.replicand(here), lC, n*n, 0, hi-lo, N, tiled);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

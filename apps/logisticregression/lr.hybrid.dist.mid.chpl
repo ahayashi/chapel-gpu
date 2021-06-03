@@ -7,6 +7,7 @@ use GPUIterator;
 use GPUAPI;
 use BlockDist;
 use SysCTypes;
+use CPtr;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -55,15 +56,14 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   }
   ref lW = W.localSlice(lo .. hi);
   if (verbose) { ProfilerStart(); }
-  var dX = new GPUArray(X);
-  var dY = new GPUArray(Y);
-  var dWcurr = new GPUArray(Wcurr);
+  var dX = new GPUArray(X.replicand(here));
+  var dY = new GPUArray(Y.replicand(here));
+  var dWcurr = new GPUArray(Wcurr.replicand(here));
   var dW = new GPUArray(lW);
   toDevice(dX, dY, dWcurr);
   LaunchLR(dX.dPtr(), dY.dPtr(), dW.dPtr(), dWcurr.dPtr(), alpha, nSamples, nFeatures, lo, hi, N);
   DeviceSynchronize();
   fromDevice(dW);
-  free(dX, dY, dW, dWcurr);
   if (verbose) { ProfilerStop(); }
 }
 

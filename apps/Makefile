@@ -25,7 +25,7 @@ baseline: $(TARGET).baseline.chpl
 
 # CUDA
 
-cuda: cuda.gpu cuda.hybrid cuda.hybrid.dist cuda.hybrid.dist.lowmid cuda.hybrid.dist.mid
+cuda: cuda.gpu cuda.hybrid cuda.hybrid.dist cuda.hybrid.dist.midlow cuda.hybrid.dist.mid
 
 build/lib$(TARGET).cuda.a: $(TARGET).cu
 	rm -rf build &&	mkdir build && cd build && cmake .. && make
@@ -36,15 +36,15 @@ build/lib$(TARGET).kernel.cuda.a: $(TARGET).kernel.cu
 cuda.%.mid: $(TARGET).%.mid.chpl $(TARGET).kernel.h build/lib$(TARGET).kernel.cuda.a
 	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.mid.chpl -L./build -l$(TARGET).kernel.cuda $(CUDA_LIBS) -o $(TARGET).$@
 
-cuda.%.lowmid: $(TARGET).%.lowmid.chpl $(TARGET).kernel.h build/lib$(TARGET).kernel.cuda.a
-	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.lowmid.chpl -L./build -l$(TARGET).kernel.cuda $(CUDA_LIBS) -o $(TARGET).$@
+cuda.%.midlow: $(TARGET).%.midlow.chpl $(TARGET).kernel.h build/lib$(TARGET).kernel.cuda.a
+	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.midlow.chpl -L./build -l$(TARGET).kernel.cuda $(CUDA_LIBS) -o $(TARGET).$@
 
 cuda.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).cuda.a
 	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl -L./build -l$(TARGET).cuda $(CUDA_LIBS) -o $(TARGET).$@
 
 # HIP
 
-hip: hip.gpu hip.hybrid hip.hybrid.dist hip.hybrid.dist.lowmid hip.hybrid.dist.mid
+hip: hip.gpu hip.hybrid hip.hybrid.dist hip.hybrid.dist.midlow hip.hybrid.dist.mid
 
 build/lib$(TARGET).hip.a: $(TARGET).cu
 	rm -rf build &&	mkdir build && cd build && cmake .. && make
@@ -55,8 +55,8 @@ build/lib$(TARGET).kernel.hip.a: $(TARGET).kernel.cu
 hip.%.mid: $(TARGET).%.mid.chpl $(TARGET).kernel.h  build/lib$(TARGET).kernel.hip.a
 	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.mid.chpl -L./build -l$(TARGET).kernel.hip $(HIP_LIBS) -o $(TARGET).$@
 
-hip.%.lowmid: $(TARGET).%.lowmid.chpl $(TARGET).kernel.h build/lib$(TARGET).kernel.hip.a
-	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.lowmid.chpl -L./build -l$(TARGET).kernel.hip $(HIP_LIBS) -o $(TARGET).$@
+hip.%.midlow: $(TARGET).%.midlow.chpl $(TARGET).kernel.h build/lib$(TARGET).kernel.hip.a
+	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.midlow.chpl -L./build -l$(TARGET).kernel.hip $(HIP_LIBS) -o $(TARGET).$@
 
 hip.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).hip.a
 	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl -L./build -l$(TARGET).hip $(HIP_LIBS) -o $(TARGET).$@

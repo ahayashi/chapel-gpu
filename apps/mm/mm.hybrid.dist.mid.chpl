@@ -7,6 +7,7 @@ use GPUIterator;
 use GPUAPI;
 use BlockDist;
 use SysCTypes;
+use CPtr;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -53,7 +54,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
 
   if (verbose) { ProfilerStart(); }
   var dA = new GPUArray(lA);
-  var dB = new GPUArray(B);
+  var dB = new GPUArray(B.replicand(here));
   var dC = new GPUArray(lC);
 
   //writeln("lA.size: ", lA.size, " B.size: ", B.size);
@@ -62,7 +63,6 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   DeviceSynchronize();
   dC.fromDevice();
 
-  free(dA, dB, dC);
   if (verbose) { ProfilerStop(); }
 
   //mmCUDA(lA, B, lC, n*n, 0, hi-lo, N, tiled);

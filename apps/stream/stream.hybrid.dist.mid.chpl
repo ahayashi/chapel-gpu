@@ -6,7 +6,9 @@ use Time;
 use GPUIterator;
 use GPUAPI;
 use BlockDist;
+use SysBasic;
 use SysCTypes;
+use CPtr;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -58,10 +60,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   DeviceSynchronize();
   dA.fromDevice();
 
-  free(dA, dB, dC);
   if (verbose) { ProfilerStop(); }
-
-  //streamCUDA(lA, lB, lC, alpha, 0, hi-lo, N);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
