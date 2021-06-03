@@ -23,8 +23,8 @@ cuda: $(TARGET).chpl $(TARGET).kernel.h build/lib$(TARGET).kernel.cuda.a
 build/lib$(TARGET).kernel.hip.a: $(TARGET).kernel.cu
 	rm -rf build &&	mkdir build && cd build && cmake .. && make
 
-hip: $(TARGET).%.mid.chpl $(TARGET).kernel.h  build/lib$(TARGET).kernel.hip.a
-	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.mid.chpl -L./build -l$(TARGET).kernel.hip $(HIP_LIBS) -o $(TARGET).$@
+hip: $(TARGET).chpl $(TARGET).kernel.h  build/lib$(TARGET).kernel.hip.a
+	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).chpl -L./build -l$(TARGET).kernel.hip $(HIP_LIBS) -o $(TARGET).$@
 
 .PHONY: clean
 clean:
