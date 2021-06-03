@@ -1,0 +1,2 @@
+TARGET=jagged
+include ../Makefile

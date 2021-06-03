@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2019, Rice University
  * Copyright (c) 2019, Georgia Institute of Technology
@@ -50,31 +49,58 @@ module GPUAPI {
       var hosPtr: c_void_ptr;
       var size: size_t;
       var sizeInBytes: size_t;
-      var pitch: size_t;
+      var pitched: bool;
+      var hpitch: size_t;
+      var dpitch: size_t;
+      var height: size_t;
 
-      proc init(ref arr) {
+      proc init(ref arr, pitched=false) {
         // Low-level info
         this.devPtr = nil;
         this.hosPtr = c_ptrTo(arr);
         // size info
         size = arr.size: size_t;
         sizeInBytes = (((arr.size: size_t) * c_sizeof(arr.eltType)) : size_t);
-        if (arr.rank == 2) {
-            pitch = arr.domain.dim(1).size:size_t * c_sizeof(arr.eltType);
-        }
+        this.pitched = pitched;
         this.complete();
-        // allocation
-        Malloc(devPtr, sizeInBytes);
+        if (!pitched) {
+            // allocation
+            Malloc(devPtr, sizeInBytes);
+            if (arr.rank == 2) {
+               this.hpitch = arr.domain.dim(1).size:size_t * c_sizeof(arr.eltType);
+               this.dpitch = this.hpitch;
+            }
+        } else if (arr.rank == 2) {
+            this.hpitch = arr.domain.dim(1).size:size_t * c_sizeof(arr.eltType);
+            // allocation
+            MallocPitch(devPtr, this.dpitch, this.hpitch, arr.domain.dim(0).size:size_t);
+            this.height = arr.domain.dim(0).size:size_t;
+        } else {
+            writeln("GPU Array allocation error: pitched=true only works with 2D array, but the given rank is ", arr.rank);
+            exit();
+        }
         if (debugGPUAPI) { writeln("malloc'ed: ", devPtr, " sizeInBytes: ", sizeInBytes); }
       }
 
+      proc deinit() {
+          Free(this.dPtr());
+      }
+
       inline proc toDevice() {
-          Memcpy(this.dPtr(), this.hPtr(), this.sizeInBytes, 0);
+          if (this.pitched == false) {
+              Memcpy(this.dPtr(), this.hPtr(), this.sizeInBytes, 0);
+          } else {
+              Memcpy2D(this.dPtr(), this.dpitch, this.hPtr(), this.hpitch, this.hpitch, this.height, 0);
+          }
           if (debugGPUAPI) { writeln("h2d : ", this.hPtr(), " -> ", this.dPtr(), " transBytes: ", this.sizeInBytes); }
       }
 
       inline proc fromDevice() {
-          Memcpy(this.hPtr(), this.dPtr(), this.sizeInBytes, 1);
+          if (this.pitched == false) {
+              Memcpy(this.hPtr(), this.dPtr(), this.sizeInBytes, 1);
+          } else {
+              Memcpy2D(this.hPtr(), this.hpitch, this.dPtr(), this.dpitch, this.hpitch, this.height, 1);
+          }
           if (debugGPUAPI) { writeln("d2h : ", this.dPtr(), " -> ", this.hPtr(), " transBytes: ", this.sizeInBytes); }
       }
 
@@ -119,6 +145,14 @@ module GPUAPI {
       var size: size_t;
       var sizeInBytes: size_t;
 
+      // args: iterable
+      // class C {
+      //   var n: int;
+      //   proc init(_n: int) { n = _n;  }
+      //   var x: [0..#n] int;
+      // }
+      // var Cs = [new C(256), new C(512)];
+      // var dCs = new GPUJaggedArray(Cs.x);
       proc init(args) {
         this.nRows = 0;
         for i in args {
@@ -136,23 +170,26 @@ module GPUAPI {
         Malloc(this.devPtr, nRows:size_t * c_sizeof(c_ptr(c_void_ptr)));
       }
 
+      // var dCs = new GPUJaggedArray(Cs[0].x, Cs[1].x, ...);
       proc init(args ...?n) where n>=2 {
         this.nRows = n;
         this.complete();
         var idx: int = 0;
         for arg in args {
-          var array = [i in arg] i;
-          const elemSize = array.size: size_t * c_sizeof(array.eltType);
+          const elemSize = arg.size: size_t * c_sizeof(arg.eltType);
           Malloc(this.devPtrs[idx], elemSize);
-          this.hosPtrs[idx] = c_ptrTo(array);
+          this.hosPtrs[idx] = c_ptrTo(arg);
           this.elemSizes[idx] = elemSize;
-          // temporary
-          Memcpy(this.devPtrs[idx], this.hosPtrs[idx], elemSizes[idx], 0);
           idx = idx + 1;
         }
         Malloc(this.devPtr, nRows:size_t * c_sizeof(c_ptr(c_void_ptr)));
-        Memcpy(this.devPtr, c_ptrTo(this.devPtrs), nRows:size_t * c_sizeof(c_ptr(c_void_ptr)), 0);
-        //toDevice();
+      }
+
+      proc deinit() {
+        for i in 0..#nRows {
+          Free(this.devPtrs[i]);
+        }
+        Free(this.devPtr);
       }
 
       inline proc toDevice() {
@@ -160,6 +197,12 @@ module GPUAPI {
           Memcpy(this.devPtrs[i], this.hosPtrs[i], elemSizes[i], 0);
         }
         Memcpy(this.devPtr, c_ptrTo(this.devPtrs), nRows:size_t * c_sizeof(c_ptr(c_void_ptr)), 0);
+      }
+
+      inline proc fromDevice() {
+        for i in 0..#nRows {
+          Memcpy(this.hosPtrs[i], this.devPtrs[i], elemSizes[i], 1);
+        }
       }
 
       inline proc dPtr(): c_ptr(c_void_ptr) {
