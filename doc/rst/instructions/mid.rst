@@ -7,7 +7,7 @@ Writing MID-level programs
 MID-level API
 ######################
 
-To reiterate, the biggest motivation for introducing ``LOW-MID`` and ``MID`` -level GPU API is moving some of low-level GPU operations to the Chapel-level. Consider the following GPU callback function and C function:
+To reiterate, the biggest motivation for introducing ``MID-LOW`` and ``MID`` -level GPU API is moving some of low-level GPU operations to the Chapel-level. Consider the following GPU callback function and C function:
 
 .. code-block:: chapel
    :caption: vc.hybrid.chpl
@@ -34,7 +34,7 @@ To reiterate, the biggest motivation for introducing ``LOW-MID`` and ``MID`` -le
      }
    }
 
-At the MID-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation, 2) device synchronization, and 3) data transfer can be written in Chapel. Also, unlike the LOW-MID level, the MID-level API is more Chapel programmer-friendly, where you can allocate GPU memory using the ``new`` keyword and no longer need to directly manipulate C types. Here is an example program written with the MID-level API:
+At the MID-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation, 2) device synchronization, and 3) data transfer can be written in Chapel. Also, unlike the MID-LOW level, the MID-level API is more Chapel programmer-friendly, where you can allocate GPU memory using the ``new`` keyword and no longer need to directly manipulate C types. Here is an example program written with the MID-level API:
 
 
 .. code-block:: chapel
@@ -50,7 +50,7 @@ At the MID-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation,
      free(dA, dB);
    }
 
-.. tip:: The MID-level API can interoperate with the LOW-MID-level API.
+.. tip:: The MID-level API can interoperate with the MID-LOW-level API.
 
 .. seealso:: :ref:`MID-level API Reference`
 

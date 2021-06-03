@@ -9,11 +9,12 @@ MID-level API Reference
 
 .. class:: GPUArray
 
-   .. method:: proc init(ref arr)
+   .. method:: proc init(ref arr, pitched=false)
 
-      Allocates memory on the device. The allocation size is automatically computed by this module -i.e., ``(arr.size: size_t) * c_sizeof(arr.eltType)``.
+      Allocates memory on the device. The allocation size is automatically computed by this module -i.e., ``(arr.size: size_t) * c_sizeof(arr.eltType)``, which means the index space is linearlized when ``arr`` is multi-dimensional. Also, if ``arr`` is 2D and ``pitched=true``, pitched allocation is performed and the host and device pitch can be obtained by doing ``obj.hpitch`` and ``obj.dpitch``. Note that the allocated memory is automatically reclaimed when the object is deleted.
 
       :arg arr: The reference of the non-distributed Chapel Array that will be mapped onto the device.
+      :arg pitched: whether pitched allocation is performed or not (default is false)
 
       .. code-block:: chapel
          :emphasize-lines: 6,21
@@ -121,10 +122,18 @@ MID-level API Reference
    toDevice(A, B)
    ..
    fromDevice(C);
-   free(A, B, C);
+   // GPU memory is automatically deallocated when dA, dB, and dC.
+
+.. class:: GPUJaggedArray
+
+   .. method:: proc init(ref arr1, ref arr2, ...)
+
+      Allocates jagged array on the device. Basically it takes a set of Chapel arrays and creates an array of arrays on the device.
+
+   .. note:: A working example can be found `here <https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/jagged/jagged.chpl>`_.
 
 
-LOW-MID-level API Reference
+MID-LOW-level API Reference
 ############################
 
 .. method:: Malloc(ref devPtr: c_void_ptr, size: size_t)
@@ -170,6 +179,25 @@ LOW-MID-level API Reference
    .. note:: ``c_sizeofo(A.eltType)`` returns the size in bytes of the element of the Chapel array ``A``. For more details, please refer to `this <https://chapel-lang.org/docs/builtins/CPtr.html#CPtr.c_sizeof>`_.
 
 
+
+.. method:: MallocPitch(ref devPtr: c_void_ptr, ref pitch: size_t, width: size_t, height: size_t)
+
+   Allocates pitched 2D memory on the device.
+
+   :arg devPtr: Pointer to the allocated pitched 2D device array
+   :type devPtr: `c_voidPtr`
+
+   :arg pitch: Pitch for allocation on the device, which is set by the runtime
+   :type pitch: `size_t`
+
+   :arg width: The width of the original Chapel array (in bytes)
+   :type width: `size_t`
+
+   :arg height: The number of rows (height)
+   :type height: `size_t`
+
+   .. note:: A working example can be found `here <https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/pitched2d/pitched2d.chpl>`_. The detailed descirption of the underlying CUDA API can be found `here <https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g32bd7a39135594788a542ae72217775c>`_.
+
 .. method:: Memcpy(dst: c_void_ptr, src: c_void_ptr, count: size_t, kind: int)
 
    Transfers data between the host and the device
@@ -203,6 +231,32 @@ LOW-MID-level API Reference
 
    .. note:: ``c_ptrTo(A)`` returns a pointer to the Chapel rectangular array ``A``. For more details, see `this document <https://chapel-lang.org/docs/builtins/CPtr.html#CPtr.c_ptrTo>`_.
 
+.. method:: Memcpy2D(dst: c_void_ptr, dpitch: size_t, src: c_void_ptr, spitch: size_t, width: size_t, height:size_t, kind: int)
+
+   Transfers pitched 2D array between the host and the device
+
+   :arg dst: the desination address
+   :type dst: `c_void_ptr`
+
+   :arg dpitch: the pitch of destination memory
+   :type dpitch: `size_t`
+
+   :arg src: the source address
+   :type src: `c_void_ptr`
+
+   :arg spitch: the pitch of source memory
+   :type spitch: `size_t`
+
+   :arg width: the width of 2D array to be transferred (in bytes)
+   :type width: `size_t`
+
+   :arg height: the height of 2D array to be transferred (# of rows)
+   :type height: `size_t`
+
+   :arg kind: type of transfer (``0``: host-to-device, ``1``: device-to-host)
+   :type kind: `int`
+
+   .. note:: A working example can be found `here <https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/pitched2d/pitched2d.chpl>`_. The detailed descirption of the underlying CUDA API can be found `here <https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g3a58270f6775efe56c65ac47843e7cee>`_.
 
 .. method:: Free(devPtr: c_void_ptr)
 

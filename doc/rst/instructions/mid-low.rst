@@ -1,13 +1,13 @@
 .. default-domain:: chpl
                     
 =============================================
-Writing LOW-MID-level programs
+Writing MID-LOW-level programs
 =============================================
 
-LOW-MID-level API
+MID-LOW-level API
 ######################
 
-The biggest motivation for introducing ``LOW-MID`` and ``MID`` -level GPU API is moving some of low-level GPU operations to the Chapel-level. Consider the following GPU callback function and C function:
+The biggest motivation for introducing ``MID-LOW`` and ``MID`` -level GPU API is moving some of low-level GPU operations to the Chapel-level. Consider the following GPU callback function and C function:
 
 .. code-block:: chapel
    :caption: vc.hybrid.chpl
@@ -34,7 +34,7 @@ The biggest motivation for introducing ``LOW-MID`` and ``MID`` -level GPU API is
      }
    }
 
-At the LOW-MID-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation, 2) device synchronization, and 3) data transfer can be written in Chapel. However, it's worth noting that this level of abstraction only provides thin wrapper functions for the CUDA/HIP/OpenCL-level API functions, which requires you to directly manipulate C types like ``c_void_ptr`` and so on. The LOW-MID is helpful particularly when you want to fine-tune the use of GPU API, but still want to stick with Chapel. Here is an example program written with the LOW-MID-level API:
+At the MID-LOW-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation, 2) device synchronization, and 3) data transfer can be written in Chapel. However, it's worth noting that this level of abstraction only provides thin wrapper functions for the CUDA/HIP/OpenCL-level API functions, which requires you to directly manipulate C types like ``c_void_ptr`` and so on. The MID-LOW is helpful particularly when you want to fine-tune the use of GPU API, but still want to stick with Chapel. Here is an example program written with the MID-LOW-level API:
 
 .. code-block:: chapel
    :caption: vc.hybrid.chpl
@@ -52,6 +52,6 @@ At the LOW-MID-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocat
      Free(dB);     
    }
 
-.. tip:: The LOW-MID-level API can interoperate with the MID-level API.
+.. tip:: The MID-LOW-level API can interoperate with the MID-level API.
 
-.. seealso:: :ref:`LOW-MID-level API Reference`
+.. seealso:: :ref:`MID-LOW-level API Reference`

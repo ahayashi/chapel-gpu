@@ -13,7 +13,7 @@ The GPUAPI module provides Chapel-level GPU API. The use of the API assumes case
 
   * Example: ``var ga = new GPUArray(A);``
 
-* `LOW-MID-level`: Provides wrapper functions for raw GPU API functions
+* `MID-LOW-level`: Provides wrapper functions for raw GPU API functions
 
   * Example: ``var ga: c_void_ptr = Malloc(sizeInBytes);``
 

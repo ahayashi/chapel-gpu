@@ -16,7 +16,7 @@ This document describes the following two Chapel modules that facilitate GPU pro
 
        * Example: :chapel:`var ga = new GPUArray(A);`
 
-    * `LOW-MID-level`: Provides wrapper functions for raw GPU API functions
+    * `MID-LOW-level`: Provides wrapper functions for raw GPU API functions
 
        * Example: :chapel:`var ga: c_void_ptr = Malloc(sizeInBytes);`
 

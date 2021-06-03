@@ -15,7 +15,7 @@ The repository has several example applications in ``chapel-gpu/example`` and ``
    Matrix Multiplication, ``apps/mm``, Matrix-Matrix Multiply,
    PageRank, ``apps/mm``, The pagerank algorithm, WIP
    N-Queens, WIP, The n-queens problem, WIP
-
+   GPU API Examples, ``example/gpuapi``, ,
 
 .. note:: This section assumes the Chapel-GPU components are already installed in ``$CHPL_GPU_HOME``. If you have not done so please see :ref:`Building Chapel-GPU`.
 
@@ -43,7 +43,16 @@ The example applications in ``chapel-gpu/example`` and ``chapel-gpu/apps`` direc
         or
         make opencl
 
-   - Example 2: ``chapel-gpu/apps/stream``
+   - Example 2: ``chapel-gpu/example/gpuapi``
+
+     .. code-block:: bash
+
+        cd path/to/chapel-gpu/example/gpuapi/2d
+        make cuda
+        or
+        make hip
+
+   - Example 3: ``chapel-gpu/apps/stream``
 
      .. code-block:: bash
 
@@ -68,11 +77,11 @@ The example applications in ``chapel-gpu/example`` and ``chapel-gpu/apps`` direc
       ``vc.cuda.gpu``, A GPU-only implmentation w/o the GPUIterator., ``make cuda.gpu``
       ``vc.cuda.hybrid``, The GPUIterator implemenation (single-locale)., ``make cuda.hybrid``
       ``vc.cuda.hybrid.dist``, The GPUIterator implemenation (multi-locale)., ``make cuda.hybrid.dist``
-      ``vc.cuda.hybrid.dist.lowmid``, The LOW-MID implemenation (multi-locale)., ``make cuda.hybrid.dist.lowmid``
+      ``vc.cuda.hybrid.dist.midlow``, The MID-LOW implemenation (multi-locale)., ``make cuda.hybrid.dist.midlow``
       ``vc.cuda.hybrid.dist.mid``, The MID implementation (multi-locale)., ``make cuda.hybrid.dist.mid``
 
 
-   .. tip:: If you want to compile a specific variant, please do ``make X.Y``, where ``X`` is either ``cuda``, ``hip``, or ``opencl``, and ``Y`` is either ``gpu``, ``hybrid``, ``hybrid.dist``, ``hybrid.dist.lowmid``, or ``hybrid.dist.mid``. Please also see the third column above. Also, the LOW-MID and MID variants with OpenCL are currently not supported.
+   .. tip:: If you want to compile a specific variant, please do ``make X.Y``, where ``X`` is either ``cuda``, ``hip``, or ``opencl``, and ``Y`` is either ``gpu``, ``hybrid``, ``hybrid.dist``, ``hybrid.dist.midlow``, or ``hybrid.dist.mid``. Please also see the third column above. Also, the MID-LOW and MID variants with OpenCL are currently not supported.
 
   .. note:: The ``Makefile`` internally uses ``cmake`` to generate a static library from a GPU source program (``vc.cu`` in this case)
 
