@@ -7,7 +7,7 @@ Using Chapel-GPU
    :caption: Step-by-step Guide
 
    low
-   low-mid
+   mid-low
    mid
    compile
    guide

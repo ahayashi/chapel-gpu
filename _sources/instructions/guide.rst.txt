@@ -13,7 +13,7 @@ In general, GPU programs should include typical host and device operations inclu
 
    * - Level
      - MID-level
-     - LOW-MID-level
+     - MID-LOW-level
      - LOW-level
    * - Kernel Invocation
      - CUDA/HIP
@@ -21,11 +21,11 @@ In general, GPU programs should include typical host and device operations inclu
      - CUDA/HIP/OpenCL
    * - Memory (de)allocations
      - Chapel (MID)
-     - Chapel (LOW-MID)
+     - Chapel (MID-LOW)
      - CUDA/HIP/OpenCL
    * - Data transfers
      - Chapel (MID)
-     - Chapel (LOW-MID)
+     - Chapel (MID-LOW)
      - CUDA/HIP/OpenCL
 
 
@@ -33,11 +33,11 @@ In general, GPU programs should include typical host and device operations inclu
 
    * :ref:`Writing MID-level programs`
    * :ref:`MID-level API Reference`
-   * :ref:`Writing LOW-MID-level programs`
-   * :ref:`LOW-MID-level API Reference`
+   * :ref:`Writing MID-LOW-level programs`
+   * :ref:`MID-LOW-level API Reference`
    * :ref:`Writing LOW-level (GPUIterator Only) programs`
 
-.. note:: LOW/LOW-MID/MID levels can interoperate with each other.
+.. note:: LOW/MID-LOW/MID levels can interoperate with each other.
 
 
 Writing GPU program

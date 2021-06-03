@@ -106,7 +106,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gpuiterator.html">GPUIterator</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">GPUAPI</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#mid-level-api-reference">MID-level API Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#low-mid-level-api-reference">LOW-MID-level API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mid-low-level-api-reference">MID-LOW-level API Reference</a></li>
 </ul>
 </li>
 </ul>
@@ -187,13 +187,17 @@
 <em class="property">class </em><code class="descname">GPUArray</code><a class="headerlink" href="#GPUArray" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="GPUArray.init">
-<em class="property">proc </em><code class="descname">init</code><span class="sig-paren">(</span><em>ref arr</em><span class="sig-paren">)</span><a class="headerlink" href="#GPUArray.init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Allocates memory on the device. The allocation size is automatically computed by this module -i.e., <code class="docutils literal"><span class="pre">(arr.size:</span> <span class="pre">size_t)</span> <span class="pre">*</span> <span class="pre">c_sizeof(arr.eltType)</span></code>.</p>
+<em class="property">proc </em><code class="descname">init</code><span class="sig-paren">(</span><em>ref arr</em>, <em>pitched=false</em><span class="sig-paren">)</span><a class="headerlink" href="#GPUArray.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allocates memory on the device. The allocation size is automatically computed by this module -i.e., <code class="docutils literal"><span class="pre">(arr.size:</span> <span class="pre">size_t)</span> <span class="pre">*</span> <span class="pre">c_sizeof(arr.eltType)</span></code>, which means the index space is linearlized when <code class="docutils literal"><span class="pre">arr</span></code> is multi-dimensional. Also, if <code class="docutils literal"><span class="pre">arr</span></code> is 2D and <code class="docutils literal"><span class="pre">pitched=true</span></code>, pitched allocation is performed and the host and device pitch can be obtained by doing <code class="docutils literal"><span class="pre">obj.hpitch</span></code> and <code class="docutils literal"><span class="pre">obj.dpitch</span></code>. Note that the allocated memory is automatically reclaimed when the object is deleted.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><strong>arr</strong> – The reference of the non-distributed Chapel Array that will be mapped onto the device.</td>
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>arr</strong> – The reference of the non-distributed Chapel Array that will be mapped onto the device.</li>
+<li><strong>pitched</strong> – whether pitched allocation is performed or not (default is false)</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -330,12 +334,27 @@
 <span class="nx">toDevice</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">)</span>
 <span class="o">..</span>
 <span class="nx">fromDevice</span><span class="p">(</span><span class="nx">C</span><span class="p">);</span>
-<span class="nx">free</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">C</span><span class="p">);</span>
+<span class="c1">// GPU memory is automatically deallocated when dA, dB, and dC.</span>
 </pre></div>
 </div>
+<dl class="class">
+<dt id="GPUJaggedArray">
+<em class="property">class </em><code class="descname">GPUJaggedArray</code><a class="headerlink" href="#GPUJaggedArray" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="GPUJaggedArray.init">
+<em class="property">proc </em><code class="descname">init</code><span class="sig-paren">(</span><em>ref arr1</em>, <em>ref arr2</em>, <em>...</em><span class="sig-paren">)</span><a class="headerlink" href="#GPUJaggedArray.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allocates jagged array on the device. Basically it takes a set of Chapel arrays and creates an array of arrays on the device.</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A working example can be found <a class="reference external" href="https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/jagged/jagged.chpl">here</a>.</p>
 </div>
-<div class="section" id="low-mid-level-api-reference">
-<h2>LOW-MID-level API Reference<a class="headerlink" href="#low-mid-level-api-reference" title="Permalink to this headline">¶</a></h2>
+</dd></dl>
+
+</div>
+<div class="section" id="mid-low-level-api-reference">
+<h2>MID-LOW-level API Reference<a class="headerlink" href="#mid-low-level-api-reference" title="Permalink to this headline">¶</a></h2>
 <dl class="method">
 <dt id="Malloc">
 <em class="property">proc </em><code class="descname">Malloc</code><span class="sig-paren">(</span><em>ref devPtr: c_void_ptr</em>, <em>size: size_t</em><span class="sig-paren">)</span><a class="headerlink" href="#Malloc" title="Permalink to this definition">¶</a></dt>
@@ -387,6 +406,30 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="MallocPitch">
+<em class="property">proc </em><code class="descname">MallocPitch</code><span class="sig-paren">(</span><em>ref devPtr: c_void_ptr</em>, <em>ref pitch: size_t</em>, <em>width: size_t</em>, <em>height: size_t</em><span class="sig-paren">)</span><a class="headerlink" href="#MallocPitch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allocates pitched 2D memory on the device.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>devPtr</strong> : <cite>c_voidPtr</cite> – Pointer to the allocated pitched 2D device array</li>
+<li><strong>pitch</strong> : <cite>size_t</cite> – Pitch for allocation on the device, which is set by the runtime</li>
+<li><strong>width</strong> : <cite>size_t</cite> – The width of the original Chapel array (in bytes)</li>
+<li><strong>height</strong> : <cite>size_t</cite> – The number of rows (height)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A working example can be found <a class="reference external" href="https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/pitched2d/pitched2d.chpl">here</a>. The detailed descirption of the underlying CUDA API can be found <a class="reference external" href="https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g32bd7a39135594788a542ae72217775c">here</a>.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="Memcpy">
 <em class="property">proc </em><code class="descname">Memcpy</code><span class="sig-paren">(</span><em>dst: c_void_ptr</em>, <em>src: c_void_ptr</em>, <em>count: size_t</em>, <em>kind: int</em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transfers data between the host and the device</p>
@@ -420,6 +463,33 @@
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last"><code class="docutils literal"><span class="pre">c_ptrTo(A)</span></code> returns a pointer to the Chapel rectangular array <code class="docutils literal"><span class="pre">A</span></code>. For more details, see <a class="reference external" href="https://chapel-lang.org/docs/builtins/CPtr.html#CPtr.c_ptrTo">this document</a>.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Memcpy2D">
+<em class="property">proc </em><code class="descname">Memcpy2D</code><span class="sig-paren">(</span><em>dst: c_void_ptr</em>, <em>dpitch: size_t</em>, <em>src: c_void_ptr</em>, <em>spitch: size_t</em>, <em>width: size_t</em>, <em>height:size_t</em>, <em>kind: int</em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transfers pitched 2D array between the host and the device</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dst</strong> : <cite>c_void_ptr</cite> – the desination address</li>
+<li><strong>dpitch</strong> : <cite>size_t</cite> – the pitch of destination memory</li>
+<li><strong>src</strong> : <cite>c_void_ptr</cite> – the source address</li>
+<li><strong>spitch</strong> : <cite>size_t</cite> – the pitch of source memory</li>
+<li><strong>width</strong> : <cite>size_t</cite> – the width of 2D array to be transferred (in bytes)</li>
+<li><strong>height</strong> : <cite>size_t</cite> – the height of 2D array to be transferred (# of rows)</li>
+<li><strong>kind</strong> : <cite>int</cite> – type of transfer (<code class="docutils literal"><span class="pre">0</span></code>: host-to-device, <code class="docutils literal"><span class="pre">1</span></code>: device-to-host)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A working example can be found <a class="reference external" href="https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/pitched2d/pitched2d.chpl">here</a>. The detailed descirption of the underlying CUDA API can be found <a class="reference external" href="https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g3a58270f6775efe56c65ac47843e7cee">here</a>.</p>
 </div>
 </dd></dl>
 

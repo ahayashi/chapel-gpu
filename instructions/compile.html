@@ -96,7 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="build.html">Building Chapel-GPU</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="write.html">Using Chapel-GPU</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="low.html">Writing LOW-level (GPUIterator Only) programs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="low-mid.html">Writing LOW-MID-level programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mid-low.html">Writing MID-LOW-level programs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mid.html">Writing MID-level programs</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Compiling and Running Applications</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#compiling-applications">Compiling Applications</a></li>
@@ -240,6 +240,11 @@
 <td>The n-queens problem</td>
 <td>WIP</td>
 </tr>
+<tr class="row-odd"><td>GPU API Examples</td>
+<td><code class="docutils literal"><span class="pre">example/gpuapi</span></code></td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
 </tbody>
 </table>
 <div class="admonition note">
@@ -270,7 +275,15 @@ make opencl
 </pre></div>
 </div>
 </li>
-<li><p class="first">Example 2: <code class="docutils literal"><span class="pre">chapel-gpu/apps/stream</span></code></p>
+<li><p class="first">Example 2: <code class="docutils literal"><span class="pre">chapel-gpu/example/gpuapi</span></code></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/example/gpuapi/2d
+make cuda
+or
+make hip
+</pre></div>
+</div>
+</li>
+<li><p class="first">Example 3: <code class="docutils literal"><span class="pre">chapel-gpu/apps/stream</span></code></p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/apps/stream
 make cuda
 or
@@ -317,9 +330,9 @@ make opencl
 <td>The GPUIterator implemenation (multi-locale).</td>
 <td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist</span></code></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">vc.cuda.hybrid.dist.lowmid</span></code></td>
-<td>The LOW-MID implemenation (multi-locale).</td>
-<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist.lowmid</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">vc.cuda.hybrid.dist.midlow</span></code></td>
+<td>The MID-LOW implemenation (multi-locale).</td>
+<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist.midlow</span></code></td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">vc.cuda.hybrid.dist.mid</span></code></td>
 <td>The MID implementation (multi-locale).</td>
@@ -329,7 +342,7 @@ make opencl
 </table>
 <div class="admonition tip">
 <p class="first admonition-title">Tip</p>
-<p class="last">If you want to compile a specific variant, please do <code class="docutils literal"><span class="pre">make</span> <span class="pre">X.Y</span></code>, where <code class="docutils literal"><span class="pre">X</span></code> is either <code class="docutils literal"><span class="pre">cuda</span></code>, <code class="docutils literal"><span class="pre">hip</span></code>, or <code class="docutils literal"><span class="pre">opencl</span></code>, and <code class="docutils literal"><span class="pre">Y</span></code> is either <code class="docutils literal"><span class="pre">gpu</span></code>, <code class="docutils literal"><span class="pre">hybrid</span></code>, <code class="docutils literal"><span class="pre">hybrid.dist</span></code>, <code class="docutils literal"><span class="pre">hybrid.dist.lowmid</span></code>, or <code class="docutils literal"><span class="pre">hybrid.dist.mid</span></code>. Please also see the third column above. Also, the LOW-MID and MID variants with OpenCL are currently not supported.</p>
+<p class="last">If you want to compile a specific variant, please do <code class="docutils literal"><span class="pre">make</span> <span class="pre">X.Y</span></code>, where <code class="docutils literal"><span class="pre">X</span></code> is either <code class="docutils literal"><span class="pre">cuda</span></code>, <code class="docutils literal"><span class="pre">hip</span></code>, or <code class="docutils literal"><span class="pre">opencl</span></code>, and <code class="docutils literal"><span class="pre">Y</span></code> is either <code class="docutils literal"><span class="pre">gpu</span></code>, <code class="docutils literal"><span class="pre">hybrid</span></code>, <code class="docutils literal"><span class="pre">hybrid.dist</span></code>, <code class="docutils literal"><span class="pre">hybrid.dist.midlow</span></code>, or <code class="docutils literal"><span class="pre">hybrid.dist.mid</span></code>. Please also see the third column above. Also, the MID-LOW and MID variants with OpenCL are currently not supported.</p>
 </div>
 </li>
 </ol>

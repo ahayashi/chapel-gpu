@@ -2,6 +2,13 @@
 Chapel-GPU Evolution
 =============================================
 
+version 0.3.0, June, 2021
+############################
+
+Version 0.3.0 adds the following new features to version 0.2.0:
+
+- Update the GPUAPI module to add 1) pitched 2D array support at MID-LOW-level, and 2) jagged array suuport at the MID-level.
+
 version 0.2.0, August, 2020
 ############################
 

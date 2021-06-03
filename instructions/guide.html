@@ -96,7 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="build.html">Building Chapel-GPU</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="write.html">Using Chapel-GPU</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="low.html">Writing LOW-level (GPUIterator Only) programs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="low-mid.html">Writing LOW-MID-level programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mid-low.html">Writing MID-LOW-level programs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mid.html">Writing MID-level programs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compile.html">Compiling and Running Applications</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Guide to Write GPU programs</a><ul>
@@ -202,7 +202,7 @@
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Level</th>
 <th class="head">MID-level</th>
-<th class="head">LOW-MID-level</th>
+<th class="head">MID-LOW-level</th>
 <th class="head">LOW-level</th>
 </tr>
 </thead>
@@ -214,12 +214,12 @@
 </tr>
 <tr class="row-odd"><td>Memory (de)allocations</td>
 <td>Chapel (MID)</td>
-<td>Chapel (LOW-MID)</td>
+<td>Chapel (MID-LOW)</td>
 <td>CUDA/HIP/OpenCL</td>
 </tr>
 <tr class="row-even"><td>Data transfers</td>
 <td>Chapel (MID)</td>
-<td>Chapel (LOW-MID)</td>
+<td>Chapel (MID-LOW)</td>
 <td>CUDA/HIP/OpenCL</td>
 </tr>
 </tbody>
@@ -229,14 +229,14 @@
 <ul class="last simple">
 <li><a class="reference internal" href="mid.html#writing-mid-level-programs"><span class="std std-ref">Writing MID-level programs</span></a></li>
 <li><a class="reference internal" href="../api/gpuapi.html#mid-level-api-reference"><span class="std std-ref">MID-level API Reference</span></a></li>
-<li><a class="reference internal" href="low-mid.html#writing-low-mid-level-programs"><span class="std std-ref">Writing LOW-MID-level programs</span></a></li>
-<li><a class="reference internal" href="../api/gpuapi.html#low-mid-level-api-reference"><span class="std std-ref">LOW-MID-level API Reference</span></a></li>
+<li><a class="reference internal" href="mid-low.html#writing-mid-low-level-programs"><span class="std std-ref">Writing MID-LOW-level programs</span></a></li>
+<li><a class="reference internal" href="../api/gpuapi.html#mid-low-level-api-reference"><span class="std std-ref">MID-LOW-level API Reference</span></a></li>
 <li><a class="reference internal" href="low.html#writing-low-level-gpuiterator-only-programs"><span class="std std-ref">Writing LOW-level (GPUIterator Only) programs</span></a></li>
 </ul>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">LOW/LOW-MID/MID levels can interoperate with each other.</p>
+<p class="last">LOW/MID-LOW/MID levels can interoperate with each other.</p>
 </div>
 </div>
 <div class="section" id="writing-gpu-program">

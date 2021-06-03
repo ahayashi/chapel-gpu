@@ -5,7 +5,7 @@ Building Chapel-GPU
 Prerequisites
 ##############
 
-* Chapel: 1.22 or below. Detailed instructions for installing Chapel can be found: `here <https://chapel-lang.org/docs/usingchapel/QUICKSTART.html>`_.
+* Chapel: 1.24.1 or below. Detailed instructions for installing Chapel can be found: `here <https://chapel-lang.org/docs/usingchapel/QUICKSTART.html>`_.
 
 * GPU Compilers & Runtimes: GPUIterator and GPUAPI require either of the following GPU programing environments.
 
@@ -17,7 +17,7 @@ Prerequisites
 
    * cmake: 3.8.0 or above
 
-.. note:: While ``GPUIterator`` works with OpenCL, ``GPUAPI`` with OpenCL is under developement.
+.. note:: While ``GPUIterator`` works with OpenCL, ``GPUAPI`` with OpenCL/SYCL is under developement.
 
 Instructions
 ##############

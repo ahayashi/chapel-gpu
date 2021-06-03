@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Compiling and Running Applications" href="compile.html" />
-    <link rel="prev" title="Writing LOW-MID-level programs" href="low-mid.html" /> 
+    <link rel="prev" title="Writing MID-LOW-level programs" href="mid-low.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -96,7 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="build.html">Building Chapel-GPU</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="write.html">Using Chapel-GPU</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="low.html">Writing LOW-level (GPUIterator Only) programs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="low-mid.html">Writing LOW-MID-level programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mid-low.html">Writing MID-LOW-level programs</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Writing MID-level programs</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#mid-level-api">MID-level API</a></li>
 </ul>
@@ -190,7 +190,7 @@
 <h1>Writing MID-level programs<a class="headerlink" href="#writing-mid-level-programs" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="mid-level-api">
 <h2>MID-level API<a class="headerlink" href="#mid-level-api" title="Permalink to this headline">¶</a></h2>
-<p>To reiterate, the biggest motivation for introducing <code class="docutils literal"><span class="pre">LOW-MID</span></code> and <code class="docutils literal"><span class="pre">MID</span></code> -level GPU API is moving some of low-level GPU operations to the Chapel-level. Consider the following GPU callback function and C function:</p>
+<p>To reiterate, the biggest motivation for introducing <code class="docutils literal"><span class="pre">MID-LOW</span></code> and <code class="docutils literal"><span class="pre">MID</span></code> -level GPU API is moving some of low-level GPU operations to the Chapel-level. Consider the following GPU callback function and C function:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.chpl</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
 <div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="c1">// lo, hi, and N are automatically computed by the GPUIterator</span>
@@ -218,7 +218,7 @@
 </pre></div>
 </div>
 </div>
-<p>At the MID-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation, 2) device synchronization, and 3) data transfer can be written in Chapel. Also, unlike the LOW-MID level, the MID-level API is more Chapel programmer-friendly, where you can allocate GPU memory using the <code class="docutils literal"><span class="pre">new</span></code> keyword and no longer need to directly manipulate C types. Here is an example program written with the MID-level API:</p>
+<p>At the MID-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation, 2) device synchronization, and 3) data transfer can be written in Chapel. Also, unlike the MID-LOW level, the MID-level API is more Chapel programmer-friendly, where you can allocate GPU memory using the <code class="docutils literal"><span class="pre">new</span></code> keyword and no longer need to directly manipulate C types. Here is an example program written with the MID-level API:</p>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.chpl</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
 <div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
@@ -235,7 +235,7 @@
 </div>
 <div class="admonition tip">
 <p class="first admonition-title">Tip</p>
-<p class="last">The MID-level API can interoperate with the LOW-MID-level API.</p>
+<p class="last">The MID-level API can interoperate with the MID-LOW-level API.</p>
 </div>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
@@ -255,7 +255,7 @@
         <a href="compile.html" class="btn btn-neutral float-right" title="Compiling and Running Applications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="low-mid.html" class="btn btn-neutral float-left" title="Writing LOW-MID-level programs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="mid-low.html" class="btn btn-neutral float-left" title="Writing MID-LOW-level programs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
