@@ -9,6 +9,8 @@ endif
 CUDA_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPICUDA_static -L$(CUDA_ROOT_DIR)/lib -lcudart $(CUBLAS_LIB)
 # HIP
 HIP_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPIHIP_static -L$(HIP_ROOT_DIR)/lib -lhip_hcc
+# DPC++
+DPCPP_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPIDPCPP_static
 
 # OpenCL
 UNAME_S := $(shell uname -s)
@@ -71,6 +73,34 @@ build/lib$(TARGET).opencl.a: $(TARGET).opencl.c
 opencl.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).opencl.a
 	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl -L./build -l$(TARGET).opencl $(OPENCL_LIBS) -o $(TARGET).$@
 
+#DPC++
+
+dpcpp: dpcpp.gpu dpcpp.hybrid dpcpp.hybrid.dist dpcpp.hybrid.dist.midlow dpcpp.hybrid.dist.mid
+
+build/lib$(TARGET).dpcpp.a: $(TARGET).cu
+	rm -rf build &&	mkdir build && cd build && cmake .. && make
+
+build/lib$(TARGET).kernel.dpcpp.a: $(TARGET).kernel.cu
+	rm -rf build &&	mkdir build && cd build && cmake .. && make
+
+dpcpp.%.mid: $(TARGET).%.mid.chpl $(TARGET).kernel.h  build/lib$(TARGET).kernel.dpcpp.a
+	rm -rf tmp
+	-chpl --savec tmp $(CHPL_FLAGS) $(TARGET).$*.mid.chpl
+	dpcpp build/$(TARGET).kernel.dp.cpp tmp/$(TARGET).$*.mid.tmp.o $(CHPL_HOME)/lib/`$(CHPL_HOME)/util/printchplenv --runtime --path`/main.o `$(CHPL_HOME)/util/config/compileline --libraries` $(DPCPP_LIBS) -o $(TARGET).$@
+	rm -rf tmp
+
+dpcpp.%.midlow: $(TARGET).%.midlow.chpl $(TARGET).kernel.h  build/lib$(TARGET).kernel.dpcpp.a
+	rm -rf tmp
+	-chpl --savec tmp $(CHPL_FLAGS) $(TARGET).$*.midlow.chpl
+	dpcpp build/$(TARGET).kernel.dp.cpp tmp/$(TARGET).$*.midlow.tmp.o $(CHPL_HOME)/lib/`$(CHPL_HOME)/util/printchplenv --runtime --path`/main.o `$(CHPL_HOME)/util/config/compileline --libraries` $(DPCPP_LIBS) -o $(TARGET).$@
+	rm -rf tmp
+
+dpcpp.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).dpcpp.a
+	rm -rf tmp
+	-chpl --savec tmp $(CHPL_FLAGS) $(TARGET).$*.chpl
+	dpcpp build/$(TARGET).dp.cpp tmp/$(TARGET).$*.tmp.o $(CHPL_HOME)/lib/`$(CHPL_HOME)/util/printchplenv --runtime --path`/main.o `$(CHPL_HOME)/util/config/compileline --libraries` $(DPCPP_LIBS) -o $(TARGET).$@
+	rm -rf tmp
+
 .PHONY: clean
 clean:
-	rm -rf ./build $(TARGET).cpu.baseline $(TARGET).cuda.* $(TARGET).hip.* $(TARGET).opencl.gpu $(TARGET).opencl.hybrid*
+	rm -rf ./build $(TARGET).cpu.baseline $(TARGET).cuda.* $(TARGET).hip.* $(TARGET).opencl.gpu $(TARGET).opencl.hybrid* $(TARGET).dpcpp.*

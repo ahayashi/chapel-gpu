@@ -16,6 +16,9 @@ find_package(HIP QUIET)
 # FindOpenCL
 find_package(OpenCL QUIET)
 
+# FindDPC++
+find_program(DPCPP_FOUND dpcpp QUIET)
+
 if(CMAKE_CUDA_COMPILER)
   enable_language(CUDA)
   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
@@ -68,5 +71,41 @@ if(OpenCL_FOUND)
   target_link_libraries(${APP}.opencl OpenCL::OpenCL)
 else()
   message(STATUS "OpenCL Not Found")
+endif()
+
+if(DPCPP_FOUND)
+  find_program(DPCT_FOUND dpct QUIET)
+  if(DPCT_FOUND)
+    message(STATUS "Found DPC++: " ${DPCPP_FOUND})
+    message(STATUS "Found DPCT: " ${DPCT_FOUND})
+    set(CMAKE_CXX_COMPILER "dpcpp")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fPIC")
+    set(CUDA_INCLUDE_PATH $ENV{CUDA_HOME}/include)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${APP}.cu")
+      add_custom_command(
+        OUTPUT ${APP}.dp.cpp
+        COMMAND dpct --in-root=${CMAKE_CURRENT_SOURCE_DIR} --out-root=. --cuda-include-path=${CUDA_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.cu
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.cu
+        COMMENT "Convering .cu to .dp.cpp"
+      )
+      add_library(${APP}.dpcpp STATIC ${APP}.dp.cpp)
+    endif()
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${APP}.kernel.cu")
+      add_custom_command(
+        OUTPUT ${APP}.kernel.dp.cpp
+        COMMAND dpct --in-root=${CMAKE_CURRENT_SOURCE_DIR} --out-root=. --cuda-include-path=${CUDA_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.kernel.cu
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.kernel.cu
+        COMMENT "Convering kernel.cu to kernel..dp.cpp"
+      )
+      add_library(${APP}.kernel.dpcpp STATIC ${APP}.kernel.dp.cpp)
+    endif()
+  else()
+	message(STATUS "Found DPC++, but DPCT NOTFOUND")
+    set(DPCPP_FOUND OFF)
+  endif()
+else()
+  message(STATUS "DPC++ Not Found")
 endif()
 

@@ -11,6 +11,11 @@
 #define CudaSafeCall( err ) __cudaSafeCall( err, __FILE__, __LINE__ )
 #define CudaCheckError()    __cudaCheckError( __FILE__, __LINE__ )
 
+//TODO: Remove this hack added for DPC++
+#ifdef DPCT_COMPATIBILITY_TEMP
+#undef DPCT_COMPATIBILITY_TEMP
+#endif
+
 inline void __cudaSafeCall( cudaError err, const char *file, const int line )
 {
 #ifdef CUDA_ERROR_CHECK
