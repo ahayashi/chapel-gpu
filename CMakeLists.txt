@@ -19,6 +19,9 @@ find_package(HIP QUIET)
 # FindOpenCL
 find_package(OpenCL QUIET)
 
+# FindDPC++
+find_program(DPCPP_FOUND dpcpp QUIET)
+
 #
 set(GPU_ROOT_DIRS "")
 
@@ -69,6 +72,40 @@ if(OpenCL_FOUND)
   set(GPU_COMPILER_FOUND ON)
 else()
   message(STATUS "OpenCL Not Found")
+endif()
+
+if(DPCPP_FOUND)
+  find_program(DPCT_FOUND dpct QUIET)
+  if(DPCT_FOUND)
+    message(STATUS "Found DPC++: " ${DPCPP_FOUND})
+    message(STATUS "Found DPCT: " ${DPCT_FOUND})
+    if(CMAKE_CUDA_COMPILER)
+      set(CUDA_INCLUDE_PATH ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+    elseif(DEFINED ENV{CUDA_HOME})
+      set(CUDA_INCLUDE_PATH $ENV{CUDA_HOME}/include)
+    else()
+      message(FATAL_ERROR "Unable to find CUDA cmake or CUDA_HOME environment variable")
+    endif()
+    add_custom_command(
+      OUTPUT GPUAPI.dp.cpp
+      COMMAND dpct --in-root=${CMAKE_CURRENT_SOURCE_DIR}/src/ --out-root=. --cuda-include-path=${CUDA_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.cu
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.cu
+      COMMENT "Convering GPUAPI.cu to GPUAPI.dp.cpp"
+    )
+  else()
+	message(STATUS "Found DPC++, but DPCT NOTFOUND")
+    set(DPCPP_FOUND OFF)
+  endif()
+  set(CMAKE_CXX_COMPILER "dpcpp")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fPIC")
+  add_library(GPUAPIDPCPP SHARED GPUAPI.dp.cpp)
+  add_library(GPUAPIDPCPP_static STATIC GPUAPI.dp.cpp)
+  set_target_properties(GPUAPIDPCPP PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.h)
+  list(APPEND GPU_ROOT_DIRS " ")
+  set(GPU_COMPILER_FOUND ON)
+else()
+	message(STATUS "DPC++ Not Found")
 endif()
 
 if(NOT GPU_ROOT_DIRS)
@@ -140,7 +177,16 @@ if(OpenCL_FOUND)
     )
 endif()
 
-if(CMAKE_CUDA_COMPILER OR HIP_FOUND)
+if(DPCPP_FOUND)
+  install(
+    TARGETS GPUAPIDPCPP GPUAPIDPCPP_static
+    ARCHIVE DESTINATION ${INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDEDIR}
+    )
+endif()
+
+if(CMAKE_CUDA_COMPILER OR HIP_FOUND OR DPCPP_FOUND)
   install(
     FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/lambda.h
