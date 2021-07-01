@@ -79,7 +79,13 @@ if(DPCPP_FOUND)
   if(DPCT_FOUND)
     message(STATUS "Found DPC++: " ${DPCPP_FOUND})
     message(STATUS "Found DPCT: " ${DPCT_FOUND})
-    set(CUDA_INCLUDE_PATH $ENV{CUDA_HOME}/include)
+    if(CMAKE_CUDA_COMPILER)
+      set(CUDA_INCLUDE_PATH ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+    elseif(DEFINED ENV{CUDA_HOME})
+      set(CUDA_INCLUDE_PATH $ENV{CUDA_HOME}/include)
+    else()
+      message(FATAL_ERROR "Unable to find CUDA cmake or CUDA_HOME environment variable")
+    endif()
     add_custom_command(
       OUTPUT GPUAPI.dp.cpp
       COMMAND dpct --in-root=${CMAKE_CURRENT_SOURCE_DIR}/src/ --out-root=. --cuda-include-path=${CUDA_INCLUDE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.cu
