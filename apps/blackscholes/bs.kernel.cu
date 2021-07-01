@@ -84,14 +84,18 @@ __global__ void bs(float *drand, float *dput, float *dcall, int n) {
 #include "lambda.h"
 #endif
 
+#ifndef THREADS_PER_BLOCK
+#define THREADS_PER_BLOCK 1024
+#endif
+
 extern "C" {
 #ifndef USE_LAMBDA
     void LaunchBS(float* drand, float *dput, float *dcall, int N) {
-        bs<<<ceil(((float)N)/1024), 1024>>>(drand, dput, dcall, N);
+        bs<<<ceil(((float)N)/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(drand, dput, dcall, N);
     }
 #else
     void LaunchBS(float* drand, float *dput, float *dcall, int N) {
-        call_gpu_functor(N, 1024, NULL, [=] __device__ (int id) {
+        call_gpu_functor(N, THREADS_PER_BLOCK, NULL, [=] __device__ (int id) {
                 float c1 = 0.319381530f;
                 float c2 = -0.356563782f;
                 float c3 = 1.781477937f;

@@ -18,14 +18,18 @@ __global__ void kernel2(float *dW, float *dWcurr, float *dX, float *dY, float al
 #include "lambda.h"
 #endif
 
+#ifndef THREADS_PER_BLOCK
+#define THREADS_PER_BLOCK 1024
+#endif
+
 extern "C" {
 #ifndef USE_LAMBDA
     void LaunchLR(float* dX, float *dY, float *dW, float *dWcurr, float alpha, int nSamples, int nFeatures, int start, int end, int GPUN) {
-        kernel2<<<ceil(((float)GPUN)/1024), 1024>>>(dW, dWcurr, dX, dY, alpha, nSamples, nFeatures, start-1, GPUN);
+        kernel2<<<ceil(((float)GPUN)/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(dW, dWcurr, dX, dY, alpha, nSamples, nFeatures, start-1, GPUN);
     }
 #else
     void LaunchLR(float* dX, float *dY, float *dW, float *dWcurr, float alpha, int nSamples, int nFeatures, int start, int end, int GPUN) {
-        call_gpu_functor(GPUN, 1024, NULL, [=] __device__ (int id) {
+        call_gpu_functor(GPUN, THREADS_PER_BLOCK, NULL, [=] __device__ (int id) {
                 float err = 0.0;
                 for (int s = 0; s < nSamples; s++) {
                     float arg = 0.0;

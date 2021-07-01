@@ -6,6 +6,11 @@
 #include <cublas_v2.h>
 #endif
 
+#ifndef THREADS_PER_BLOCK
+#define THREADS_PER_BLOCK 1024
+#endif
+#define THREADS_PER_DIM 32
+
 #define VERBOSE
 //#define PROF
 #define CUDA_ERROR_CHECK
@@ -151,10 +156,10 @@ extern "C" {
             CudaSafeCall(cudaEventRecord(startCudaKernelEvent));
 #endif
             if (!tiled) {
-                mm<<<ceil(((float)GPUN)/1024), 1024>>>(dA, dB, dC, ceil(sqrt(N)), N, GPUN);
+                mm<<<ceil(((float)GPUN)/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(dA, dB, dC, ceil(sqrt(N)), N, GPUN);
             } else if (tiled == 1){
-                dim3 block(32,32);
-                dim3 grid(ceil(sqrt(N)/32), ceil(sqrt(N)/32));
+                dim3 block(THREADS_PER_DIM, THREADS_PER_DIM);
+                dim3 grid(ceil(sqrt(N)/THREADS_PER_DIM), ceil(sqrt(N)/THREADS_PER_DIM));
                 mm_tiled<<<grid, block>>>(dA, dB, dC, ceil(sqrt(N)), N, N);
             } else {
 #ifdef __NVCC__

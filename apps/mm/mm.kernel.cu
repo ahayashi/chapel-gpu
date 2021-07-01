@@ -6,6 +6,10 @@
 #include <cublas_v2.h>
 #endif
 
+#ifndef THREADS_PER_BLOCK
+#define THREADS_PER_BLOCK 1024
+#endif
+
 __global__ void mm(float *dA, float *dB, float *dC, int DIM, int N, int GPUN) {
     int id = blockIdx.x * blockDim.x + threadIdx.x;
     if (id <= GPUN) {
@@ -30,7 +34,7 @@ extern "C" {
             printf("\t range: %d..%d\n", start, end);
 #endif
             if (!tiled) {
-                mm<<<ceil(((float)GPUN)/1024), 1024>>>(A, B, C, ceil(sqrt(N)), N, GPUN);
+                mm<<<ceil(((float)GPUN)/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(A, B, C, ceil(sqrt(N)), N, GPUN);
             }
             else if(tiled == 1) {
                 printf("Tile not imlemented\n");

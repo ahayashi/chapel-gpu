@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <assert.h>
+
+#ifndef THREADS_PER_BLOCK
+#define THREADS_PER_BLOCK 1024
+#endif
+
 #define CUDA_ERROR_CHECK
 #define CudaSafeCall( err ) __cudaSafeCall( err, __FILE__, __LINE__ )
 
@@ -43,7 +48,7 @@ extern "C" {
             CudaSafeCall(cudaMemcpy(dB, B + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
             CudaSafeCall(cudaMemcpy(dC, C + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
 
-            stream<<<ceil(((float)GPUN)/1024), 1024>>>(dA, dB, dC, alpha, GPUN);
+            stream<<<ceil(((float)GPUN)/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(dA, dB, dC, alpha, GPUN);
 
             CudaSafeCall(cudaDeviceSynchronize());
             CudaSafeCall(cudaMemcpy(A + start, dA, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
