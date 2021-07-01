@@ -3,6 +3,10 @@
 #include <sys/time.h>
 #include <assert.h>
 
+#ifndef THREADS_PER_BLOCK
+#define THREADS_PER_BLOCK 1024
+#endif
+
 //#define VERBOSE
 //#define PROF
 #define CUDA_ERROR_CHECK
@@ -76,7 +80,7 @@ extern "C" {
 #ifdef PROF
             CudaSafeCall(cudaEventRecord(startCudaKernelEvent));
 #endif
-            vc<<<ceil(((float)GPUN)/1024), 1024>>>(dA, dB, GPUN);
+            vc<<<ceil(((float)GPUN)/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(dA, dB, GPUN);
 #ifdef PROF
             CudaSafeCall(cudaEventRecord(endCudaKernelEvent));
             CudaSafeCall(cudaEventSynchronize(endCudaKernelEvent));

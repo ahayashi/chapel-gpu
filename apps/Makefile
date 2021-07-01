@@ -5,12 +5,15 @@ CHPL_GPU_LIB_PATH=-L$(CHPL_GPU_HOME)/lib -L$(CHPL_GPU_HOME)/lib64
 # CUDA
 ifeq ($(USE_CUBLAS), yes)
   CUBLAS_LIB=-lcublas
+  DBLAS_LIB=-L${MKLROOT}/lib/intel64 -lmkl_sycl -lmkl_intel_ilp64 -lmkl_tbb_thread -lmkl_core -lsycl -lOpenCL -ltbb -lpthread -ldl -lm
+  DBLAS_FLAG=-DMKL_ILP64
 endif
 CUDA_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPICUDA_static -L$(CUDA_ROOT_DIR)/lib -lcudart $(CUBLAS_LIB)
 # HIP
 HIP_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPIHIP_static -L$(HIP_ROOT_DIR)/lib -lhip_hcc
 # DPC++
-DPCPP_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPIDPCPP_static
+DPCPP_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPIDPCPP_static $(DBLAS_LIB)
+DPCPP_FLAGS=-DTHREADS_PER_BLOCK=256 $(DBLAS_FLAG)
 
 # OpenCL
 UNAME_S := $(shell uname -s)
@@ -86,19 +89,19 @@ build/lib$(TARGET).kernel.dpcpp.a: $(TARGET).kernel.cu
 dpcpp.%.mid: $(TARGET).%.mid.chpl $(TARGET).kernel.h  build/lib$(TARGET).kernel.dpcpp.a
 	rm -rf tmp
 	-chpl --savec tmp $(CHPL_FLAGS) $(TARGET).$*.mid.chpl
-	dpcpp build/$(TARGET).kernel.dp.cpp tmp/$(TARGET).$*.mid.tmp.o $(CHPL_HOME)/lib/`$(CHPL_HOME)/util/printchplenv --runtime --path`/main.o `$(CHPL_HOME)/util/config/compileline --libraries` $(DPCPP_LIBS) -o $(TARGET).$@
+	dpcpp $(DPCPP_FLAGS) build/$(TARGET).kernel.dp.cpp tmp/$(TARGET).$*.mid.tmp.o $(CHPL_HOME)/lib/`$(CHPL_HOME)/util/printchplenv --runtime --path`/main.o `$(CHPL_HOME)/util/config/compileline --libraries` $(DPCPP_LIBS) -o $(TARGET).$@
 	rm -rf tmp
 
 dpcpp.%.midlow: $(TARGET).%.midlow.chpl $(TARGET).kernel.h  build/lib$(TARGET).kernel.dpcpp.a
 	rm -rf tmp
 	-chpl --savec tmp $(CHPL_FLAGS) $(TARGET).$*.midlow.chpl
-	dpcpp build/$(TARGET).kernel.dp.cpp tmp/$(TARGET).$*.midlow.tmp.o $(CHPL_HOME)/lib/`$(CHPL_HOME)/util/printchplenv --runtime --path`/main.o `$(CHPL_HOME)/util/config/compileline --libraries` $(DPCPP_LIBS) -o $(TARGET).$@
+	dpcpp $(DPCPP_FLAGS) build/$(TARGET).kernel.dp.cpp tmp/$(TARGET).$*.midlow.tmp.o $(CHPL_HOME)/lib/`$(CHPL_HOME)/util/printchplenv --runtime --path`/main.o `$(CHPL_HOME)/util/config/compileline --libraries` $(DPCPP_LIBS) -o $(TARGET).$@
 	rm -rf tmp
 
 dpcpp.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).dpcpp.a
 	rm -rf tmp
 	-chpl --savec tmp $(CHPL_FLAGS) $(TARGET).$*.chpl
-	dpcpp build/$(TARGET).dp.cpp tmp/$(TARGET).$*.tmp.o $(CHPL_HOME)/lib/`$(CHPL_HOME)/util/printchplenv --runtime --path`/main.o `$(CHPL_HOME)/util/config/compileline --libraries` $(DPCPP_LIBS) -o $(TARGET).$@
+	dpcpp $(DPCPP_FLAGS) build/$(TARGET).dp.cpp tmp/$(TARGET).$*.tmp.o $(CHPL_HOME)/lib/`$(CHPL_HOME)/util/printchplenv --runtime --path`/main.o `$(CHPL_HOME)/util/config/compileline --libraries` $(DPCPP_LIBS) -o $(TARGET).$@
 	rm -rf tmp
 
 .PHONY: clean

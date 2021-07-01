@@ -1,4 +1,7 @@
 
+#ifndef THREADS_PER_BLOCK
+#define THREADS_PER_BLOCK 1024
+#endif
 
 __global__ void stream(float* dA, float* dB, float* dC, float alpha, int N) {
     int id = blockIdx.x * blockDim.x + threadIdx.x;
@@ -9,6 +12,6 @@ __global__ void stream(float* dA, float* dB, float* dC, float alpha, int N) {
 
 extern "C" {
     void LaunchStream(float* dA, float *dB, float* dC, float alpha, int N) {
-        stream<<<ceil(((float)N)/1024), 1024>>>(dA, dB, dC, alpha, N);
+        stream<<<ceil(((float)N)/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(dA, dB, dC, alpha, N);
     }
 }

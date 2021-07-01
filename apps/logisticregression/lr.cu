@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <assert.h>
+
+#ifndef THREADS_PER_BLOCK
+#define THREADS_PER_BLOCK 1024
+#endif
+
 #define CUDA_ERROR_CHECK
 #define CudaSafeCall( err ) __cudaSafeCall( err, __FILE__, __LINE__ )
 
@@ -56,7 +61,7 @@ extern "C" {
             CudaSafeCall(cudaMalloc(&dWcurr, sizeof(float) * GPUN));
 
             CudaSafeCall(cudaMemcpy(dW, W + start, sizeof(float) * GPUN, cudaMemcpyHostToDevice));
-            kernel1<<<ceil(((float)GPUN)/1024), 1024>>>(dW, dWcurr, GPUN);
+            kernel1<<<ceil(((float)GPUN)/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(dW, dWcurr, GPUN);
 
             CudaSafeCall(cudaDeviceSynchronize());
             CudaSafeCall(cudaMemcpy(Wcurr + start, dWcurr, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
@@ -84,7 +89,7 @@ extern "C" {
             CudaSafeCall(cudaMemcpy(dY, Y, sizeof(float) * nSamples, cudaMemcpyHostToDevice));
             CudaSafeCall(cudaMemcpy(dWcurr, Wcurr, sizeof(float) * nFeatures, cudaMemcpyHostToDevice));
 
-            kernel2<<<ceil(((float)GPUN)/1024), 1024>>>(dW, dWcurr, dX, dY, alpha, nSamples, nFeatures, start-1, GPUN);
+            kernel2<<<ceil(((float)GPUN)/THREADS_PER_BLOCK), THREADS_PER_BLOCK>>>(dW, dWcurr, dX, dY, alpha, nSamples, nFeatures, start-1, GPUN);
             CudaSafeCall(cudaDeviceSynchronize());
             CudaSafeCall(cudaMemcpy(W, dW, sizeof(float) * GPUN, cudaMemcpyDeviceToHost));
 
