@@ -1,0 +1,25 @@
+name: ci
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - doc/**
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: |
+          cd doc
+          pip install -r requirements.txt
+          make html
+      - uses: actions/upload-artifact@v2
+        with:
+          name: html
+          path: doc/build/html
+
