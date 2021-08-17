@@ -11,7 +11,7 @@ Prerequisites
 
    * NVIDIA CUDA: Tested with 10.2
    * AMD HIP: Tested with 2.8
-   * Intel DPC++
+   * Intel DPC++:
    * OpenCL: Tested with 2.2 and 1.2
 
 * Build tools
