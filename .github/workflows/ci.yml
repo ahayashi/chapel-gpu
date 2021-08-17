@@ -18,8 +18,10 @@ jobs:
           cd doc
           pip install -r requirements.txt
           make html
+      - uses: actions/checkout@v2
+        with:
+          ref: gh-pages
       - run: |
-          git checkout gh-pages
           cp -rf doc/build/html/* .
           git add -u
           git config --global user.name 'Akihiro Hayashi'
