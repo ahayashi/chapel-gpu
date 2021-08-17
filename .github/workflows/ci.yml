@@ -25,6 +25,7 @@ jobs:
           ref: gh-pages
           path: gh-pages
       - run: |
+          cd $GITHUB_WORKSPACE/gh-pages
           cp -rf $GITHUB_WORKSPACE/master/doc/build/html/* .
           git add -u
           git config --global user.name 'Akihiro Hayashi'
