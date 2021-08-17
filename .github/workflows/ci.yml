@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          path: master
       - uses: actions/setup-python@v2
         with:
           python-version: 3.x
@@ -22,7 +24,7 @@ jobs:
         with:
           ref: gh-pages
       - run: |
-          cp -rf doc/build/html/* .
+          cp -rf $GITHUB_WORKSPACE/master/doc/build/html/* .
           git add -u
           git config --global user.name 'Akihiro Hayashi'
           git config --global user.email 'ahayashi@gatech.edu'
