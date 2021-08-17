@@ -23,6 +23,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: gh-pages
+          path: gh-pages
       - run: |
           cp -rf $GITHUB_WORKSPACE/master/doc/build/html/* .
           git add -u
