@@ -18,8 +18,11 @@ jobs:
           cd doc
           pip install -r requirements.txt
           make html
-      - uses: actions/upload-artifact@v2
-        with:
-          name: html
-          path: doc/build/html
-
+      - run: |
+          git checkout gh-pages
+          cp -rf doc/build/html/* .
+          git add -u
+          git config --global user.name 'Akihiro Hayashi'
+          git config --global user.email 'ahayashi@gatech.edu'
+          git commit -am "Auto Deployed"
+          git push
