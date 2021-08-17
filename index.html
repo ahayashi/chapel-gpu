@@ -1,11 +1,11 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Chapel GPU Documentation &mdash; Chapel-GPU 0.3 documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -25,20 +30,11 @@
   <![endif]-->
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'0.3',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -59,7 +55,7 @@
           
 
           
-            <a href="#" class="icon icon-home" alt="Documentation Home"> Chapel-GPU
+            <a href="#" class="icon icon-home"> Chapel-GPU
           
 
           
@@ -148,6 +144,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -159,7 +157,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -179,22 +177,21 @@
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>This document describes the following two Chapel modules that facilitate GPU programming in Chapel:</p>
 <ul>
-<li><p class="first"><cite>GPUIterator</cite>: A Chapel iterator that facilitates invoking user-written GPU programs (e.g., CUDA/HIP/OpenCL) from Chapel programs. It is also designed to easily perform hybrid and/or distributed execution - i.e., CPU-only, GPU-only, X% for CPU + Y% for GPU on a single or multiple CPU+GPU node(s), which helps the user to explore the best configuration.</p>
-</li>
-<li><p class="first"><cite>GPUAPI</cite>: Chapel-level GPU API that allows the user to perform basic operations such as GPU memory (de)allocations, device-to-host/host-to-device transfers, and so on. This module can be used either standalone or with the GPUIterator module. Currently, the following two tiers of API are provided:</p>
+<li><p><cite>GPUIterator</cite>: A Chapel iterator that facilitates invoking user-written GPU programs (e.g., CUDA/HIP/OpenCL) from Chapel programs. It is also designed to easily perform hybrid and/or distributed execution - i.e., CPU-only, GPU-only, X% for CPU + Y% for GPU on a single or multiple CPU+GPU node(s), which helps the user to explore the best configuration.</p></li>
+<li><p><cite>GPUAPI</cite>: Chapel-level GPU API that allows the user to perform basic operations such as GPU memory (de)allocations, device-to-host/host-to-device transfers, and so on. This module can be used either standalone or with the GPUIterator module. Currently, the following two tiers of API are provided:</p>
 <blockquote>
 <div><ul>
-<li><p class="first"><cite>MID-level</cite>: Provides Chapel user-friendly GPU API functions.</p>
+<li><p><cite>MID-level</cite>: Provides Chapel user-friendly GPU API functions.</p>
 <blockquote>
 <div><ul class="simple">
-<li>Example: <code class="code chapel docutils literal"><span class="keyword declaration"><span class="pre">var</span></span> <span class="name other"><span class="pre">ga</span></span> <span class="operator"><span class="pre">=</span></span> <span class="name other"><span class="pre">new</span></span> <span class="name other"><span class="pre">GPUArray</span></span><span class="punctuation"><span class="pre">(</span></span><span class="name other"><span class="pre">A</span></span><span class="punctuation"><span class="pre">);</span></span></code></li>
+<li><p>Example: <code class="code chapel docutils literal notranslate"><span class="keyword declaration"><span class="pre">var</span></span> <span class="name other"><span class="pre">ga</span></span> <span class="operator"><span class="pre">=</span></span> <span class="keyword"><span class="pre">new</span></span> <span class="name other"><span class="pre">GPUArray</span></span><span class="punctuation"><span class="pre">(</span></span><span class="name other"><span class="pre">A</span></span><span class="punctuation"><span class="pre">);</span></span></code></p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p class="first"><cite>MID-LOW-level</cite>: Provides wrapper functions for raw GPU API functions</p>
+<li><p><cite>MID-LOW-level</cite>: Provides wrapper functions for raw GPU API functions</p>
 <blockquote>
 <div><ul class="simple">
-<li>Example: <code class="code chapel docutils literal"><span class="keyword declaration"><span class="pre">var</span></span> <span class="name other"><span class="pre">ga</span></span><span class="punctuation"><span class="pre">:</span></span> <span class="name other"><span class="pre">c_void_ptr</span></span> <span class="operator"><span class="pre">=</span></span> <span class="name other"><span class="pre">Malloc</span></span><span class="punctuation"><span class="pre">(</span></span><span class="name other"><span class="pre">sizeInBytes</span></span><span class="punctuation"><span class="pre">);</span></span></code></li>
+<li><p>Example: <code class="code chapel docutils literal notranslate"><span class="keyword declaration"><span class="pre">var</span></span> <span class="name other"><span class="pre">ga</span></span><span class="punctuation"><span class="pre">:</span></span> <span class="name other"><span class="pre">c_void_ptr</span></span> <span class="operator"><span class="pre">=</span></span> <span class="name other"><span class="pre">Malloc</span></span><span class="punctuation"><span class="pre">(</span></span><span class="name other"><span class="pre">sizeInBytes</span></span><span class="punctuation"><span class="pre">);</span></span></code></p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -267,35 +264,28 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="instructions/build.html" class="btn btn-neutral float-right" title="Building Chapel-GPU" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
+        <a href="instructions/build.html" class="btn btn-neutral float-right" title="Building Chapel-GPU" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2019, Rice University, 2019-2021, Georgia Institute of Technology
+        &#169; Copyright 2019, Rice University, 2019-2021, Georgia Institute of Technology.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

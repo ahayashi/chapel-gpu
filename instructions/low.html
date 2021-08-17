@@ -1,11 +1,11 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Writing LOW-level (GPUIterator Only) programs &mdash; Chapel-GPU 0.3 documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -25,20 +30,11 @@
   <![endif]-->
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.3',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -60,7 +56,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Chapel-GPU
+            <a href="../index.html" class="icon icon-home"> Chapel-GPU
           
 
           
@@ -160,6 +156,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -173,7 +171,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/instructions/low.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -189,25 +187,25 @@
             
   <div class="section" id="writing-low-level-gpuiterator-only-programs">
 <h1>Writing LOW-level (GPUIterator Only) programs<a class="headerlink" href="#writing-low-level-gpuiterator-only-programs" title="Permalink to this headline">¶</a></h1>
-<p>Here we provide a step-by-step guide for utilizing the <code class="docutils literal"><span class="pre">GPUIterator</span></code> module using a simple Chapel program (<code class="docutils literal"><span class="pre">vector</span> <span class="pre">copy</span></code>) in single-locale and multiple-locale scenarios.</p>
+<p>Here we provide a step-by-step guide for utilizing the <code class="docutils literal notranslate"><span class="pre">GPUIterator</span></code> module using a simple Chapel program (<code class="docutils literal notranslate"><span class="pre">vector</span> <span class="pre">copy</span></code>) in single-locale and multiple-locale scenarios.</p>
 <div class="section" id="single-locale-version">
 <h2>Single-locale version<a class="headerlink" href="#single-locale-version" title="Permalink to this headline">¶</a></h2>
-<p>In this single-locale scenario, you are supposed to create and edit one Chapel source file and one CUDA source file: <code class="docutils literal"><span class="pre">vc.hybrid.chpl</span></code> and <code class="docutils literal"><span class="pre">vc.cu</span></code>.</p>
+<p>In this single-locale scenario, you are supposed to create and edit one Chapel source file and one CUDA source file: <code class="docutils literal notranslate"><span class="pre">vc.hybrid.chpl</span></code> and <code class="docutils literal notranslate"><span class="pre">vc.cu</span></code>.</p>
 <ol class="arabic">
-<li><p class="first">Import the GPUIterator module</p>
-<p>First, import the module using the <code class="docutils literal"><span class="pre">use</span></code> keyword:</p>
+<li><p>Import the GPUIterator module</p>
+<p>First, import the module using the <code class="docutils literal notranslate"><span class="pre">use</span></code> keyword:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.chpl</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span><span class="p">;</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span><span class="p">;</span>
 </pre></div>
 </div>
 </div>
 </li>
-<li><p class="first">Declare Chapel arrays</p>
-<p>Then, create two Chapel arrays, <code class="docutils literal"><span class="pre">A</span></code> and <code class="docutils literal"><span class="pre">B</span></code>, which will be used for the copy operation:</p>
+<li><p>Declare Chapel arrays</p>
+<p>Then, create two Chapel arrays, <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code>, which will be used for the copy operation:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.chpl</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span><span class="p">;</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span><span class="p">;</span>
 
 <span class="hll"><span class="kd">config</span> <span class="kd">const</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">32</span><span class="p">:</span> <span class="kt">int</span><span class="p">;</span>
 </span><span class="hll"><span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
@@ -216,19 +214,19 @@
 </div>
 </div>
 <div class="admonition tip">
-<p class="first admonition-title">Tip</p>
-<p class="last">It’s wise to define <code class="docutils literal"><span class="pre">n</span></code> as <a class="reference external" href="https://chapel-lang.org/docs/users-guide/base/configs.html">a configurable constant</a>, which can be overridden on the command line (e.g., <code class="docutils literal"><span class="pre">./vc</span> <span class="pre">--n=1024</span></code>).</p>
+<p class="admonition-title">Tip</p>
+<p>It’s wise to define <code class="docutils literal notranslate"><span class="pre">n</span></code> as <a class="reference external" href="https://chapel-lang.org/docs/users-guide/base/configs.html">a configurable constant</a>, which can be overridden on the command line (e.g., <code class="docutils literal notranslate"><span class="pre">./vc</span> <span class="pre">--n=1024</span></code>).</p>
 </div>
 </li>
-<li><p class="first">Import your GPU program</p>
+<li><p>Import your GPU program</p>
 <ol class="loweralpha">
-<li><p class="first">Write a GPU program</p>
+<li><p>Write a GPU program</p>
 <p>It is worth noting that the design and implementation of the GPU program is completely your choice. Please also see <a class="reference internal" href="guide.html#guide-to-write-gpu-programs"><span class="std std-ref">Guide to Write GPU programs</span></a>. Here is one working vector copy example with CUDA:</p>
 </li>
 </ol>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">vc.cu</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
-<div class="highlight-c"><div class="highlight"><pre><span></span><span class="n">__global__</span> <span class="kt">void</span> <span class="nf">vc</span><span class="p">(</span><span class="kt">float</span> <span class="o">*</span><span class="n">dA</span><span class="p">,</span> <span class="kt">float</span> <span class="o">*</span><span class="n">dB</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">__global__</span> <span class="kt">void</span> <span class="n">vc</span><span class="p">(</span><span class="kt">float</span> <span class="o">*</span><span class="n">dA</span><span class="p">,</span> <span class="kt">float</span> <span class="o">*</span><span class="n">dB</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">)</span> <span class="p">{</span>
   <span class="kt">int</span> <span class="n">id</span> <span class="o">=</span> <span class="n">blockIdx</span><span class="p">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">blockDim</span><span class="p">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">threadIdx</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">id</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">dA</span><span class="p">[</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dB</span><span class="p">[</span><span class="n">id</span><span class="p">];</span>
@@ -236,7 +234,7 @@
 <span class="p">}</span>
 
 <span class="k">extern</span> <span class="s">&quot;C&quot;</span> <span class="p">{</span>
-  <span class="kt">void</span> <span class="n">vcCUDA</span><span class="p">(</span><span class="kt">float</span><span class="o">*</span> <span class="n">A</span><span class="p">,</span> <span class="kt">float</span> <span class="o">*</span><span class="n">B</span><span class="p">,</span> <span class="kt">int</span> <span class="n">start</span><span class="p">,</span> <span class="kt">int</span> <span class="n">end</span><span class="p">,</span> <span class="kt">int</span> <span class="n">GPUN</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">void</span> <span class="nf">vcCUDA</span><span class="p">(</span><span class="kt">float</span><span class="o">*</span> <span class="n">A</span><span class="p">,</span> <span class="kt">float</span> <span class="o">*</span><span class="n">B</span><span class="p">,</span> <span class="kt">int</span> <span class="n">start</span><span class="p">,</span> <span class="kt">int</span> <span class="n">end</span><span class="p">,</span> <span class="kt">int</span> <span class="n">GPUN</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">float</span> <span class="o">*</span><span class="n">dA</span><span class="p">,</span> <span class="o">*</span><span class="n">dB</span><span class="p">;</span>
     <span class="n">cudaMalloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dA</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span> <span class="o">*</span> <span class="n">GPUN</span><span class="p">);</span>
     <span class="n">cudaMalloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dB</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span> <span class="o">*</span> <span class="n">GPUN</span><span class="p">);</span>
@@ -252,17 +250,17 @@
 </div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">For the presentation purposes, any error checking is omitted. A complete program can be found in <code class="docutils literal"><span class="pre">apps</span></code> directory.</p>
+<p class="admonition-title">Note</p>
+<p>For the presentation purposes, any error checking is omitted. A complete program can be found in <code class="docutils literal notranslate"><span class="pre">apps</span></code> directory.</p>
 </div>
 <ol class="loweralpha" start="2">
-<li><p class="first">Declare it as an external function</p>
-<p>Use <a class="reference external" href="https://chapel-lang.org/docs/technotes/extern.html">Chapel’s C interoperability feature</a> to declare <code class="docutils literal"><span class="pre">vcCUDA()</span></code> as an external function.</p>
+<li><p>Declare it as an external function</p>
+<p>Use <a class="reference external" href="https://chapel-lang.org/docs/technotes/extern.html">Chapel’s C interoperability feature</a> to declare <code class="docutils literal notranslate"><span class="pre">vcCUDA()</span></code> as an external function.</p>
 </li>
 </ol>
 <div class="literal-block-wrapper docutils container" id="id4">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.chpl</span><a class="headerlink" href="#id4" title="Permalink to this code">¶</a></div>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span><span class="p">;</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span><span class="p">;</span>
 
 <span class="kd">config</span> <span class="kd">const</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">32</span><span class="p">:</span> <span class="kt">int</span><span class="p">;</span>
 <span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
@@ -273,15 +271,15 @@
 </div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">More details on the C interoperability feature can be found <a class="reference external" href="https://chapel-lang.org/docs/technotes/extern.html">here</a>.</p>
+<p class="admonition-title">Note</p>
+<p>More details on the C interoperability feature can be found <a class="reference external" href="https://chapel-lang.org/docs/technotes/extern.html">here</a>.</p>
 </div>
 </li>
-<li><p class="first">Write a GPU callback function</p>
-<p>The GPU callback function is supposed to be invoked from the GPUIterator with an automatically computed subrange (<code class="docutils literal"><span class="pre">lo</span></code> and <code class="docutils literal"><span class="pre">hi</span></code>). In this example, we call the external function <code class="docutils literal"><span class="pre">vcCUDA</span></code> with the two global arrays (<code class="docutils literal"><span class="pre">A</span></code> and <code class="docutils literal"><span class="pre">B</span></code>), the subrange (<code class="docutils literal"><span class="pre">lo</span></code> and <code class="docutils literal"><span class="pre">hi</span></code>), plus the number of elements (<code class="docutils literal"><span class="pre">N</span> <span class="pre">=</span> <span class="pre">size(lo..hi)</span></code>).</p>
+<li><p>Write a GPU callback function</p>
+<p>The GPU callback function is supposed to be invoked from the GPUIterator with an automatically computed subrange (<code class="docutils literal notranslate"><span class="pre">lo</span></code> and <code class="docutils literal notranslate"><span class="pre">hi</span></code>). In this example, we call the external function <code class="docutils literal notranslate"><span class="pre">vcCUDA</span></code> with the two global arrays (<code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code>), the subrange (<code class="docutils literal notranslate"><span class="pre">lo</span></code> and <code class="docutils literal notranslate"><span class="pre">hi</span></code>), plus the number of elements (<code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">=</span> <span class="pre">size(lo..hi)</span></code>).</p>
 <div class="literal-block-wrapper docutils container" id="id5">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.chpl</span><a class="headerlink" href="#id5" title="Permalink to this code">¶</a></div>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span><span class="p">;</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span><span class="p">;</span>
 
 <span class="kd">config</span> <span class="kd">const</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">32</span><span class="p">:</span> <span class="kt">int</span><span class="p">;</span>
 <span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
@@ -299,50 +297,50 @@
 </li>
 </ol>
 <blockquote id="callback">
-<div><p>It is worth noting that there will be multiple calls to <code class="docutils literal"><span class="pre">GPUCallBack()</span></code> when the number of GPUs is greater than one. Internally, the GPUIterator detects the number of GPUs within a locale, then automatically computes a subrange for each GPU, and creates a separate task that is responsible for each GPU. This design keeps the callback function simple and independent from GPU ID. The table below illustrates how <code class="docutils literal"><span class="pre">GPUCallBack()</span></code> is called when <code class="docutils literal"><span class="pre">n=1024,</span> <span class="pre">nLocales=1,</span> <span class="pre">nGPUs=2</span></code>:</p>
-<table border="1" class="colwidths-given docutils" id="id6">
+<div><p>It is worth noting that there will be multiple calls to <code class="docutils literal notranslate"><span class="pre">GPUCallBack()</span></code> when the number of GPUs is greater than one. Internally, the GPUIterator detects the number of GPUs within a locale, then automatically computes a subrange for each GPU, and creates a separate task that is responsible for each GPU. This design keeps the callback function simple and independent from GPU ID. The table below illustrates how <code class="docutils literal notranslate"><span class="pre">GPUCallBack()</span></code> is called when <code class="docutils literal notranslate"><span class="pre">n=1024,</span> <span class="pre">nLocales=1,</span> <span class="pre">nGPUs=2</span></code>:</p>
+<table class="colwidths-given docutils align-default" id="id6">
 <caption><span class="caption-text">n=1024, nLocales=1, nGPUs=2</span><a class="headerlink" href="#id6" title="Permalink to this table">¶</a></caption>
 <colgroup>
-<col width="25%" />
-<col width="25%" />
-<col width="25%" />
-<col width="25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">&#160;</th>
-<th class="head">Locales[0]</th>
-<th class="head">&#160;</th>
-<th class="head">&#160;</th>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>Locales[0]</p></th>
+<th class="head"></th>
+<th class="head"></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>&#160;</td>
-<td>CPUs</td>
-<td>GPU0</td>
-<td>GPU1</td>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p>CPUs</p></td>
+<td><p>GPU0</p></td>
+<td><p>GPU1</p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">lo..hi</span></code></td>
-<td><code class="docutils literal"><span class="pre">1..512</span></code></td>
-<td><code class="docutils literal"><span class="pre">512..767</span></code></td>
-<td><code class="docutils literal"><span class="pre">768..1024</span></code></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lo..hi</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1..512</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">512..767</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">768..1024</span></code></p></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">GPUCallBack(lo,hi,N);</span></code></td>
-<td>N/A</td>
-<td><code class="docutils literal"><span class="pre">GPUCallBack(512,767,256);</span></code></td>
-<td><code class="docutils literal"><span class="pre">GPUCallBack(768,1024,256);</span></code></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GPUCallBack(lo,hi,N);</span></code></p></td>
+<td><p>N/A</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GPUCallBack(512,767,256);</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GPUCallBack(768,1024,256);</span></code></p></td>
 </tr>
 </tbody>
 </table>
 <div class="admonition tip">
-<p class="first admonition-title">Tip</p>
-<p class="last">The number of GPUs can be overridden by giving the <cite>–nGPUs=n</cite> option (two dashes) on the command line</p>
+<p class="admonition-title">Tip</p>
+<p>The number of GPUs can be overridden by giving the <cite>–nGPUs=n</cite> option (two dashes) on the command line</p>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
+<p class="admonition-title">Note</p>
 <ol class="arabic simple">
-<li>Writing GPU ID dependent code in a callback function can be also done using the <code class="docutils literal"><span class="pre">GetDevice</span></code> function of the GPUAPI :</li>
+<li><p>Writing GPU ID dependent code in a callback function can be also done using the <code class="docutils literal notranslate"><span class="pre">GetDevice</span></code> function of the GPUAPI :</p></li>
 </ol>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUAPI</span><span class="p">;</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUAPI</span><span class="p">;</span>
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span><span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">id</span><span class="p">;</span>
   <span class="nx">GetDevice</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
@@ -352,28 +350,28 @@
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
-<li>While the use of a lambda function would be more productive and elegant, we’d recommend writing a Chapel function for the callback since the lambda support in Chapel is still early.</li>
+<li><p>While the use of a lambda function would be more productive and elegant, we’d recommend writing a Chapel function for the callback since the lambda support in Chapel is still early.</p></li>
 </ol>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">GPUCallBack</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span><span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span> <span class="nx">vcCUDA</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">lo</span><span class="p">,</span> <span class="nx">hi</span><span class="p">,</span> <span class="nx">N</span><span class="p">);</span> <span class="p">};</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">GPUCallBack</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span><span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span> <span class="nx">vcCUDA</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">lo</span><span class="p">,</span> <span class="nx">hi</span><span class="p">,</span> <span class="nx">N</span><span class="p">);</span> <span class="p">};</span>
 <span class="k">forall</span> <span class="nx">i</span> <span class="kd">in</span> <span class="nx">GPU</span><span class="p">(</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">,</span> <span class="nx">GPUCallback</span><span class="p">)</span> <span class="p">{</span> <span class="o">..</span><span class="p">.</span> <span class="p">}</span>
 </pre></div>
 </div>
 <p>If the this lambda version does not work, try <a class="reference external" href="https://github.com/chapel-lang/chapel/issues/8351">this workaround</a>:</p>
-<div class="last highlight-chapel"><div class="highlight"><pre><span></span><span class="k">record</span> <span class="nc">Lambda</span> <span class="p">{</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">record</span> <span class="nc">Lambda</span> <span class="p">{</span>
   <span class="k">proc</span> <span class="nf">this</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span><span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span><span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span> <span class="nx">vcCUDA</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">lo</span><span class="p">,</span> <span class="nx">hi</span><span class="p">,</span> <span class="nx">N</span><span class="p">);</span> <span class="p">}</span>
 <span class="p">}</span>
-<span class="kd">var</span> <span class="nx">GPUCallBack</span> <span class="o">=</span> <span class="nx">new</span> <span class="nx">Lambda</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">GPUCallBack</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Lambda</span><span class="p">();</span>
 <span class="k">forall</span> <span class="nx">i</span> <span class="kd">in</span> <span class="nx">GPU</span><span class="p">(</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">,</span> <span class="nx">GPUCallback</span><span class="p">)</span> <span class="p">{</span> <span class="o">..</span><span class="p">.</span> <span class="p">}</span>
 </pre></div>
 </div>
 </div>
 </div></blockquote>
 <ol class="arabic" start="5">
-<li><p class="first">Invoke the <code class="docutils literal"><span class="pre">GPU()</span></code> iterator in a <code class="docutils literal"><span class="pre">forall</span></code> loop</p>
-<p>When writing a <code class="docutils literal"><span class="pre">forall</span></code> loop, simply wrap the iteration space (<code class="docutils literal"><span class="pre">1..n</span></code>) in <code class="docutils literal"><span class="pre">GPU()</span></code> and give the callback function (<code class="docutils literal"><span class="pre">GPUCallBack</span></code>). Here is a complete program with output verification:</p>
+<li><p>Invoke the <code class="docutils literal notranslate"><span class="pre">GPU()</span></code> iterator in a <code class="docutils literal notranslate"><span class="pre">forall</span></code> loop</p>
+<p>When writing a <code class="docutils literal notranslate"><span class="pre">forall</span></code> loop, simply wrap the iteration space (<code class="docutils literal notranslate"><span class="pre">1..n</span></code>) in <code class="docutils literal notranslate"><span class="pre">GPU()</span></code> and give the callback function (<code class="docutils literal notranslate"><span class="pre">GPUCallBack</span></code>). Here is a complete program with output verification:</p>
 <div class="literal-block-wrapper docutils container" id="id7">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.chpl</span><a class="headerlink" href="#id7" title="Permalink to this code">¶</a></div>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span><span class="p">;</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span><span class="p">;</span>
 
 <span class="kd">config</span> <span class="kd">const</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">32</span><span class="p">:</span> <span class="kt">int</span><span class="p">;</span>
 <span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
@@ -401,29 +399,28 @@
 </div>
 </div>
 </li>
-<li><p class="first">Compile and Run</p>
+<li><p>Compile and Run</p>
 <p>See <a class="reference internal" href="compile.html"><span class="doc">Compiling and running</span></a></p>
 </li>
 </ol>
 </div>
 <div class="section" id="multi-locale-version">
 <h2>Multi-locale version<a class="headerlink" href="#multi-locale-version" title="Permalink to this headline">¶</a></h2>
-<p>In the multi-locale scenario, you are supposed to update <code class="docutils literal"><span class="pre">vc.hybrid.chpl</span></code> slightly, but you can keep the GPU program (<code class="docutils literal"><span class="pre">vc.cu</span></code>) unchanged.</p>
+<p>In the multi-locale scenario, you are supposed to update <code class="docutils literal notranslate"><span class="pre">vc.hybrid.chpl</span></code> slightly, but you can keep the GPU program (<code class="docutils literal notranslate"><span class="pre">vc.cu</span></code>) unchanged.</p>
 <ol class="arabic" start="0">
-<li><p class="first">Copy <code class="docutils literal"><span class="pre">vc.hybrid.chpl</span></code> to <code class="docutils literal"><span class="pre">vc.hybrid.dist.chpl</span></code></p>
-</li>
-<li><p class="first">Add <code class="docutils literal"><span class="pre">BlockDist</span></code> module and replace the range with a block-distributed domain</p>
+<li><p>Copy <code class="docutils literal notranslate"><span class="pre">vc.hybrid.chpl</span></code> to <code class="docutils literal notranslate"><span class="pre">vc.hybrid.dist.chpl</span></code></p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">BlockDist</span></code> module and replace the range with a block-distributed domain</p>
 <div class="literal-block-wrapper docutils container" id="id8">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.dist.chpl</span><a class="headerlink" href="#id8" title="Permalink to this code">¶</a></div>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">use</span> <span class="nx">GPUIterator</span>
 <span class="hll"><span class="k">use</span> <span class="nx">BlockDist</span><span class="p">;</span>
 </span></pre></div>
 </div>
 </div>
-<p>Then, declare two Chapel arrays with a block-distributed domain <code class="docutils literal"><span class="pre">D</span></code>.</p>
+<p>Then, declare two Chapel arrays with a block-distributed domain <code class="docutils literal notranslate"><span class="pre">D</span></code>.</p>
 <div class="literal-block-wrapper docutils container" id="id9">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.dist.chpl</span><a class="headerlink" href="#id9" title="Permalink to this code">¶</a></div>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="kd">config</span> <span class="kd">const</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">32</span><span class="p">:</span> <span class="kt">int</span><span class="p">;</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="kd">config</span> <span class="kd">const</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">32</span><span class="p">:</span> <span class="kt">int</span><span class="p">;</span>
 <span class="hll"><span class="kd">var</span> <span class="nx">D</span><span class="p">:</span> <span class="k">domain</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">dmapped</span> <span class="nx">Block</span><span class="p">(</span><span class="nx">boundingBox</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">})</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">};</span>
 </span><span class="hll"><span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="nx">D</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
 </span><span class="hll"><span class="kd">var</span> <span class="nx">B</span><span class="p">:</span> <span class="p">[</span><span class="nx">D</span><span class="p">]</span> <span class="kt">real</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
@@ -433,10 +430,10 @@
 </div>
 </div>
 </li>
-<li><p class="first">Update <code class="docutils literal"><span class="pre">GPUCallBack</span></code></p>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">GPUCallBack</span></code></p>
 <div class="literal-block-wrapper docutils container" id="id10">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.dist.chpl</span><a class="headerlink" href="#id10" title="Permalink to this code">¶</a></div>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="c1">// lo, hi, and N are automatically computed by the GPUIterator</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="c1">// lo, hi, and N are automatically computed by the GPUIterator</span>
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
 <span class="hll">  <span class="c1">// the first element of lA is lA(lo), which corresponds to A[0] in the vcCUDA part.</span>
 </span><span class="hll">  <span class="kd">ref</span> <span class="nx">lA</span> <span class="o">=</span> <span class="nx">A</span><span class="p">.</span><span class="nx">localSlice</span><span class="p">(</span><span class="nx">lo</span><span class="o">..</span><span class="nx">hi</span><span class="p">);</span>
@@ -450,92 +447,92 @@
 </div>
 <p>While the code looks pretty much similar to the single-locale version, since the two arrays are distributed, the following two additional things need to be done:</p>
 <ol class="loweralpha">
-<li><p class="first">Using <code class="docutils literal"><span class="pre">localSlice()</span></code> API</p>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="c1">// for GPU X on locale Y, (locale- and device-neutral)</span>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">localSlice()</span></code> API</p>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="c1">// for GPU X on locale Y, (locale- and device-neutral)</span>
 <span class="kd">ref</span> <span class="nx">lA</span> <span class="o">=</span> <span class="nx">A</span><span class="p">.</span><span class="nx">localSlice</span><span class="p">(</span><span class="nx">lo</span><span class="o">..</span><span class="nx">hi</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Similar to the single-locale + multiple GPUs case discussed <a class="reference internal" href="#callback">above</a>,  multiple instances of <code class="docutils literal"><span class="pre">GPUCallBack()</span></code> will be invoked for each GPU on different locales. However, you can still write the callback in a way that is locale and GPU ID independent by utilizing Chapel’s <code class="docutils literal"><span class="pre">localSlice(d:</span> <span class="pre">domain)</span></code> API (<a class="reference external" href="https://chapel-lang.org/docs/builtins/ChapelArray.html#ChapelArray.localSlice">link</a>). Essentially, feeding the automatically computed subrange (<code class="docutils literal"><span class="pre">lo..hi</span></code>) to the API returns a proper slice of a distributed array in a specific instance of <code class="docutils literal"><span class="pre">GPUCallBack()</span></code>.</p>
+<p>Similar to the single-locale + multiple GPUs case discussed <a class="reference internal" href="#callback">above</a>,  multiple instances of <code class="docutils literal notranslate"><span class="pre">GPUCallBack()</span></code> will be invoked for each GPU on different locales. However, you can still write the callback in a way that is locale and GPU ID independent by utilizing Chapel’s <code class="docutils literal notranslate"><span class="pre">localSlice(d:</span> <span class="pre">domain)</span></code> API (<a class="reference external" href="https://chapel-lang.org/docs/builtins/ChapelArray.html#ChapelArray.localSlice">link</a>). Essentially, feeding the automatically computed subrange (<code class="docutils literal notranslate"><span class="pre">lo..hi</span></code>) to the API returns a proper slice of a distributed array in a specific instance of <code class="docutils literal notranslate"><span class="pre">GPUCallBack()</span></code>.</p>
 </li>
-<li><p class="first">Updating the arguments to <code class="docutils literal"><span class="pre">vcCUDA()</span></code></p>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="c1">// call to the external GPU program</span>
+<li><p>Updating the arguments to <code class="docutils literal notranslate"><span class="pre">vcCUDA()</span></code></p>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="c1">// call to the external GPU program</span>
 <span class="nx">vcCUDA</span><span class="p">(</span><span class="nx">lA</span><span class="p">,</span> <span class="nx">lB</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">hi</span><span class="o">-</span><span class="nx">lo</span><span class="p">,</span> <span class="nx">N</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Let us first explain how the local reference (say <code class="docutils literal"><span class="pre">lA</span></code>) can be accessed in the GPU program (<code class="docutils literal"><span class="pre">vcCUDA</span></code>). To give you a concrete example, suppose <code class="docutils literal"><span class="pre">n=2048,</span> <span class="pre">nLocales=2,</span> <span class="pre">CPUPercent=50</span></code>, in which <code class="docutils literal"><span class="pre">A(1..1024)</span></code> resides on <cite>Locale 0</cite>, and <code class="docutils literal"><span class="pre">A(1025..2048)</span></code> resides on <cite>Locale 1</cite>. The table below summarizes how <code class="docutils literal"><span class="pre">lA</span></code> corresponds to the C array (<code class="docutils literal"><span class="pre">A</span></code>) in each instance of the callback:</p>
-<table border="1" class="colwidths-given docutils" id="id11">
+<p>Let us first explain how the local reference (say <code class="docutils literal notranslate"><span class="pre">lA</span></code>) can be accessed in the GPU program (<code class="docutils literal notranslate"><span class="pre">vcCUDA</span></code>). To give you a concrete example, suppose <code class="docutils literal notranslate"><span class="pre">n=2048,</span> <span class="pre">nLocales=2,</span> <span class="pre">CPUPercent=50</span></code>, in which <code class="docutils literal notranslate"><span class="pre">A(1..1024)</span></code> resides on <cite>Locale 0</cite>, and <code class="docutils literal notranslate"><span class="pre">A(1025..2048)</span></code> resides on <cite>Locale 1</cite>. The table below summarizes how <code class="docutils literal notranslate"><span class="pre">lA</span></code> corresponds to the C array (<code class="docutils literal notranslate"><span class="pre">A</span></code>) in each instance of the callback:</p>
+<table class="colwidths-given docutils align-default" id="id11">
 <caption><span class="caption-text">n=2048, nLocales=2, nGPUs=2</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
 <colgroup>
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
-<col width="14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">&#160;</th>
-<th class="head">Locales[0]</th>
-<th class="head">&#160;</th>
-<th class="head">&#160;</th>
-<th class="head">Locales[1]</th>
-<th class="head">&#160;</th>
-<th class="head">&#160;</th>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>Locales[0]</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"><p>Locales[1]</p></th>
+<th class="head"></th>
+<th class="head"></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>&#160;</td>
-<td>CPUs</td>
-<td>GPU0</td>
-<td>GPU1</td>
-<td>CPUs</td>
-<td>GPU0</td>
-<td>GPU1</td>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p>CPUs</p></td>
+<td><p>GPU0</p></td>
+<td><p>GPU1</p></td>
+<td><p>CPUs</p></td>
+<td><p>GPU0</p></td>
+<td><p>GPU1</p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">lo..hi</span></code></td>
-<td><code class="docutils literal"><span class="pre">1..512</span></code></td>
-<td><code class="docutils literal"><span class="pre">513..768</span></code></td>
-<td><code class="docutils literal"><span class="pre">769..1024</span></code></td>
-<td><code class="docutils literal"><span class="pre">1025..1536</span></code></td>
-<td><code class="docutils literal"><span class="pre">1537..1792</span></code></td>
-<td><code class="docutils literal"><span class="pre">1793..2048</span></code></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lo..hi</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1..512</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">513..768</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">769..1024</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1025..1536</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1537..1792</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1793..2048</span></code></p></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">GPUCallBack(lo,hi,N);</span></code></td>
-<td>N/A</td>
-<td><code class="docutils literal"><span class="pre">GPUCallBack(513,768,256);</span></code></td>
-<td><code class="docutils literal"><span class="pre">GPUCallBack(769,1024,256);</span></code></td>
-<td>N/A</td>
-<td><code class="docutils literal"><span class="pre">GPUCallBack(1537,1792,256);</span></code></td>
-<td><code class="docutils literal"><span class="pre">GPUCallBack(1793,2048,256);</span></code></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GPUCallBack(lo,hi,N);</span></code></p></td>
+<td><p>N/A</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GPUCallBack(513,768,256);</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GPUCallBack(769,1024,256);</span></code></p></td>
+<td><p>N/A</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GPUCallBack(1537,1792,256);</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GPUCallBack(1793,2048,256);</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">lA</span> <span class="pre">=</span> <span class="pre">A.localSlice(lo..hi)</span></code></td>
-<td>N/A</td>
-<td><code class="docutils literal"><span class="pre">A.localSlice(513..768);</span></code></td>
-<td><code class="docutils literal"><span class="pre">A.localSlice(769..1024);</span></code></td>
-<td>N/A</td>
-<td><code class="docutils literal"><span class="pre">A.localSlice(1537..1792);</span></code></td>
-<td><code class="docutils literal"><span class="pre">A.localSlice(1793..2048);</span></code></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lA</span> <span class="pre">=</span> <span class="pre">A.localSlice(lo..hi)</span></code></p></td>
+<td><p>N/A</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A.localSlice(513..768);</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A.localSlice(769..1024);</span></code></p></td>
+<td><p>N/A</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A.localSlice(1537..1792);</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A.localSlice(1793..2048);</span></code></p></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">A[0]</span></code> in <code class="docutils literal"><span class="pre">vcCUDA</span></code> corresponds to</td>
-<td>N/A</td>
-<td><code class="docutils literal"><span class="pre">lA(513)</span></code></td>
-<td><code class="docutils literal"><span class="pre">lA(769)</span></code></td>
-<td>N/A</td>
-<td><code class="docutils literal"><span class="pre">lA(1537)</span></code></td>
-<td><code class="docutils literal"><span class="pre">lA(1793)</span></code></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">A[0]</span></code> in <code class="docutils literal notranslate"><span class="pre">vcCUDA</span></code> corresponds to</p></td>
+<td><p>N/A</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lA(513)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lA(769)</span></code></p></td>
+<td><p>N/A</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lA(1537)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lA(1793)</span></code></p></td>
 </tr>
 </tbody>
 </table>
-<p>Notice that <code class="docutils literal"><span class="pre">A[0]</span></code> in <code class="docutils literal"><span class="pre">vcCUDA(float</span> <span class="pre">*A,</span> <span class="pre">...)</span></code> corresponds to the first element of the local slice, which is why the third argument is zero (= <code class="docutils literal"><span class="pre">start</span></code>) and thr fourth argument is <code class="docutils literal"><span class="pre">hi-lo</span></code> (= <code class="docutils literal"><span class="pre">end</span></code>).</p>
+<p>Notice that <code class="docutils literal notranslate"><span class="pre">A[0]</span></code> in <code class="docutils literal notranslate"><span class="pre">vcCUDA(float</span> <span class="pre">*A,</span> <span class="pre">...)</span></code> corresponds to the first element of the local slice, which is why the third argument is zero (= <code class="docutils literal notranslate"><span class="pre">start</span></code>) and thr fourth argument is <code class="docutils literal notranslate"><span class="pre">hi-lo</span></code> (= <code class="docutils literal notranslate"><span class="pre">end</span></code>).</p>
 </li>
 </ol>
 </li>
-<li><p class="first">Update <code class="docutils literal"><span class="pre">GPU()</span></code></p>
-<p>Finally, give the distributed domain (<code class="docutils literal"><span class="pre">D</span></code>) to <code class="docutils literal"><span class="pre">GPU()</span></code>:</p>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">GPU()</span></code></p>
+<p>Finally, give the distributed domain (<code class="docutils literal notranslate"><span class="pre">D</span></code>) to <code class="docutils literal notranslate"><span class="pre">GPU()</span></code>:</p>
 <div class="literal-block-wrapper docutils container" id="id12">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.dist.chpl</span><a class="headerlink" href="#id12" title="Permalink to this code">¶</a></div>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">forall</span> <span class="nx">i</span> <span class="kd">in</span> <span class="nx">GPU</span><span class="p">(</span><span class="nx">D</span><span class="p">,</span> <span class="nx">GPUCallBack</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">forall</span> <span class="nx">i</span> <span class="kd">in</span> <span class="nx">GPU</span><span class="p">(</span><span class="nx">D</span><span class="p">,</span> <span class="nx">GPUCallBack</span><span class="p">)</span> <span class="p">{</span>
 <span class="c1">//forall i in GPU(1..n, GPUCallBack) {</span>
   <span class="c1">// CPU Version</span>
   <span class="nx">A</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">=</span> <span class="nx">B</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
@@ -544,7 +541,7 @@
 </div>
 </div>
 </li>
-<li><p class="first">Compile and Run</p>
+<li><p>Compile and Run</p>
 <p>See <a class="reference internal" href="compile.html"><span class="doc">Compiling and running</span></a></p>
 </li>
 </ol>
@@ -556,37 +553,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="mid-low.html" class="btn btn-neutral float-right" title="Writing MID-LOW-level programs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="write.html" class="btn btn-neutral float-left" title="Using Chapel-GPU" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="mid-low.html" class="btn btn-neutral float-right" title="Writing MID-LOW-level programs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="write.html" class="btn btn-neutral float-left" title="Using Chapel-GPU" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2019, Rice University, 2019-2021, Georgia Institute of Technology
+        &#169; Copyright 2019, Rice University, 2019-2021, Georgia Institute of Technology.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

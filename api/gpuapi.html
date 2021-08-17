@@ -1,11 +1,11 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>GPUAPI &mdash; Chapel-GPU 0.3 documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -25,20 +30,11 @@
   <![endif]-->
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.3',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -60,7 +56,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Chapel-GPU
+            <a href="../index.html" class="icon icon-home"> Chapel-GPU
           
 
           
@@ -153,6 +149,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -164,7 +162,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/api/gpuapi.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -182,31 +180,27 @@
 <h1>GPUAPI<a class="headerlink" href="#gpuapi" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="mid-level-api-reference">
 <h2>MID-level API Reference<a class="headerlink" href="#mid-level-api-reference" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="GPUArray">
-<em class="property">class </em><code class="descname">GPUArray</code><a class="headerlink" href="#GPUArray" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="GPUArray.init">
-<em class="property">proc </em><code class="descname">init</code><span class="sig-paren">(</span><em>ref arr</em>, <em>pitched=false</em><span class="sig-paren">)</span><a class="headerlink" href="#GPUArray.init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Allocates memory on the device. The allocation size is automatically computed by this module -i.e., <code class="docutils literal"><span class="pre">(arr.size:</span> <span class="pre">size_t)</span> <span class="pre">*</span> <span class="pre">c_sizeof(arr.eltType)</span></code>, which means the index space is linearlized when <code class="docutils literal"><span class="pre">arr</span></code> is multi-dimensional. Also, if <code class="docutils literal"><span class="pre">arr</span></code> is 2D and <code class="docutils literal"><span class="pre">pitched=true</span></code>, pitched allocation is performed and the host and device pitch can be obtained by doing <code class="docutils literal"><span class="pre">obj.hpitch</span></code> and <code class="docutils literal"><span class="pre">obj.dpitch</span></code>. Note that the allocated memory is automatically reclaimed when the object is deleted.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>arr</strong> – The reference of the non-distributed Chapel Array that will be mapped onto the device.</li>
-<li><strong>pitched</strong> – whether pitched allocation is performed or not (default is false)</li>
+<dl class="chpl class">
+<dt class="sig sig-object chpl" id="GPUArray">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">GPUArray</span></span><a class="headerlink" href="#GPUArray" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="chpl method">
+<dt class="sig sig-object chpl" id="GPUArray.init">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">arr</span></em>, <em class="sig-param"><span class="pre">pitched=false</span></em><span class="sig-paren">)</span><a class="headerlink" href="#GPUArray.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allocates memory on the device. The allocation size is automatically computed by this module -i.e., <code class="docutils literal notranslate"><span class="pre">(arr.size:</span> <span class="pre">size_t)</span> <span class="pre">*</span> <span class="pre">c_sizeof(arr.eltType)</span></code>, which means the index space is linearlized when <code class="docutils literal notranslate"><span class="pre">arr</span></code> is multi-dimensional. Also, if <code class="docutils literal notranslate"><span class="pre">arr</span></code> is 2D and <code class="docutils literal notranslate"><span class="pre">pitched=true</span></code>, pitched allocation is performed and the host and device pitch can be obtained by doing <code class="docutils literal notranslate"><span class="pre">obj.hpitch</span></code> and <code class="docutils literal notranslate"><span class="pre">obj.dpitch</span></code>. Note that the allocated memory is automatically reclaimed when the object is deleted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arr</strong> – The reference of the non-distributed Chapel Array that will be mapped onto the device.</p></li>
+<li><p><strong>pitched</strong> – whether pitched allocation is performed or not (default is false)</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="c1">// Example 1: Non-distributed array</span>
+</dd>
+</dl>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="c1">// Example 1: Non-distributed array</span>
 <span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">int</span><span class="p">;</span>
 
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// n * sizeof(int) will be allocated onto the device</span>
-<span class="hll">  <span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="nx">new</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">A</span><span class="p">);</span>
+<span class="hll">  <span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">A</span><span class="p">);</span>
 </span>  <span class="o">..</span><span class="p">.</span>
 <span class="p">}</span>
 
@@ -221,7 +215,7 @@
   <span class="c1">// get the local portion of the distributed array</span>
   <span class="kd">var</span> <span class="nx">localA</span> <span class="o">=</span> <span class="nx">A</span><span class="p">.</span><span class="nx">localSlice</span><span class="p">(</span><span class="nx">lo</span><span class="o">..</span><span class="p">.</span><span class="nx">hi</span><span class="p">);</span>
   <span class="c1">// n * sizeof(int) will be allocated onto the device</span>
-<span class="hll">  <span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="nx">new</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">localA</span><span class="p">);</span>
+<span class="hll">  <span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">localA</span><span class="p">);</span>
 </span>  <span class="o">..</span><span class="p">.</span>
 <span class="p">}</span>
 
@@ -230,20 +224,20 @@
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The allocated memory resides on the <cite>current device</cite>. With the <code class="docutils literal"><span class="pre">GPUIterator</span></code>, the current device is automatically set by it. Without it, it is the user’s responsibilities to set the current device (e.g., by calling the <code class="docutils literal"><span class="pre">SetDevice</span></code> API below). Otherwise, the default device (usually the first GPU) will be used.</p>
+<p class="admonition-title">Note</p>
+<p>The allocated memory resides on the <cite>current device</cite>. With the <code class="docutils literal notranslate"><span class="pre">GPUIterator</span></code>, the current device is automatically set by it. Without it, it is the user’s responsibilities to set the current device (e.g., by calling the <code class="docutils literal notranslate"><span class="pre">SetDevice</span></code> API below). Otherwise, the default device (usually the first GPU) will be used.</p>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">With distributed arrays, it is required to use Chapel array’s <a class="reference external" href="https://chapel-lang.org/docs/builtins/ChapelArray.html#ChapelArray.localSlice">localSlice API</a> to get the local portion of the distributed array. With the <code class="docutils literal"><span class="pre">GPUIterator</span></code>, the local portion is already computed and given as the first two arguments (<code class="docutils literal"><span class="pre">lo</span></code> and <code class="docutils literal"><span class="pre">hi</span></code>).</p>
+<p class="admonition-title">Note</p>
+<p>With distributed arrays, it is required to use Chapel array’s <a class="reference external" href="https://chapel-lang.org/docs/builtins/ChapelArray.html#ChapelArray.localSlice">localSlice API</a> to get the local portion of the distributed array. With the <code class="docutils literal notranslate"><span class="pre">GPUIterator</span></code>, the local portion is already computed and given as the first two arguments (<code class="docutils literal notranslate"><span class="pre">lo</span></code> and <code class="docutils literal notranslate"><span class="pre">hi</span></code>).</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="GPUArray.toDevice">
-<em class="property">proc </em><code class="descname">toDevice</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#GPUArray.toDevice" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="GPUArray.toDevice">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">toDevice</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#GPUArray.toDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transfers the contents of the Chapel array to the device.</p>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">n</span><span class="p">:</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">n</span><span class="p">:</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">A</span><span class="p">);</span>
 <span class="hll">  <span class="nx">dA</span><span class="p">.</span><span class="nx">toDevice</span><span class="p">();</span>
 </span><span class="p">}</span>
@@ -251,11 +245,11 @@
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="GPUArray.fromDevice">
-<em class="property">proc </em><code class="descname">fromDevice</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#GPUArray.fromDevice" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="GPUArray.fromDevice">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">fromDevice</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#GPUArray.fromDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transfers back the contents of the device array to the Chapel array.</p>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">n</span><span class="p">:</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">n</span><span class="p">:</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">A</span><span class="p">);</span>
 <span class="hll">  <span class="nx">dA</span><span class="p">.</span><span class="nx">fromDevice</span><span class="p">();</span>
 </span><span class="p">}</span>
@@ -263,11 +257,11 @@
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="GPUArray.free">
-<em class="property">proc </em><code class="descname">free</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#GPUArray.free" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="GPUArray.free">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">free</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#GPUArray.free" title="Permalink to this definition">¶</a></dt>
 <dd><p>Frees memory on the device.</p>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">n</span><span class="p">:</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">n</span><span class="p">:</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">A</span><span class="p">);</span>
 <span class="hll">  <span class="nx">dA</span><span class="p">.</span><span class="nx">free</span><span class="p">();</span>
 </span><span class="p">}</span>
@@ -275,59 +269,55 @@
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="GPUArray.dPtr">
-<em class="property">proc </em><code class="descname">dPtr</code><span class="sig-paren">(</span><span class="sig-paren">)</span>: c_void_ptr<a class="headerlink" href="#GPUArray.dPtr" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="GPUArray.dPtr">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">dPtr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="pre">:</span> <span class="pre">c_void_ptr</span><a class="headerlink" href="#GPUArray.dPtr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a pointer to the allocated device memory.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">pointer to the allocated device memory</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><cite>c_void_ptr</cite></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>pointer to the allocated device memory</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><cite>c_void_ptr</cite></p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="GPUArray.hPtr">
-<em class="property">proc </em><code class="descname">hPtr</code><span class="sig-paren">(</span><span class="sig-paren">)</span>: c_void_ptr<a class="headerlink" href="#GPUArray.hPtr" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="GPUArray.hPtr">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">hPtr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="pre">:</span> <span class="pre">c_void_ptr</span><a class="headerlink" href="#GPUArray.hPtr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a pointer to the head of the Chapel array.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">pointer to the head of the Chapel array</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><cite>c_void_ptr</cite></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>pointer to the head of the Chapel array</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><cite>c_void_ptr</cite></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="method">
-<dt id="toDevice">
-<em class="property">proc </em><code class="descname">toDevice</code><span class="sig-paren">(</span><em>args: GPUArray ...?n</em><span class="sig-paren">)</span><a class="headerlink" href="#toDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Utility function that takes a variable number of <code class="docutils literal"><span class="pre">GPUArray</span></code> and performs the <code class="docutils literal"><span class="pre">toDevice</span></code> operation for each.</p>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="toDevice">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">toDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">args:</span> <span class="pre">GPUArray</span> <span class="pre">...?n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#toDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function that takes a variable number of <code class="docutils literal notranslate"><span class="pre">GPUArray</span></code> and performs the <code class="docutils literal notranslate"><span class="pre">toDevice</span></code> operation for each.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="fromDevice">
-<em class="property">proc </em><code class="descname">fromDevice</code><span class="sig-paren">(</span><em>args: GPUArray ...?n</em><span class="sig-paren">)</span><a class="headerlink" href="#fromDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Utility function that takes a variable number of <code class="docutils literal"><span class="pre">GPUArray</span></code> and performs the <code class="docutils literal"><span class="pre">fromDevice</span></code> operation for each.</p>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="fromDevice">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">fromDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">args:</span> <span class="pre">GPUArray</span> <span class="pre">...?n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#fromDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function that takes a variable number of <code class="docutils literal notranslate"><span class="pre">GPUArray</span></code> and performs the <code class="docutils literal notranslate"><span class="pre">fromDevice</span></code> operation for each.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="free">
-<em class="property">proc </em><code class="descname">free</code><span class="sig-paren">(</span><em>args: GPUArray ...?n</em><span class="sig-paren">)</span><a class="headerlink" href="#free" title="Permalink to this definition">¶</a></dt>
-<dd><p>Utility function that takes a variable number of <code class="docutils literal"><span class="pre">GPUArray</span></code> and performs the <code class="docutils literal"><span class="pre">free</span></code> operation for each.</p>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="free">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">args:</span> <span class="pre">GPUArray</span> <span class="pre">...?n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function that takes a variable number of <code class="docutils literal notranslate"><span class="pre">GPUArray</span></code> and performs the <code class="docutils literal notranslate"><span class="pre">free</span></code> operation for each.</p>
 </dd></dl>
 
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">A</span><span class="p">);</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">A</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">dB</span> <span class="o">=</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">B</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">dC</span> <span class="o">=</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">C</span><span class="p">);</span>
 
@@ -337,41 +327,37 @@
 <span class="c1">// GPU memory is automatically deallocated when dA, dB, and dC.</span>
 </pre></div>
 </div>
-<dl class="class">
-<dt id="GPUJaggedArray">
-<em class="property">class </em><code class="descname">GPUJaggedArray</code><a class="headerlink" href="#GPUJaggedArray" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="GPUJaggedArray.init">
-<em class="property">proc </em><code class="descname">init</code><span class="sig-paren">(</span><em>ref arr1</em>, <em>ref arr2</em>, <em>...</em><span class="sig-paren">)</span><a class="headerlink" href="#GPUJaggedArray.init" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl class">
+<dt class="sig sig-object chpl" id="GPUJaggedArray">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">GPUJaggedArray</span></span><a class="headerlink" href="#GPUJaggedArray" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="chpl method">
+<dt class="sig sig-object chpl" id="GPUJaggedArray.init">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">arr1</span></em>, <em class="sig-param"><span class="pre">ref</span> <span class="pre">arr2</span></em>, <em class="sig-param"><span class="pre">...</span></em><span class="sig-paren">)</span><a class="headerlink" href="#GPUJaggedArray.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allocates jagged array on the device. Basically it takes a set of Chapel arrays and creates an array of arrays on the device.</p>
 </dd></dl>
 
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">A working example can be found <a class="reference external" href="https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/jagged/jagged.chpl">here</a>.</p>
+<p class="admonition-title">Note</p>
+<p>A working example can be found <a class="reference external" href="https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/jagged/jagged.chpl">here</a>.</p>
 </div>
 </dd></dl>
 
 </div>
 <div class="section" id="mid-low-level-api-reference">
 <h2>MID-LOW-level API Reference<a class="headerlink" href="#mid-low-level-api-reference" title="Permalink to this headline">¶</a></h2>
-<dl class="method">
-<dt id="Malloc">
-<em class="property">proc </em><code class="descname">Malloc</code><span class="sig-paren">(</span><em>ref devPtr: c_void_ptr</em>, <em>size: size_t</em><span class="sig-paren">)</span><a class="headerlink" href="#Malloc" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="Malloc">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Malloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">devPtr:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">size:</span> <span class="pre">size_t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Malloc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allocates memory on the device.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>devPtr</strong> : <cite>c_voidPtr</cite> – Pointer to the allocated device array</li>
-<li><strong>size</strong> : <cite>size_t</cite> – Allocation size in bytes</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>devPtr</strong> : <cite>c_voidPtr</cite> – Pointer to the allocated device array</p></li>
+<li><p><strong>size</strong> : <cite>size_t</cite> – Allocation size in bytes</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="c1">// Example 1: Non-distributed array</span>
+</dd>
+</dl>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="c1">// Example 1: Non-distributed array</span>
 <span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">int</span><span class="p">;</span>
 
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
@@ -400,54 +386,46 @@
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last"><code class="docutils literal"><span class="pre">c_sizeofo(A.eltType)</span></code> returns the size in bytes of the element of the Chapel array <code class="docutils literal"><span class="pre">A</span></code>. For more details, please refer to <a class="reference external" href="https://chapel-lang.org/docs/builtins/CPtr.html#CPtr.c_sizeof">this</a>.</p>
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">c_sizeofo(A.eltType)</span></code> returns the size in bytes of the element of the Chapel array <code class="docutils literal notranslate"><span class="pre">A</span></code>. For more details, please refer to <a class="reference external" href="https://chapel-lang.org/docs/builtins/CPtr.html#CPtr.c_sizeof">this</a>.</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="MallocPitch">
-<em class="property">proc </em><code class="descname">MallocPitch</code><span class="sig-paren">(</span><em>ref devPtr: c_void_ptr</em>, <em>ref pitch: size_t</em>, <em>width: size_t</em>, <em>height: size_t</em><span class="sig-paren">)</span><a class="headerlink" href="#MallocPitch" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="MallocPitch">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">MallocPitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">devPtr:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">ref</span> <span class="pre">pitch:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">width:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">height:</span> <span class="pre">size_t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MallocPitch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allocates pitched 2D memory on the device.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>devPtr</strong> : <cite>c_voidPtr</cite> – Pointer to the allocated pitched 2D device array</li>
-<li><strong>pitch</strong> : <cite>size_t</cite> – Pitch for allocation on the device, which is set by the runtime</li>
-<li><strong>width</strong> : <cite>size_t</cite> – The width of the original Chapel array (in bytes)</li>
-<li><strong>height</strong> : <cite>size_t</cite> – The number of rows (height)</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>devPtr</strong> : <cite>c_voidPtr</cite> – Pointer to the allocated pitched 2D device array</p></li>
+<li><p><strong>pitch</strong> : <cite>size_t</cite> – Pitch for allocation on the device, which is set by the runtime</p></li>
+<li><p><strong>width</strong> : <cite>size_t</cite> – The width of the original Chapel array (in bytes)</p></li>
+<li><p><strong>height</strong> : <cite>size_t</cite> – The number of rows (height)</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">A working example can be found <a class="reference external" href="https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/pitched2d/pitched2d.chpl">here</a>. The detailed descirption of the underlying CUDA API can be found <a class="reference external" href="https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g32bd7a39135594788a542ae72217775c">here</a>.</p>
+<p class="admonition-title">Note</p>
+<p>A working example can be found <a class="reference external" href="https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/pitched2d/pitched2d.chpl">here</a>. The detailed descirption of the underlying CUDA API can be found <a class="reference external" href="https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g32bd7a39135594788a542ae72217775c">here</a>.</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="Memcpy">
-<em class="property">proc </em><code class="descname">Memcpy</code><span class="sig-paren">(</span><em>dst: c_void_ptr</em>, <em>src: c_void_ptr</em>, <em>count: size_t</em>, <em>kind: int</em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="Memcpy">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Memcpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dst:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">count:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">kind:</span> <span class="pre">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transfers data between the host and the device</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dst</strong> : <cite>c_void_ptr</cite> – the desination address</li>
-<li><strong>src</strong> : <cite>c_void_ptr</cite> – the source address</li>
-<li><strong>count</strong> : <cite>size_t</cite> – size in bytes to be transferred</li>
-<li><strong>kind</strong> : <cite>int</cite> – type of transfer (<code class="docutils literal"><span class="pre">0</span></code>: host-to-device, <code class="docutils literal"><span class="pre">1</span></code>: device-to-host)</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dst</strong> : <cite>c_void_ptr</cite> – the desination address</p></li>
+<li><p><strong>src</strong> : <cite>c_void_ptr</cite> – the source address</p></li>
+<li><p><strong>count</strong> : <cite>size_t</cite> – size in bytes to be transferred</p></li>
+<li><p><strong>kind</strong> : <cite>int</cite> – type of transfer (<code class="docutils literal notranslate"><span class="pre">0</span></code>: host-to-device, <code class="docutils literal notranslate"><span class="pre">1</span></code>: device-to-host)</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="c1">// Non-distributed array</span>
+</dd>
+</dl>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="c1">// Non-distributed array</span>
 <span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">int</span><span class="p">;</span>
 
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
@@ -461,110 +439,94 @@
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last"><code class="docutils literal"><span class="pre">c_ptrTo(A)</span></code> returns a pointer to the Chapel rectangular array <code class="docutils literal"><span class="pre">A</span></code>. For more details, see <a class="reference external" href="https://chapel-lang.org/docs/builtins/CPtr.html#CPtr.c_ptrTo">this document</a>.</p>
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">c_ptrTo(A)</span></code> returns a pointer to the Chapel rectangular array <code class="docutils literal notranslate"><span class="pre">A</span></code>. For more details, see <a class="reference external" href="https://chapel-lang.org/docs/builtins/CPtr.html#CPtr.c_ptrTo">this document</a>.</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="Memcpy2D">
-<em class="property">proc </em><code class="descname">Memcpy2D</code><span class="sig-paren">(</span><em>dst: c_void_ptr</em>, <em>dpitch: size_t</em>, <em>src: c_void_ptr</em>, <em>spitch: size_t</em>, <em>width: size_t</em>, <em>height:size_t</em>, <em>kind: int</em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy2D" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="Memcpy2D">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Memcpy2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dst:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">dpitch:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">spitch:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">width:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">height:size_t</span></em>, <em class="sig-param"><span class="pre">kind:</span> <span class="pre">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy2D" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transfers pitched 2D array between the host and the device</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dst</strong> : <cite>c_void_ptr</cite> – the desination address</li>
-<li><strong>dpitch</strong> : <cite>size_t</cite> – the pitch of destination memory</li>
-<li><strong>src</strong> : <cite>c_void_ptr</cite> – the source address</li>
-<li><strong>spitch</strong> : <cite>size_t</cite> – the pitch of source memory</li>
-<li><strong>width</strong> : <cite>size_t</cite> – the width of 2D array to be transferred (in bytes)</li>
-<li><strong>height</strong> : <cite>size_t</cite> – the height of 2D array to be transferred (# of rows)</li>
-<li><strong>kind</strong> : <cite>int</cite> – type of transfer (<code class="docutils literal"><span class="pre">0</span></code>: host-to-device, <code class="docutils literal"><span class="pre">1</span></code>: device-to-host)</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dst</strong> : <cite>c_void_ptr</cite> – the desination address</p></li>
+<li><p><strong>dpitch</strong> : <cite>size_t</cite> – the pitch of destination memory</p></li>
+<li><p><strong>src</strong> : <cite>c_void_ptr</cite> – the source address</p></li>
+<li><p><strong>spitch</strong> : <cite>size_t</cite> – the pitch of source memory</p></li>
+<li><p><strong>width</strong> : <cite>size_t</cite> – the width of 2D array to be transferred (in bytes)</p></li>
+<li><p><strong>height</strong> : <cite>size_t</cite> – the height of 2D array to be transferred (# of rows)</p></li>
+<li><p><strong>kind</strong> : <cite>int</cite> – type of transfer (<code class="docutils literal notranslate"><span class="pre">0</span></code>: host-to-device, <code class="docutils literal notranslate"><span class="pre">1</span></code>: device-to-host)</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">A working example can be found <a class="reference external" href="https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/pitched2d/pitched2d.chpl">here</a>. The detailed descirption of the underlying CUDA API can be found <a class="reference external" href="https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g3a58270f6775efe56c65ac47843e7cee">here</a>.</p>
+<p class="admonition-title">Note</p>
+<p>A working example can be found <a class="reference external" href="https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/pitched2d/pitched2d.chpl">here</a>. The detailed descirption of the underlying CUDA API can be found <a class="reference external" href="https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g3a58270f6775efe56c65ac47843e7cee">here</a>.</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="Free">
-<em class="property">proc </em><code class="descname">Free</code><span class="sig-paren">(</span><em>devPtr: c_void_ptr</em><span class="sig-paren">)</span><a class="headerlink" href="#Free" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="Free">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">devPtr:</span> <span class="pre">c_void_ptr</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Free" title="Permalink to this definition">¶</a></dt>
 <dd><p>Frees memory on the device</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><strong>devPtr</strong> : <cite>c_void_ptr</cite> – Device pointer to memory to be freed.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><p><strong>devPtr</strong> : <cite>c_void_ptr</cite> – Device pointer to memory to be freed.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="GetDeviceCount">
-<em class="property">proc </em><code class="descname">GetDeviceCount</code><span class="sig-paren">(</span><em>ref count: int(32)</em><span class="sig-paren">)</span><a class="headerlink" href="#GetDeviceCount" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="GetDeviceCount">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">GetDeviceCount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">count:</span> <span class="pre">int(32)</span></em><span class="sig-paren">)</span><a class="headerlink" href="#GetDeviceCount" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the number of GPU devices on the current locale.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><strong>count</strong> : <cite>int(32)</cite> – the number of GPU devices</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">nGPUs</span><span class="p">:</span> <span class="kt">int</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><p><strong>count</strong> : <cite>int(32)</cite> – the number of GPU devices</p>
+</dd>
+</dl>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">nGPUs</span><span class="p">:</span> <span class="kt">int</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
 <span class="nx">GetDeviceCount</span><span class="p">(</span><span class="nx">nGPUs</span><span class="p">);</span>
 <span class="nx">writeln</span><span class="p">(</span><span class="nx">nGPUs</span><span class="p">);</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="GetDevice">
-<em class="property">proc </em><code class="descname">GetDevice</code><span class="sig-paren">(</span><em>ref id: int(32)</em><span class="sig-paren">)</span><a class="headerlink" href="#GetDevice" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="GetDevice">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">GetDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">id:</span> <span class="pre">int(32)</span></em><span class="sig-paren">)</span><a class="headerlink" href="#GetDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the device ID currently being used.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><strong>id</strong> : <cite>int(32)</cite> – the device ID current being used</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><p><strong>id</strong> : <cite>int(32)</cite> – the device ID current being used</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="SetDevice">
-<em class="property">proc </em><code class="descname">SetDevice</code><span class="sig-paren">(</span><em>device: int(32)</em><span class="sig-paren">)</span><a class="headerlink" href="#SetDevice" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="SetDevice">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">SetDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">device:</span> <span class="pre">int(32)</span></em><span class="sig-paren">)</span><a class="headerlink" href="#SetDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the device ID to be used.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><strong>id</strong> : <cite>int(32)</cite> – the device ID to be used. <code class="docutils literal"><span class="pre">id</span></code> must be 1) greater than or equal to zero, and 2) less than the number of GPU devices.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><p><strong>id</strong> : <cite>int(32)</cite> – the device ID to be used. <code class="docutils literal notranslate"><span class="pre">id</span></code> must be 1) greater than or equal to zero, and 2) less than the number of GPU devices.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="ProfilerStart">
-<em class="property">proc </em><code class="descname">ProfilerStart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ProfilerStart" title="Permalink to this definition">¶</a></dt>
-<dd><p><strong>NVIDIA GPUs Only</strong> Start profiling with <code class="docutils literal"><span class="pre">nvprof</span></code></p>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="ProfilerStart">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">ProfilerStart</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ProfilerStart" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>NVIDIA GPUs Only</strong> Start profiling with <code class="docutils literal notranslate"><span class="pre">nvprof</span></code></p>
 </dd></dl>
 
-<dl class="method">
-<dt id="ProfilerStop">
-<em class="property">proc </em><code class="descname">ProfilerStop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ProfilerStop" title="Permalink to this definition">¶</a></dt>
-<dd><p><strong>NVIDIA GPUs Only</strong> Stop profiling with <code class="docutils literal"><span class="pre">nvprof</span></code></p>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="ProfilerStop">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">ProfilerStop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ProfilerStop" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>NVIDIA GPUs Only</strong> Stop profiling with <code class="docutils literal notranslate"><span class="pre">nvprof</span></code></p>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">ProfilerStart</span><span class="p">();</span>
   <span class="o">..</span><span class="p">.</span>
   <span class="nx">ProfilerStop</span><span class="p">();</span>
@@ -573,9 +535,9 @@
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="DeviceSynchronize">
-<em class="property">proc </em><code class="descname">DeviceSynchronize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#DeviceSynchronize" title="Permalink to this definition">¶</a></dt>
+<dl class="chpl method">
+<dt class="sig sig-object chpl" id="DeviceSynchronize">
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">DeviceSynchronize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#DeviceSynchronize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Waits for the device to finish.</p>
 </dd></dl>
 
@@ -587,37 +549,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../history/evolution.html" class="btn btn-neutral float-right" title="Chapel-GPU Evolution" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="gpuiterator.html" class="btn btn-neutral float-left" title="GPUIterator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="../history/evolution.html" class="btn btn-neutral float-right" title="Chapel-GPU Evolution" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gpuiterator.html" class="btn btn-neutral float-left" title="GPUIterator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2019, Rice University, 2019-2021, Georgia Institute of Technology
+        &#169; Copyright 2019, Rice University, 2019-2021, Georgia Institute of Technology.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

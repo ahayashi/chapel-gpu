@@ -1,11 +1,11 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Writing MID-level programs &mdash; Chapel-GPU 0.3 documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -25,20 +30,11 @@
   <![endif]-->
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.3',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -60,7 +56,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Chapel-GPU
+            <a href="../index.html" class="icon icon-home"> Chapel-GPU
           
 
           
@@ -159,6 +155,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -172,7 +170,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/instructions/mid.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -190,10 +188,10 @@
 <h1>Writing MID-level programs<a class="headerlink" href="#writing-mid-level-programs" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="mid-level-api">
 <h2>MID-level API<a class="headerlink" href="#mid-level-api" title="Permalink to this headline">¶</a></h2>
-<p>To reiterate, the biggest motivation for introducing <code class="docutils literal"><span class="pre">MID-LOW</span></code> and <code class="docutils literal"><span class="pre">MID</span></code> -level GPU API is moving some of low-level GPU operations to the Chapel-level. Consider the following GPU callback function and C function:</p>
+<p>To reiterate, the biggest motivation for introducing <code class="docutils literal notranslate"><span class="pre">MID-LOW</span></code> and <code class="docutils literal notranslate"><span class="pre">MID</span></code> -level GPU API is moving some of low-level GPU operations to the Chapel-level. Consider the following GPU callback function and C function:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.chpl</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="c1">// lo, hi, and N are automatically computed by the GPUIterator</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="c1">// lo, hi, and N are automatically computed by the GPUIterator</span>
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">vcCUDA</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">lo</span><span class="p">,</span> <span class="nx">hi</span><span class="p">,</span> <span class="nx">N</span><span class="p">);</span>
 <span class="p">}</span>
@@ -202,8 +200,8 @@
 </div>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">vc.cu</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
-<div class="highlight-c"><div class="highlight"><pre><span></span><span class="k">extern</span> <span class="s">&quot;C&quot;</span> <span class="p">{</span>
-  <span class="kt">void</span> <span class="n">vcCUDA</span><span class="p">(</span><span class="kt">float</span><span class="o">*</span> <span class="n">A</span><span class="p">,</span> <span class="kt">float</span> <span class="o">*</span><span class="n">B</span><span class="p">,</span> <span class="kt">int</span> <span class="n">start</span><span class="p">,</span> <span class="kt">int</span> <span class="n">end</span><span class="p">,</span> <span class="kt">int</span> <span class="n">GPUN</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">extern</span> <span class="s">&quot;C&quot;</span> <span class="p">{</span>
+  <span class="kt">void</span> <span class="nf">vcCUDA</span><span class="p">(</span><span class="kt">float</span><span class="o">*</span> <span class="n">A</span><span class="p">,</span> <span class="kt">float</span> <span class="o">*</span><span class="n">B</span><span class="p">,</span> <span class="kt">int</span> <span class="n">start</span><span class="p">,</span> <span class="kt">int</span> <span class="n">end</span><span class="p">,</span> <span class="kt">int</span> <span class="n">GPUN</span><span class="p">)</span> <span class="p">{</span>
     <span class="kt">float</span> <span class="o">*</span><span class="n">dA</span><span class="p">,</span> <span class="o">*</span><span class="n">dB</span><span class="p">;</span>
     <span class="n">cudaMalloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dA</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span> <span class="o">*</span> <span class="n">GPUN</span><span class="p">);</span>
     <span class="n">cudaMalloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dB</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span> <span class="o">*</span> <span class="n">GPUN</span><span class="p">);</span>
@@ -218,13 +216,13 @@
 </pre></div>
 </div>
 </div>
-<p>At the MID-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation, 2) device synchronization, and 3) data transfer can be written in Chapel. Also, unlike the MID-LOW level, the MID-level API is more Chapel programmer-friendly, where you can allocate GPU memory using the <code class="docutils literal"><span class="pre">new</span></code> keyword and no longer need to directly manipulate C types. Here is an example program written with the MID-level API:</p>
+<p>At the MID-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation, 2) device synchronization, and 3) data transfer can be written in Chapel. Also, unlike the MID-LOW level, the MID-level API is more Chapel programmer-friendly, where you can allocate GPU memory using the <code class="docutils literal notranslate"><span class="pre">new</span></code> keyword and no longer need to directly manipulate C types. Here is an example program written with the MID-level API:</p>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">vc.hybrid.chpl</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
-<div class="highlight-chapel"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-chapel notranslate"><div class="highlight"><pre><span></span><span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// n * sizeof(int) will be automatically allocated onto the device</span>
-  <span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="nx">new</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">A</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">dB</span> <span class="o">=</span> <span class="nx">new</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">B</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">A</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">dB</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">B</span><span class="p">);</span>
   <span class="nx">dB</span><span class="p">.</span><span class="nx">toDevice</span><span class="p">();</span>
   <span class="nx">LaunchVC</span><span class="p">(</span><span class="nx">dA</span><span class="p">.</span><span class="nx">dPtr</span><span class="p">(),</span> <span class="nx">dB</span><span class="p">.</span><span class="nx">dPtr</span><span class="p">(),</span> <span class="nx">N</span><span class="p">:</span> <span class="nx">size_t</span><span class="p">);</span>
   <span class="nx">dA</span><span class="p">.</span><span class="nx">fromDevice</span><span class="p">();</span>
@@ -234,12 +232,12 @@
 </div>
 </div>
 <div class="admonition tip">
-<p class="first admonition-title">Tip</p>
-<p class="last">The MID-level API can interoperate with the MID-LOW-level API.</p>
+<p class="admonition-title">Tip</p>
+<p>The MID-level API can interoperate with the MID-LOW-level API.</p>
 </div>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="../api/gpuapi.html#mid-level-api-reference"><span class="std std-ref">MID-level API Reference</span></a></p>
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="../api/gpuapi.html#mid-level-api-reference"><span class="std std-ref">MID-level API Reference</span></a></p>
 </div>
 </div>
 </div>
@@ -249,37 +247,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="compile.html" class="btn btn-neutral float-right" title="Compiling and Running Applications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="mid-low.html" class="btn btn-neutral float-left" title="Writing MID-LOW-level programs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="compile.html" class="btn btn-neutral float-right" title="Compiling and Running Applications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="mid-low.html" class="btn btn-neutral float-left" title="Writing MID-LOW-level programs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2019, Rice University, 2019-2021, Georgia Institute of Technology
+        &#169; Copyright 2019, Rice University, 2019-2021, Georgia Institute of Technology.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

@@ -1,11 +1,11 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Compiling and Running Applications &mdash; Chapel-GPU 0.3 documentation</title>
   
@@ -13,10 +13,15 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -25,20 +30,11 @@
   <![endif]-->
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../',
-              VERSION:'0.3',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -60,7 +56,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Chapel-GPU
+            <a href="../index.html" class="icon icon-home"> Chapel-GPU
           
 
           
@@ -160,6 +156,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -173,7 +171,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/instructions/compile.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -189,84 +187,84 @@
             
   <div class="section" id="compiling-and-running-applications">
 <h1>Compiling and Running Applications<a class="headerlink" href="#compiling-and-running-applications" title="Permalink to this headline">¶</a></h1>
-<p>The repository has several example applications in <code class="docutils literal"><span class="pre">chapel-gpu/example</span></code> and <code class="docutils literal"><span class="pre">chapel-gpu/apps</span></code> directory, most of which has a distributed version:</p>
-<table border="1" class="colwidths-given docutils">
+<p>The repository has several example applications in <code class="docutils literal notranslate"><span class="pre">chapel-gpu/example</span></code> and <code class="docutils literal notranslate"><span class="pre">chapel-gpu/apps</span></code> directory, most of which has a distributed version:</p>
+<table class="colwidths-given docutils align-default">
 <colgroup>
-<col width="25%" />
-<col width="25%" />
-<col width="25%" />
-<col width="25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Benchmark</th>
-<th class="head">Location</th>
-<th class="head">Description</th>
-<th class="head">Note</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Benchmark</p></th>
+<th class="head"><p>Location</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Note</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>Vector Copy</td>
-<td><code class="docutils literal"><span class="pre">example</span></code> and <code class="docutils literal"><span class="pre">apps/vector_copy</span></code></td>
-<td>A simple vector kernel</td>
-<td>&#160;</td>
+<tbody>
+<tr class="row-even"><td><p>Vector Copy</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">example</span></code> and <code class="docutils literal notranslate"><span class="pre">apps/vector_copy</span></code></p></td>
+<td><p>A simple vector kernel</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>STREAM</td>
-<td><code class="docutils literal"><span class="pre">apps/stream</span></code></td>
-<td><cite>A = B + alpha * C</cite></td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>STREAM</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">apps/stream</span></code></p></td>
+<td><p><cite>A = B + alpha * C</cite></p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>BlackScholes</td>
-<td><code class="docutils literal"><span class="pre">apps/blackscholes</span></code></td>
-<td>The Black-Scholes Equation</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>BlackScholes</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">apps/blackscholes</span></code></p></td>
+<td><p>The Black-Scholes Equation</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>Logistic Regression</td>
-<td><code class="docutils literal"><span class="pre">apps/logisticregression</span></code></td>
-<td>A classification algorithm</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>Logistic Regression</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">apps/logisticregression</span></code></p></td>
+<td><p>A classification algorithm</p></td>
+<td></td>
 </tr>
-<tr class="row-even"><td>Matrix Multiplication</td>
-<td><code class="docutils literal"><span class="pre">apps/mm</span></code></td>
-<td>Matrix-Matrix Multiply</td>
-<td>&#160;</td>
+<tr class="row-even"><td><p>Matrix Multiplication</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">apps/mm</span></code></p></td>
+<td><p>Matrix-Matrix Multiply</p></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td>PageRank</td>
-<td><code class="docutils literal"><span class="pre">apps/mm</span></code></td>
-<td>The pagerank algorithm</td>
-<td>WIP</td>
+<tr class="row-odd"><td><p>PageRank</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">apps/mm</span></code></p></td>
+<td><p>The pagerank algorithm</p></td>
+<td><p>WIP</p></td>
 </tr>
-<tr class="row-even"><td>N-Queens</td>
-<td>WIP</td>
-<td>The n-queens problem</td>
-<td>WIP</td>
+<tr class="row-even"><td><p>N-Queens</p></td>
+<td><p>WIP</p></td>
+<td><p>The n-queens problem</p></td>
+<td><p>WIP</p></td>
 </tr>
-<tr class="row-odd"><td>GPU API Examples</td>
-<td><code class="docutils literal"><span class="pre">example/gpuapi</span></code></td>
-<td>&#160;</td>
-<td>&#160;</td>
+<tr class="row-odd"><td><p>GPU API Examples</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">example/gpuapi</span></code></p></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This section assumes the Chapel-GPU components are already installed in <code class="docutils literal"><span class="pre">$CHPL_GPU_HOME</span></code>. If you have not done so please see <a class="reference internal" href="build.html#building-chapel-gpu"><span class="std std-ref">Building Chapel-GPU</span></a>.</p>
+<p class="admonition-title">Note</p>
+<p>This section assumes the Chapel-GPU components are already installed in <code class="docutils literal notranslate"><span class="pre">$CHPL_GPU_HOME</span></code>. If you have not done so please see <a class="reference internal" href="build.html#building-chapel-gpu"><span class="std std-ref">Building Chapel-GPU</span></a>.</p>
 </div>
 <div class="section" id="compiling-applications">
 <h2>Compiling Applications<a class="headerlink" href="#compiling-applications" title="Permalink to this headline">¶</a></h2>
-<p>The example applications in <code class="docutils literal"><span class="pre">chapel-gpu/example</span></code> and <code class="docutils literal"><span class="pre">chapel-gpu/apps</span></code> directory can be build by just doing <code class="docutils literal"><span class="pre">make</span> <span class="pre">X</span></code>, where <code class="docutils literal"><span class="pre">X</span></code> is either <code class="docutils literal"><span class="pre">cuda</span></code>, <code class="docutils literal"><span class="pre">hip</span></code>, or <code class="docutils literal"><span class="pre">opencl</span></code>. Please be sure to <code class="docutils literal"><span class="pre">source</span></code> the setting script before doing so.</p>
+<p>The example applications in <code class="docutils literal notranslate"><span class="pre">chapel-gpu/example</span></code> and <code class="docutils literal notranslate"><span class="pre">chapel-gpu/apps</span></code> directory can be build by just doing <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">X</span></code>, where <code class="docutils literal notranslate"><span class="pre">X</span></code> is either <code class="docutils literal notranslate"><span class="pre">cuda</span></code>, <code class="docutils literal notranslate"><span class="pre">hip</span></code>, or <code class="docutils literal notranslate"><span class="pre">opencl</span></code>. Please be sure to <code class="docutils literal notranslate"><span class="pre">source</span></code> the setting script before doing so.</p>
 <ol class="arabic simple">
-<li>Set environment variables</li>
+<li><p>Set environment variables</p></li>
 </ol>
 <blockquote>
-<div><div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">source</span> <span class="nv">$CHPL_GPU_HOME</span>/bin/env.sh
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> <span class="nv">$CHPL_GPU_HOME</span>/bin/env.sh
 </pre></div>
 </div>
 </div></blockquote>
 <ol class="arabic" start="2">
-<li><p class="first">Compile</p>
+<li><p>Compile</p>
 <ul>
-<li><p class="first">Example 1: <code class="docutils literal"><span class="pre">chapel-gpu/example</span></code></p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/example
+<li><p>Example 1: <code class="docutils literal notranslate"><span class="pre">chapel-gpu/example</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/example
 make cuda
 or
 make hip
@@ -275,16 +273,16 @@ make opencl
 </pre></div>
 </div>
 </li>
-<li><p class="first">Example 2: <code class="docutils literal"><span class="pre">chapel-gpu/example/gpuapi</span></code></p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/example/gpuapi/2d
+<li><p>Example 2: <code class="docutils literal notranslate"><span class="pre">chapel-gpu/example/gpuapi</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/example/gpuapi/2d
 make cuda
 or
 make hip
 </pre></div>
 </div>
 </li>
-<li><p class="first">Example 3: <code class="docutils literal"><span class="pre">chapel-gpu/apps/stream</span></code></p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/apps/stream
+<li><p>Example 3: <code class="docutils literal notranslate"><span class="pre">chapel-gpu/apps/stream</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/apps/stream
 make cuda
 or
 make hip
@@ -295,72 +293,72 @@ make opencl
 </li>
 </ul>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">A baseline implementation for CPUs can be built by doing <code class="docutils literal"><span class="pre">make</span> <span class="pre">baseline</span></code>.</p>
+<p class="admonition-title">Note</p>
+<p>A baseline implementation for CPUs can be built by doing <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">baseline</span></code>.</p>
 </div>
 </li>
-<li><p class="first">Check the generated executables</p>
-<p>For example, <code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda</span></code> in <code class="docutils literal"><span class="pre">apps/vector_copy</span></code> generates the following files:</p>
-<table border="1" class="colwidths-given docutils">
+<li><p>Check the generated executables</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">cuda</span></code> in <code class="docutils literal notranslate"><span class="pre">apps/vector_copy</span></code> generates the following files:</p>
+<table class="colwidths-given docutils align-default">
 <colgroup>
-<col width="20%" />
-<col width="40%" />
-<col width="40%" />
+<col style="width: 20%" />
+<col style="width: 40%" />
+<col style="width: 40%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Name</th>
-<th class="head">Description</th>
-<th class="head">Individual make command</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Individual make command</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">vc.baseline</span></code></td>
-<td>A baseline implementation for CPUs.</td>
-<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">baseline</span></code></td>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vc.baseline</span></code></p></td>
+<td><p>A baseline implementation for CPUs.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">baseline</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">vc.cuda.gpu</span></code></td>
-<td>A GPU-only implmentation w/o the GPUIterator.</td>
-<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.gpu</span></code></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vc.cuda.gpu</span></code></p></td>
+<td><p>A GPU-only implmentation w/o the GPUIterator.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">cuda.gpu</span></code></p></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">vc.cuda.hybrid</span></code></td>
-<td>The GPUIterator implemenation (single-locale).</td>
-<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.hybrid</span></code></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vc.cuda.hybrid</span></code></p></td>
+<td><p>The GPUIterator implemenation (single-locale).</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">cuda.hybrid</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">vc.cuda.hybrid.dist</span></code></td>
-<td>The GPUIterator implemenation (multi-locale).</td>
-<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist</span></code></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vc.cuda.hybrid.dist</span></code></p></td>
+<td><p>The GPUIterator implemenation (multi-locale).</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist</span></code></p></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">vc.cuda.hybrid.dist.midlow</span></code></td>
-<td>The MID-LOW implemenation (multi-locale).</td>
-<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist.midlow</span></code></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vc.cuda.hybrid.dist.midlow</span></code></p></td>
+<td><p>The MID-LOW implemenation (multi-locale).</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist.midlow</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">vc.cuda.hybrid.dist.mid</span></code></td>
-<td>The MID implementation (multi-locale).</td>
-<td><code class="docutils literal"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist.mid</span></code></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vc.cuda.hybrid.dist.mid</span></code></p></td>
+<td><p>The MID implementation (multi-locale).</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">cuda.hybrid.dist.mid</span></code></p></td>
 </tr>
 </tbody>
 </table>
 <div class="admonition tip">
-<p class="first admonition-title">Tip</p>
-<p class="last">If you want to compile a specific variant, please do <code class="docutils literal"><span class="pre">make</span> <span class="pre">X.Y</span></code>, where <code class="docutils literal"><span class="pre">X</span></code> is either <code class="docutils literal"><span class="pre">cuda</span></code>, <code class="docutils literal"><span class="pre">hip</span></code>, or <code class="docutils literal"><span class="pre">opencl</span></code>, and <code class="docutils literal"><span class="pre">Y</span></code> is either <code class="docutils literal"><span class="pre">gpu</span></code>, <code class="docutils literal"><span class="pre">hybrid</span></code>, <code class="docutils literal"><span class="pre">hybrid.dist</span></code>, <code class="docutils literal"><span class="pre">hybrid.dist.midlow</span></code>, or <code class="docutils literal"><span class="pre">hybrid.dist.mid</span></code>. Please also see the third column above. Also, the MID-LOW and MID variants with OpenCL are currently not supported.</p>
+<p class="admonition-title">Tip</p>
+<p>If you want to compile a specific variant, please do <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">X.Y</span></code>, where <code class="docutils literal notranslate"><span class="pre">X</span></code> is either <code class="docutils literal notranslate"><span class="pre">cuda</span></code>, <code class="docutils literal notranslate"><span class="pre">hip</span></code>, or <code class="docutils literal notranslate"><span class="pre">opencl</span></code>, and <code class="docutils literal notranslate"><span class="pre">Y</span></code> is either <code class="docutils literal notranslate"><span class="pre">gpu</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid.dist</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid.dist.midlow</span></code>, or <code class="docutils literal notranslate"><span class="pre">hybrid.dist.mid</span></code>. Please also see the third column above. Also, the MID-LOW and MID variants with OpenCL are currently not supported.</p>
 </div>
 </li>
 </ol>
 <blockquote>
 <div><div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The <code class="docutils literal"><span class="pre">Makefile</span></code> internally uses <code class="docutils literal"><span class="pre">cmake</span></code> to generate a static library from a GPU source program (<code class="docutils literal"><span class="pre">vc.cu</span></code> in this case)</p>
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> internally uses <code class="docutils literal notranslate"><span class="pre">cmake</span></code> to generate a static library from a GPU source program (<code class="docutils literal notranslate"><span class="pre">vc.cu</span></code> in this case)</p>
 </div>
 </div></blockquote>
 </div>
 <div class="section" id="running-applications">
 <h2>Running Applications<a class="headerlink" href="#running-applications" title="Permalink to this headline">¶</a></h2>
 <p>Once you have compiled a Chapel-GPU program, you can run it from the command-line:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>./vc.cuda.hybrid
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./vc.cuda.hybrid
 </pre></div>
 </div>
-<p>Also, many of the example applications accepts the <code class="docutils literal"><span class="pre">--n</span></code> option, which changes input size, the <code class="docutils literal"><span class="pre">--CPUratio</span></code> (or <code class="docutils literal"><span class="pre">--CPUPercent</span></code>) option, which controls the percentage of an iteration space will be executed on CPUs, and the <code class="docutils literal"><span class="pre">--output</span></code> option, which outputs the result arrays. For example:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>./vc.cuda.hybrid --n<span class="o">=</span><span class="m">256</span> --CPUratio<span class="o">=</span><span class="m">50</span> --output<span class="o">=</span><span class="m">1</span>
+<p>Also, many of the example applications accepts the <code class="docutils literal notranslate"><span class="pre">--n</span></code> option, which changes input size, the <code class="docutils literal notranslate"><span class="pre">--CPUratio</span></code> (or <code class="docutils literal notranslate"><span class="pre">--CPUPercent</span></code>) option, which controls the percentage of an iteration space will be executed on CPUs, and the <code class="docutils literal notranslate"><span class="pre">--output</span></code> option, which outputs the result arrays. For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./vc.cuda.hybrid --n<span class="o">=</span><span class="m">256</span> --CPUratio<span class="o">=</span><span class="m">50</span> --output<span class="o">=</span><span class="m">1</span>
 </pre></div>
 </div>
 <p>For multi-locale execution, please refer to <a class="reference external" href="https://chapel-lang.org/docs/usingchapel/QUICKSTART.html#using-chapel-in-multi-locale-mode">this document</a>.</p>
@@ -372,37 +370,29 @@ make opencl
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="guide.html" class="btn btn-neutral float-right" title="Guide to Write GPU programs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="mid.html" class="btn btn-neutral float-left" title="Writing MID-level programs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="guide.html" class="btn btn-neutral float-right" title="Guide to Write GPU programs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="mid.html" class="btn btn-neutral float-left" title="Writing MID-level programs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2019, Rice University, 2019-2021, Georgia Institute of Technology
+        &#169; Copyright 2019, Rice University, 2019-2021, Georgia Institute of Technology.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
