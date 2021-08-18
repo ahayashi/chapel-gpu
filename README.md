@@ -1,6 +1,8 @@
 ## Chapel-GPU: GPUIterator and GPUAPI module for Chapel
 
 ### Documents
+![building docs](https://github.com/ahayashi/chapel-gpu/actions/workflows/ci.yml/badge.svg)
+
 Detailed description of the modules can be found [here](https://ahayashi.github.io/chapel-gpu/index.html).
 
 ### License
