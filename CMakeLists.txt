@@ -197,6 +197,7 @@ endif()
 install(
   FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUIterator.chpl
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/DynGPUIterator.chpl
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.chpl
   DESTINATION ${INSTALL_MODULEDIR}
   )
