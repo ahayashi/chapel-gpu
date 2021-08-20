@@ -6,6 +6,6 @@ proc GPUWrapper(lo: int, hi: int, N: int) {
 }
 
 forall i in DynGPU(1..64, GPUWrapper, 4) {
-    writeln("CPU = ", i(0));
+    writeln("CPU = ", i);
     sleep(1);
 }

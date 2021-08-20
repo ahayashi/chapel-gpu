@@ -69,7 +69,10 @@ module DynGPUIterator {
                 const current:rType = remain(low .. high);
                 if (debugGPUIterator) then writeln("Parallel dynamic Iterator. Working at tid ", tid, " with range ", unDensify(current,D), " yielded as ", current);
                 if (tid < numCPUTasks) {
-                    yield (current,);
+                    //yield (current,);
+                    for i in low..high {
+                        yield i;
+                    }
                 } else {
                     GPUWrapper(low, high, high-low+1);
                 }
