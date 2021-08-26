@@ -22,16 +22,12 @@ find_package(OpenCL QUIET)
 # FindDPC++
 find_program(DPCPP_FOUND dpcpp QUIET)
 
-#
-set(GPU_ROOT_DIRS "")
-
 if(CMAKE_CUDA_COMPILER)
   enable_language(CUDA)
   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
   add_library(GPUAPICUDA SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.cu)
   add_library(GPUAPICUDA_static STATIC ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.cu)
   set_target_properties(GPUAPICUDA PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.h)
-  list(APPEND GPU_ROOT_DIRS "export CUDA_ROOT_DIR=${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}/..")
 endif()
 
 if(HIP_FOUND)
@@ -50,7 +46,6 @@ if(HIP_FOUND)
     hip_add_library(GPUAPIHIP SHARED GPUAPI.hip.cc)
     hip_add_library(GPUAPIHIP_static STATIC GPUAPI.hip.cc)
     set_target_properties(GPUAPIHIP PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.h)
-    list(APPEND GPU_ROOT_DIRS "export HIP_ROOT_DIR=${HIP_ROOT_DIR}")
   else ()
     message(STATUS "Found HIP, but HIPIFY NOTFOUND")
     set(HIP_FOUND OFF)
@@ -67,9 +62,6 @@ if(OpenCL_FOUND)
   target_link_libraries(GPUAPIOPENCL OpenCL::OpenCL)
   target_link_libraries(GPUAPIOPENCL_static OpenCL::OpenCL)
   set_target_properties(GPUAPIOPENCL PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.h)
-  list(APPEND GPU_ROOT_DIRS "export OpenCL_INCLUDE_DIRS=${OpenCL_INCLUDE_DIRS}")
-  list(APPEND GPU_ROOT_DIRS "export OpenCL_LIBRARIES=${OpenCL_LIBRARIES}")
-  set(GPU_COMPILER_FOUND ON)
 else()
   message(STATUS "OpenCL Not Found")
 endif()
@@ -102,13 +94,11 @@ if(DPCPP_FOUND)
   add_library(GPUAPIDPCPP SHARED GPUAPI.dp.cpp)
   add_library(GPUAPIDPCPP_static STATIC GPUAPI.dp.cpp)
   set_target_properties(GPUAPIDPCPP PROPERTIES PUBLIC_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.h)
-  list(APPEND GPU_ROOT_DIRS " ")
-  set(GPU_COMPILER_FOUND ON)
 else()
 	message(STATUS "DPC++ Not Found")
 endif()
 
-if(NOT GPU_ROOT_DIRS)
+if(NOT (CMAKE_CUDA_COMPILER OR HIP_FOUND OR OpenCL_FOUND OR DPCPP_FOUND))
   message(FATAL_ERROR "No GPU compiler found")
 endif()
 
@@ -141,14 +131,6 @@ foreach(p LIB INCLUDE MODULE CMAKE)
   message(STATUS "${p} components will be installed to ${_path}")
   unset(_path)
 endforeach()
-
-if (GPU_ROOT_DIRS)
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/env.sh "#!/bin/bash\n")
-  file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/env.sh "export CHPL_GPU_HOME=${CMAKE_INSTALL_PREFIX}\n")
-  foreach (p ${GPU_ROOT_DIRS})
-    file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/env.sh ${p}\n)
-  endforeach()
-endif()
 
 if(CMAKE_CUDA_COMPILER)
   install(
@@ -207,6 +189,7 @@ install(
   DESTINATION ${INSTALL_MODULEDIR}
   )
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/env.sh.in env.sh @ONLY)
 install(
   PROGRAMS
   ${CMAKE_CURRENT_BINARY_DIR}/env.sh
