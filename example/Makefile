@@ -1,6 +1,7 @@
 CHPL_GPU_MODULES=-M $(CHPL_GPU_HOME)/modules $(CHPL_GPU_HOME)/include/GPUAPI.h
 CHPL_FLAGS=--fast $(CHPL_GPU_MODULES) -suseGPU=true
 CHPL_GPU_LIB_PATH=-L$(CHPL_GPU_HOME)/lib -L$(CHPL_GPU_HOME)/lib64
+CHPL_GPU_CMAKE_PATH=$(CHPL_GPU_HOME)/share/cmake/ChapelGPUAPI
 
 # CUDA
 CUDA_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPICUDA_static -L./build -lvc.cuda -L$(CUDA_ROOT_DIR)/lib -lcudart
@@ -19,16 +20,16 @@ else
 endif
 
 build/libvc.cuda.a: vc.cu
-	rm -rf build &&	mkdir build && cd build && cmake .. && make
+	rm -rf build &&	mkdir build && cd build && cmake .. -DCMAKE_MODULE_PATH=$(CHPL_GPU_CMAKE_PATH) && make
 
 build/libvc.hip.a: vc.cu
-	rm -rf build &&	mkdir build && cd build && cmake .. && make
+	rm -rf build &&	mkdir build && cd build && cmake .. -DCMAKE_MODULE_PATH=$(CHPL_GPU_CMAKE_PATH) && make
 
 build/libvc.dpcpp.a: vc.cu
-	rm -rf build &&	mkdir build && cd build && cmake .. && make
+	rm -rf build &&	mkdir build && cd build && cmake .. -DCMAKE_MODULE_PATH=$(CHPL_GPU_CMAKE_PATH) && make
 
 build/libvc.opencl.a: vc.opencl.c
-	rm -rf build &&	mkdir build && cd build && cmake .. && make
+	rm -rf build &&	mkdir build && cd build && cmake .. -DCMAKE_MODULE_PATH=$(CHPL_GPU_CMAKE_PATH) && make
 
 cuda: vc.chpl vc.h build/libvc.cuda.a
 	chpl $(CHPL_FLAGS) vc.h vc.chpl $(CUDA_LIBS) -o vc.cuda

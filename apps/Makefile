@@ -1,6 +1,7 @@
 CHPL_GPU_MODULES=-M $(CHPL_GPU_HOME)/modules $(CHPL_GPU_HOME)/include/GPUAPI.h
 CHPL_FLAGS=--fast $(CHPL_GPU_MODULES)
 CHPL_GPU_LIB_PATH=-L$(CHPL_GPU_HOME)/lib -L$(CHPL_GPU_HOME)/lib64
+CHPL_GPU_CMAKE_PATH=$(CHPL_GPU_HOME)/share/cmake/ChapelGPUAPI
 
 # CUDA
 ifeq ($(USE_CUBLAS), yes)
@@ -33,10 +34,10 @@ baseline: $(TARGET).baseline.chpl
 cuda: cuda.gpu cuda.hybrid cuda.hybrid.dist cuda.hybrid.dist.midlow cuda.hybrid.dist.mid
 
 build/lib$(TARGET).cuda.a: $(TARGET).cu
-	rm -rf build &&	mkdir build && cd build && cmake .. && make
+	rm -rf build &&	mkdir build && cd build && cmake .. -DCMAKE_MODULE_PATH=$(CHPL_GPU_CMAKE_PATH) && make
 
 build/lib$(TARGET).kernel.cuda.a: $(TARGET).kernel.cu
-	rm -rf build &&	mkdir build && cd build && cmake .. && make
+	rm -rf build &&	mkdir build && cd build && cmake .. -DCMAKE_MODULE_PATH=$(CHPL_GPU_CMAKE_PATH) && make
 
 cuda.%.mid: $(TARGET).%.mid.chpl $(TARGET).kernel.h build/lib$(TARGET).kernel.cuda.a
 	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.mid.chpl -L./build -l$(TARGET).kernel.cuda $(CUDA_LIBS) -o $(TARGET).$@
@@ -52,10 +53,10 @@ cuda.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).cuda.a
 hip: hip.gpu hip.hybrid hip.hybrid.dist hip.hybrid.dist.midlow hip.hybrid.dist.mid
 
 build/lib$(TARGET).hip.a: $(TARGET).cu
-	rm -rf build &&	mkdir build && cd build && cmake .. && make
+	rm -rf build &&	mkdir build && cd build && cmake .. -DCMAKE_MODULE_PATH=$(CHPL_GPU_CMAKE_PATH) && make
 
 build/lib$(TARGET).kernel.hip.a: $(TARGET).kernel.cu
-	rm -rf build &&	mkdir build && cd build && cmake .. && make
+	rm -rf build &&	mkdir build && cd build && cmake .. -DCMAKE_MODULE_PATH=$(CHPL_GPU_CMAKE_PATH) && make
 
 hip.%.mid: $(TARGET).%.mid.chpl $(TARGET).kernel.h  build/lib$(TARGET).kernel.hip.a
 	chpl $(CHPL_FLAGS) $(TARGET).kernel.h $(TARGET).$*.mid.chpl -L./build -l$(TARGET).kernel.hip $(HIP_LIBS) -o $(TARGET).$@
@@ -71,7 +72,7 @@ hip.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).hip.a
 opencl: opencl.gpu opencl.hybrid opencl.hybrid.dist
 
 build/lib$(TARGET).opencl.a: $(TARGET).opencl.c
-	rm -rf build &&	mkdir build && cd build && cmake .. && make
+	rm -rf build &&	mkdir build && cd build && cmake .. -DCMAKE_MODULE_PATH=$(CHPL_GPU_CMAKE_PATH) && make
 
 opencl.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).opencl.a
 	chpl $(CHPL_FLAGS) $(TARGET).h $(TARGET).$*.chpl -L./build -l$(TARGET).opencl $(OPENCL_LIBS) -o $(TARGET).$@
@@ -81,10 +82,10 @@ opencl.%: $(TARGET).%.chpl $(TARGET).h build/lib$(TARGET).opencl.a
 dpcpp: dpcpp.gpu dpcpp.hybrid dpcpp.hybrid.dist dpcpp.hybrid.dist.midlow dpcpp.hybrid.dist.mid
 
 build/lib$(TARGET).dpcpp.a: $(TARGET).cu
-	rm -rf build &&	mkdir build && cd build && cmake .. && make
+	rm -rf build &&	mkdir build && cd build && cmake .. -DCMAKE_MODULE_PATH=$(CHPL_GPU_CMAKE_PATH) && make
 
 build/lib$(TARGET).kernel.dpcpp.a: $(TARGET).kernel.cu
-	rm -rf build &&	mkdir build && cd build && cmake .. && make
+	rm -rf build &&	mkdir build && cd build && cmake .. -DCMAKE_MODULE_PATH=$(CHPL_GPU_CMAKE_PATH) && make
 
 dpcpp.%.mid: $(TARGET).%.mid.chpl $(TARGET).kernel.h  build/lib$(TARGET).kernel.dpcpp.a
 	rm -rf tmp

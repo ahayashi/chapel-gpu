@@ -136,7 +136,7 @@ set(INSTALL_CMAKEDIR ${DEF_INSTALL_CMAKEDIR} CACHE PATH "Installation directory 
 set(INSTALL_MODULEDIR modules CACHE PATH "Installation directory for Chapel module files")
 
 # Report to user
-foreach(p LIB INCLUDE MODULE)
+foreach(p LIB INCLUDE MODULE CMAKE)
   file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${INSTALL_${p}DIR} _path )
   message(STATUS "${p} components will be installed to ${_path}")
   unset(_path)
@@ -193,6 +193,12 @@ if(CMAKE_CUDA_COMPILER OR HIP_FOUND OR DPCPP_FOUND)
     DESTINATION ${INSTALL_INCLUDEDIR}
     )
 endif()
+
+install(
+  FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/BuildGPUCode.cmake
+  DESTINATION ${INSTALL_CMAKEDIR}
+  )
 
 install(
   FILES
