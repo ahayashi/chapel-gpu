@@ -16,9 +16,9 @@ In general, GPU programs should include typical host and device operations inclu
      - MID-LOW-level
      - LOW-level
    * - Kernel Invocation
-     - CUDA/HIP
-     - CUDA/HIP
-     - CUDA/HIP/OpenCL
+     - CUDA/HIP/DPC++
+     - CUDA/HIP/DPC++
+     - CUDA/HIP/DPC++/OpenCL
    * - Memory (de)allocations
      - Chapel (MID)
      - Chapel (MID-LOW)
