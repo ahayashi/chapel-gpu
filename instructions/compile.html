@@ -251,7 +251,7 @@
 </div>
 <div class="section" id="compiling-applications">
 <h2>Compiling Applications<a class="headerlink" href="#compiling-applications" title="Permalink to this headline">¶</a></h2>
-<p>The example applications in <code class="docutils literal notranslate"><span class="pre">chapel-gpu/example</span></code> and <code class="docutils literal notranslate"><span class="pre">chapel-gpu/apps</span></code> directory can be build by just doing <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">X</span></code>, where <code class="docutils literal notranslate"><span class="pre">X</span></code> is either <code class="docutils literal notranslate"><span class="pre">cuda</span></code>, <code class="docutils literal notranslate"><span class="pre">hip</span></code>, or <code class="docutils literal notranslate"><span class="pre">opencl</span></code>. Please be sure to <code class="docutils literal notranslate"><span class="pre">source</span></code> the setting script before doing so.</p>
+<p>The example applications in <code class="docutils literal notranslate"><span class="pre">chapel-gpu/example</span></code> and <code class="docutils literal notranslate"><span class="pre">chapel-gpu/apps</span></code> directory can be build by just doing <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">X</span></code>, where <code class="docutils literal notranslate"><span class="pre">X</span></code> is either <code class="docutils literal notranslate"><span class="pre">cuda</span></code>, <code class="docutils literal notranslate"><span class="pre">hip</span></code>, <code class="docutils literal notranslate"><span class="pre">opencl</span></code>, or <code class="docutils literal notranslate"><span class="pre">dpcpp</span></code>. Please be sure to <code class="docutils literal notranslate"><span class="pre">source</span></code> the setting script before doing so.</p>
 <ol class="arabic simple">
 <li><p>Set environment variables</p></li>
 </ol>
@@ -263,31 +263,37 @@
 <ol class="arabic" start="2">
 <li><p>Compile</p>
 <ul>
-<li><p>Example 1: <code class="docutils literal notranslate"><span class="pre">chapel-gpu/example</span></code></p>
+<li><p>Example 1: <code class="docutils literal notranslate"><span class="pre">chapel-gpu/example</span></code> (Chapel + GPUIterator + a full GPU program)</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/example
 make cuda
 or
 make hip
 or
 make opencl
+or
+make dpcpp
 </pre></div>
 </div>
 </li>
-<li><p>Example 2: <code class="docutils literal notranslate"><span class="pre">chapel-gpu/example/gpuapi</span></code></p>
+<li><p>Example 2: <code class="docutils literal notranslate"><span class="pre">chapel-gpu/example/gpuapi</span></code> (Chapel + GPUAPI + a GPU kernel)</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/example/gpuapi/2d
 make cuda
 or
 make hip
+or
+make dpcpp
 </pre></div>
 </div>
 </li>
-<li><p>Example 3: <code class="docutils literal notranslate"><span class="pre">chapel-gpu/apps/stream</span></code></p>
+<li><p>Example 3: <code class="docutils literal notranslate"><span class="pre">chapel-gpu/apps/stream</span></code> (Chapel + GPUIterator + GPUAPI + a GPU kernel)</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> path/to/chapel-gpu/apps/stream
 make cuda
 or
 make hip
 or
 make opencl
+or
+make dpcpp
 </pre></div>
 </div>
 </li>
@@ -340,14 +346,23 @@ make opencl
 </table>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>If you want to compile a specific variant, please do <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">X.Y</span></code>, where <code class="docutils literal notranslate"><span class="pre">X</span></code> is either <code class="docutils literal notranslate"><span class="pre">cuda</span></code>, <code class="docutils literal notranslate"><span class="pre">hip</span></code>, or <code class="docutils literal notranslate"><span class="pre">opencl</span></code>, and <code class="docutils literal notranslate"><span class="pre">Y</span></code> is either <code class="docutils literal notranslate"><span class="pre">gpu</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid.dist</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid.dist.midlow</span></code>, or <code class="docutils literal notranslate"><span class="pre">hybrid.dist.mid</span></code>. Please also see the third column above. Also, the MID-LOW and MID variants with OpenCL are currently not supported.</p>
+<p>If you want to compile a specific variant, please do <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">X.Y</span></code>, where <code class="docutils literal notranslate"><span class="pre">X</span></code> is either <code class="docutils literal notranslate"><span class="pre">cuda</span></code>, <code class="docutils literal notranslate"><span class="pre">hip</span></code>, <code class="docutils literal notranslate"><span class="pre">opencl</span></code>, or <code class="docutils literal notranslate"><span class="pre">dpcpp</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> is either <code class="docutils literal notranslate"><span class="pre">gpu</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid.dist</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid.dist.midlow</span></code>, or <code class="docutils literal notranslate"><span class="pre">hybrid.dist.mid</span></code>. Please also see the third column above. Also, the MID-LOW and MID variants with OpenCL are currently not supported.</p>
 </div>
 </li>
 </ol>
 <blockquote>
 <div><div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> internally uses <code class="docutils literal notranslate"><span class="pre">cmake</span></code> to generate a static library from a GPU source program (<code class="docutils literal notranslate"><span class="pre">vc.cu</span></code> in this case)</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> internally uses <code class="docutils literal notranslate"><span class="pre">cmake</span></code> to generate a static library from a GPU source program (<code class="docutils literal notranslate"><span class="pre">vc.cu</span></code> in this case). Since it is not always trivial to figure out right options to compile GPU programs, we outsource it to <code class="docutils literal notranslate"><span class="pre">cmake</span></code>. However, when linking a GPU object and the GPUAPI library to a Chapel program, we end up getting back to <code class="docutils literal notranslate"><span class="pre">make</span></code> because Chapel is not officially supported in <code class="docutils literal notranslate"><span class="pre">cmake</span></code>.</p>
+<p>If you want to manually compile your Chapel program (say <code class="docutils literal notranslate"><span class="pre">test.chpl</span></code>) with your GPU program (say <code class="docutils literal notranslate"><span class="pre">gpu.cu</span></code>), you can do so like this (CUDA for example):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nvcc -c gpu.cu
+<span class="c1"># Note: gpu.h is supposed to include function declarations that are referred from test.chpl</span>
+chpl -M <span class="si">${</span><span class="nv">CHPL_GPU_HOME</span><span class="si">}</span>/modules <span class="si">${</span><span class="nv">CHPL_GPU_HOME</span><span class="si">}</span>/include/GPUAPI.h gpu.h test.chpl gpu.o -L<span class="si">${</span><span class="nv">CHPL_GPU_HOME</span><span class="si">}</span>/lib -L<span class="si">${</span><span class="nv">CHPL_GPU_HOME</span><span class="si">}</span>/lib64 -lGPUAPICUDA_static -L<span class="si">${</span><span class="nv">CUDA_ROOT_DIR</span><span class="si">}</span>/lib -lcudart
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line">For more details on compiling Chapel programs with external C/C++ programs, please see <a class="reference external" href="https://chapel-lang.org/docs/technotes/extern.html#expressing-dependencies">this</a>.</div>
+</div>
 </div>
 </div></blockquote>
 </div>

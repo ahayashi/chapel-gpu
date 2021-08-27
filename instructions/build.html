@@ -182,12 +182,12 @@
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
 <ul>
 <li><p>Chapel: 1.24.1 or below. Detailed instructions for installing Chapel can be found: <a class="reference external" href="https://chapel-lang.org/docs/usingchapel/QUICKSTART.html">here</a>.</p></li>
-<li><p>GPU Compilers &amp; Runtimes: GPUIterator and GPUAPI require either of the following GPU programing environments.</p>
+<li><p>GPU Compilers &amp; Runtimes: <code class="docutils literal notranslate"><span class="pre">GPUIterator</span></code> and <code class="docutils literal notranslate"><span class="pre">GPUAPI</span></code> require either of the following GPU programing environments.</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>NVIDIA CUDA: Tested with 10.2</p></li>
 <li><p>AMD HIP: Tested with 2.8</p></li>
-<li><p>Intel DPC++:</p></li>
+<li><p>Intel DPC++ (SYCL): Tested with 2021.3.0</p></li>
 <li><p>OpenCL: Tested with 2.2 and 1.2</p></li>
 </ul>
 </div></blockquote>
@@ -202,7 +202,11 @@
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>While <code class="docutils literal notranslate"><span class="pre">GPUIterator</span></code> works with OpenCL, <code class="docutils literal notranslate"><span class="pre">GPUAPI</span></code> with OpenCL/SYCL is under developement.</p>
+<p>While <code class="docutils literal notranslate"><span class="pre">GPUIterator</span></code> works with OpenCL (Chapel + GPUIterator + a full OpenCL program), <code class="docutils literal notranslate"><span class="pre">GPUAPI</span></code> with OpenCL is under developement.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Even if you are only interested in using <code class="docutils literal notranslate"><span class="pre">GPUIterator</span></code>, we’d recommend following the steps below because <code class="docutils literal notranslate"><span class="pre">GPUIterator</span></code> internally uses <code class="docutils literal notranslate"><span class="pre">GPUAPI</span></code> to automatically 1) query the number of GPUs per node and 2) set a specific device for GPU executions. However, if you want to build your Chapel programs with <code class="docutils literal notranslate"><span class="pre">GPUIterator</span></code> and without <code class="docutils literal notranslate"><span class="pre">GPUIAPI</span></code>, you can do so like this: <code class="docutils literal notranslate"><span class="pre">chpl</span> <span class="pre">-M</span> <span class="pre">path/to/chapel-gpu/src</span> <span class="pre">-sdisableMultiGPUs=true</span> <span class="pre">test.chpl</span></code>, in which case you can only use a single GPU per node.</p>
 </div>
 </div>
 <div class="section" id="instructions">
@@ -211,6 +215,8 @@
 <li><p>Clone the repository</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/ahayashi/chapel-gpu.git
+or
+git clone git@github.com:ahayashi/chapel-gpu.git
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
@@ -248,7 +254,7 @@ make install
 <tr class="row-odd"><td><p>libGPUAPIX.so</p></td>
 <td><p>Shared Library</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">lib</span></code></p></td>
-<td><p>X is either CUDA, HIP, or OpenCL.</p></td>
+<td><p>X is either CUDA, HIP, DPCPP, or OpenCL.</p></td>
 </tr>
 <tr class="row-even"><td><p>libGPUAPIX_static.a</p></td>
 <td><p>Static Library</p></td>
@@ -275,6 +281,16 @@ make install
 <td><p><code class="docutils literal notranslate"><span class="pre">modules</span></code></p></td>
 <td><p>The <code class="docutils literal notranslate"><span class="pre">GPUAPI</span></code> module</p></td>
 </tr>
+<tr class="row-odd"><td><p>BuildGPUCode.cmake</p></td>
+<td><p>CMake File</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">share/cmake/ChapelGPUAPI</span></code></p></td>
+<td><p>A CMake file that compiles X.cu to either CUDA/HIP/DPC++ GPUs.</p></td>
+</tr>
+<tr class="row-even"><td><p>gpuapiX-config[-nonconfig].cmake</p></td>
+<td><p>CMake File</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">share/cmake/ChapelGPUAPI</span></code></p></td>
+<td><p>A CMake config file that allows an external CMake project to find the location of this installation (X is either CUDA, HIP, or DPCPP)</p></td>
+</tr>
 </tbody>
 </table>
 <p>By default, the libraries are installed into <code class="code docutils literal notranslate"><span class="pre">chapel-gpu/install</span></code>. If you wish to install it into your preferred directly, please type:</p>
@@ -285,6 +301,7 @@ make install
 <p class="admonition-title">Note</p>
 <p><strong>For CUDA Users</strong>: If CUDA is not found, make sure <code class="code docutils literal notranslate"><span class="pre">nvcc</span></code> is in your path or tell <code class="code docutils literal notranslate"><span class="pre">cmake</span></code> the path to <code class="code docutils literal notranslate"><span class="pre">nvcc</span></code>. For example: <code class="code docutils literal notranslate"><span class="pre">cmake</span> <span class="pre">CMAKE_CUDA_COMPILER=path_to/nvcc</span> <span class="pre">..</span></code></p>
 <p><strong>For AMD HIP Users</strong>: Chapel-GPU relies on <code class="code docutils literal notranslate"><span class="pre">hipify-perl</span></code> to convert CUDA programs to HIP programs internally. If you are pretty sure HIP is installed on your system, but <code class="code docutils literal notranslate"><span class="pre">cmake</span></code> complains <code class="code docutils literal notranslate"><span class="pre">hipify-perl</span></code> is not found, consider updating the following line in <code class="code docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>: <code class="code docutils literal notranslate"><span class="pre">if(EXISTS</span> <span class="pre">&quot;${HIP_ROOT_DIR}/hip/bin/hipify-perl&quot;)</span></code></p>
+<p><strong>For DPC++ Users</strong>: Chapel-GPU relies on <code class="code docutils literal notranslate"><span class="pre">dpct</span></code> to convert CUDA programs to DPC++ programs internally, which requires CUDA header files. If <code class="code docutils literal notranslate"><span class="pre">cmake</span></code> complains CUDA is not found, please set <code class="code docutils literal notranslate"><span class="pre">CUDA_HOME</span></code> approprietly.</p>
 </div>
 <ol class="arabic simple" start="3">
 <li><p>source <code class="docutils literal notranslate"><span class="pre">env.sh</span></code></p></li>
@@ -294,7 +311,7 @@ make install
 </pre></div>
 </div>
 <div class="line-block">
-<div class="line">This sets 1) <code class="docutils literal notranslate"><span class="pre">$CHPL_GPU_HOME</span></code>, and 2) environment variables related to CUDA/HIP/OpenCL installation directory, the latter of which can be referred when the user creates object files for thier GPU programs.</div>
+<div class="line">This sets 1) <code class="docutils literal notranslate"><span class="pre">$CHPL_GPU_HOME</span></code>, and 2) environment variables related to CUDA/HIP/OpenCL/DPC++ installation directory, the latter of which can be referred when the user creates object files for thier GPU programs.</div>
 </div>
 <ol class="arabic simple" start="4">
 <li><p>Build and run a test program</p></li>
