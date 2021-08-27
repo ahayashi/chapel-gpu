@@ -25,3 +25,7 @@ Further Readings
 * Exploring a multi-resolution GPU programming model for Chapel. Akihiro Hayashi, Sri Raj Paul, Vivek Sarkar, 7th Annual Chapel Implementers and Users Workshop (CHIUW), May 2020. (co-located with IPDPS2020).
 
   .. youtube:: Mq_vhXlSHxU
+
+* GPUAPI: Multi-level Chapel Runtime API for GPUs. Akihiro Hayashi, Sri Raj Paul, Vivek Sarkar, The 8th Annual Chapel Implementers and Users Workshop (CHIUW), June 2021.
+
+  .. youtube:: 6iG84usMUVA
