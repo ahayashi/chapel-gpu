@@ -2,6 +2,14 @@
 Chapel-GPU Evolution
 =============================================
 
+version 0.4.0, October, 2021
+############################
+
+Version 0.4.0 adds the following new features to version 0.3.0:
+
+- Update the GPUAPI module to support Intel DPC++ (SYCL).
+- Update the installation script to install the package configuration files ``gpuapi[cuda|hip|dpcpp]-config.cmake`` in ``$(CHPL_GPU_HOME)/share/cmake/ChapelGPUAPI``, which allows the user to utilize the GPUAPI library from their cmake project.
+
 version 0.3.0, June, 2021
 ############################
 
