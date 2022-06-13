@@ -1,8 +1,7 @@
 use GPUAPI;
-use SysCTypes;
-use CPtr;
+use CTypes;
 
-extern proc kernel(dA: c_void_ptr, nRows: size_t, nCols: size_t, dpitch: size_t);
+extern proc kernel(dA: c_void_ptr, nRows: c_size_t, nCols: c_size_t, dpitch: c_size_t);
 
 var D = {0..8, 0..8};
 var A: [D] int;
@@ -20,17 +19,17 @@ proc init() {
 init();
 
 var dA: c_void_ptr;
-var hpitch: size_t = D.dim(1).size:size_t * c_sizeof(A.eltType);
-var dpitch: size_t;
+var hpitch: c_size_t = D.dim(1).size:c_size_t * c_sizeof(A.eltType);
+var dpitch: c_size_t;
 
-MallocPitch(dA, dpitch, hpitch, D.dim(0).size: size_t);
+MallocPitch(dA, dpitch, hpitch, D.dim(0).size: c_size_t);
 writeln("MID-LOW: pitch on the host:", hpitch);
 writeln("MID-LOW: pitch on the device: ", dpitch);
 
-Memcpy2D(dA, dpitch, c_ptrTo(A), hpitch, hpitch, D.dim(0).size: size_t, 0);
-kernel(dA, D.dim(0).size: size_t, D.dim(1).size: size_t, dpitch);
+Memcpy2D(dA, dpitch, c_ptrTo(A), hpitch, hpitch, D.dim(0).size: c_size_t, 0);
+kernel(dA, D.dim(0).size: c_size_t, D.dim(1).size: c_size_t, dpitch);
 DeviceSynchronize();
-Memcpy2D(c_ptrTo(A), hpitch, dA, dpitch, hpitch, D.dim(0).size: size_t, 1);
+Memcpy2D(c_ptrTo(A), hpitch, dA, dpitch, hpitch, D.dim(0).size: c_size_t, 1);
 
 // Verify
 if (A.equals(V)) {
@@ -50,7 +49,7 @@ if (dA2.hpitch != dA2.dpitch) {
 }
 
 dA2.toDevice();
-kernel(dA2.dPtr(), D.dim(0).size: size_t, D.dim(1).size: size_t, dA2.dpitch);
+kernel(dA2.dPtr(), D.dim(0).size: c_size_t, D.dim(1).size: c_size_t, dA2.dpitch);
 DeviceSynchronize();
 dA2.fromDevice();
 
@@ -67,7 +66,7 @@ var dA3 = new GPUArray(A, true);
 writeln("MID (pitch=true) pitch on the host:", dA3.hpitch);
 writeln("MID (pitch=true) pitch on the device: ", dA3.dpitch);
 dA3.toDevice();
-kernel(dA3.dPtr(), D.dim(0).size: size_t, D.dim(1).size: size_t, dA3.dpitch);
+kernel(dA3.dPtr(), D.dim(0).size: c_size_t, D.dim(1).size: c_size_t, dA3.dpitch);
 DeviceSynchronize();
 dA3.fromDevice();
 

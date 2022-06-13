@@ -1,4 +1,5 @@
 # FindCUDA
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -allow-unsupported-compiler")
 include(CheckLanguage)
 check_language(CUDA QUIET)
 

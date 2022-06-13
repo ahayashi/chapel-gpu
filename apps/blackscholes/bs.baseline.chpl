@@ -113,7 +113,7 @@ proc main() {
       var X = d1;
       var absX = abs(X);
       var t = one / (one + temp4 * absX);
-      var y = one - oneBySqrt2pi * Math.exp(-X * X / two) * t * (c1 + t * (c2 + t * (c3 + t * (c4 + t * c5))));
+      var y = one - oneBySqrt2pi * exp(-X * X / two) * t * (c1 + t * (c2 + t * (c3 + t * (c4 + t * c5))));
       if (X  < zero) {
 		phiD1 = one - y;
       } else {
@@ -121,7 +121,7 @@ proc main() {
       }
       // phiD2 = phi(d2)
       X = d2;
-      absX = Math.abs(X);
+      absX = abs(X);
       t = one / (one + temp4 * absX);
       y = one - oneBySqrt2pi * exp(-X * X / two) * t * (c1 + t * (c2 + t * (c3 + t * (c4 + t * c5))));
       if (X  < zero) {
@@ -134,7 +134,7 @@ proc main() {
 
       // phiD1 = phi(-d1);
       X = -d1;
-      absX = Math.abs(X);
+      absX = abs(X);
       t = one / (one + temp4 * absX);
       y = one - oneBySqrt2pi * exp(-X * X / two) * t * (c1 + t * (c2 + t * (c3 + t * (c4 + t * c5))));
       if (X  < zero) {
@@ -145,7 +145,7 @@ proc main() {
 
       // phiD2 = phi(-d2);
       X = -d2;
-      absX = Math.abs(X);
+      absX = abs(X);
       t = one / (one + temp4 * absX);
       y = one - oneBySqrt2pi * exp(-X * X / two) * t * (c1 + t * (c2 + t * (c3 + t * (c4 + t * c5))));
       if (X  < zero) {

@@ -11,7 +11,7 @@ MID-level API Reference
 
    .. method:: proc init(ref arr, pitched=false)
 
-      Allocates memory on the device. The allocation size is automatically computed by this module -i.e., ``(arr.size: size_t) * c_sizeof(arr.eltType)``, which means the index space is linearlized when ``arr`` is multi-dimensional. Also, if ``arr`` is 2D and ``pitched=true``, pitched allocation is performed and the host and device pitch can be obtained by doing ``obj.hpitch`` and ``obj.dpitch``. Note that the allocated memory is automatically reclaimed when the object is deleted.
+      Allocates memory on the device. The allocation size is automatically computed by this module -i.e., ``(arr.size: c_size_t) * c_sizeof(arr.eltType)``, which means the index space is linearlized when ``arr`` is multi-dimensional. Also, if ``arr`` is 2D and ``pitched=true``, pitched allocation is performed and the host and device pitch can be obtained by doing ``obj.hpitch`` and ``obj.dpitch``. Note that the allocated memory is automatically reclaimed when the object is deleted.
 
       :arg arr: The reference of the non-distributed Chapel Array that will be mapped onto the device.
       :arg pitched: whether pitched allocation is performed or not (default is false)
@@ -136,7 +136,7 @@ MID-level API Reference
 MID-LOW-level API Reference
 ############################
 
-.. method:: Malloc(ref devPtr: c_void_ptr, size: size_t)
+.. method:: Malloc(ref devPtr: c_void_ptr, size: c_size_t)
 
    Allocates memory on the device.
 
@@ -144,7 +144,7 @@ MID-LOW-level API Reference
    :type devPtr: `c_voidPtr`
 
    :arg size: Allocation size in bytes
-   :type size: `size_t`
+   :type size: `c_size_t`
 
    .. code-block:: chapel
       :emphasize-lines: 6,21
@@ -154,7 +154,7 @@ MID-LOW-level API Reference
 
       proc GPUCallBack(lo: int, hi: int, N: int) {
         var dA: c_void_ptr;
-        Malloc(dA, (A.size: size_t) * c_sizeof(A.eltType));
+        Malloc(dA, (A.size: c_size_t) * c_sizeof(A.eltType));
         ...
       }
 
@@ -169,7 +169,7 @@ MID-LOW-level API Reference
         var dA: c_void_ptr;
         // get the local portion of the distributed array
         var localA = A.localSlice(lo...hi);
-        Malloc(dA, (localA.size: size_t) * c_sizeof(localA.eltType));
+        Malloc(dA, (localA.size: c_size_t) * c_sizeof(localA.eltType));
         ...
       }
 
@@ -180,7 +180,7 @@ MID-LOW-level API Reference
 
 
 
-.. method:: MallocPitch(ref devPtr: c_void_ptr, ref pitch: size_t, width: size_t, height: size_t)
+.. method:: MallocPitch(ref devPtr: c_void_ptr, ref pitch: c_size_t, width: c_size_t, height: c_size_t)
 
    Allocates pitched 2D memory on the device.
 
@@ -188,17 +188,17 @@ MID-LOW-level API Reference
    :type devPtr: `c_voidPtr`
 
    :arg pitch: Pitch for allocation on the device, which is set by the runtime
-   :type pitch: `size_t`
+   :type pitch: `c_size_t`
 
    :arg width: The width of the original Chapel array (in bytes)
-   :type width: `size_t`
+   :type width: `c_size_t`
 
    :arg height: The number of rows (height)
-   :type height: `size_t`
+   :type height: `c_size_t`
 
    .. note:: A working example can be found `here <https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/pitched2d/pitched2d.chpl>`_. The detailed descirption of the underlying CUDA API can be found `here <https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g32bd7a39135594788a542ae72217775c>`_.
 
-.. method:: Memcpy(dst: c_void_ptr, src: c_void_ptr, count: size_t, kind: int)
+.. method:: Memcpy(dst: c_void_ptr, src: c_void_ptr, count: c_size_t, kind: int)
 
    Transfers data between the host and the device
 
@@ -209,7 +209,7 @@ MID-LOW-level API Reference
    :type src: `c_void_ptr`
 
    :arg count: size in bytes to be transferred
-   :type count: `size_t`
+   :type count: `c_size_t`
 
    :arg kind: type of transfer (``0``: host-to-device, ``1``: device-to-host)
    :type kind: `int`
@@ -222,7 +222,7 @@ MID-LOW-level API Reference
 
       proc GPUCallBack(lo: int, hi: int, N: int) {
         var dA: c_void_ptr;
-        Malloc(dA, (A.size: size_t) * c_sizeof(A.eltType));
+        Malloc(dA, (A.size: c_size_t) * c_sizeof(A.eltType));
         // host-to-device
         Memcpy(dA, c_ptrTo(A), size, 0);
         // device-to-host
@@ -231,7 +231,7 @@ MID-LOW-level API Reference
 
    .. note:: ``c_ptrTo(A)`` returns a pointer to the Chapel rectangular array ``A``. For more details, see `this document <https://chapel-lang.org/docs/builtins/CPtr.html#CPtr.c_ptrTo>`_.
 
-.. method:: Memcpy2D(dst: c_void_ptr, dpitch: size_t, src: c_void_ptr, spitch: size_t, width: size_t, height:size_t, kind: int)
+.. method:: Memcpy2D(dst: c_void_ptr, dpitch: c_size_t, src: c_void_ptr, spitch: c_size_t, width: c_size_t, height:c_size_t, kind: int)
 
    Transfers pitched 2D array between the host and the device
 
@@ -239,19 +239,19 @@ MID-LOW-level API Reference
    :type dst: `c_void_ptr`
 
    :arg dpitch: the pitch of destination memory
-   :type dpitch: `size_t`
+   :type dpitch: `c_size_t`
 
    :arg src: the source address
    :type src: `c_void_ptr`
 
    :arg spitch: the pitch of source memory
-   :type spitch: `size_t`
+   :type spitch: `c_size_t`
 
    :arg width: the width of 2D array to be transferred (in bytes)
-   :type width: `size_t`
+   :type width: `c_size_t`
 
    :arg height: the height of 2D array to be transferred (# of rows)
-   :type height: `size_t`
+   :type height: `c_size_t`
 
    :arg kind: type of transfer (``0``: host-to-device, ``1``: device-to-host)
    :type kind: `int`

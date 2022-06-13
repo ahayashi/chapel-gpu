@@ -6,8 +6,7 @@ use ReplicatedDist;
 use GPUIterator;
 use GPUAPI;
 use BlockDist;
-use SysCTypes;
-use CPtr;
+use CTypes;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -57,16 +56,16 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   ref lW = W.localSlice(lo .. hi);
   if (verbose) { ProfilerStart(); }
   var dX, dY, dWcurr, dW: c_void_ptr;
-  Malloc(dX, X.size:size_t * c_sizeof(X.eltType));
-  Malloc(dY, Y.size:size_t * c_sizeof(Y.eltType));
-  Malloc(dWcurr, Wcurr.size:size_t * c_sizeof(Wcurr.eltType));
-  Malloc(dW, lW.size:size_t * c_sizeof(lW.eltType));
-  Memcpy(dX, c_ptrTo(X.replicand(here)), X.size:size_t * c_sizeof(X.eltType), 0);
-  Memcpy(dY, c_ptrTo(Y.replicand(here)), Y.size:size_t * c_sizeof(Y.eltType), 0);
-  Memcpy(dWcurr, c_ptrTo(Wcurr.replicand(here)), Wcurr.size:size_t * c_sizeof(Wcurr.eltType), 0);
+  Malloc(dX, X.size:c_size_t * c_sizeof(X.eltType));
+  Malloc(dY, Y.size:c_size_t * c_sizeof(Y.eltType));
+  Malloc(dWcurr, Wcurr.size:c_size_t * c_sizeof(Wcurr.eltType));
+  Malloc(dW, lW.size:c_size_t * c_sizeof(lW.eltType));
+  Memcpy(dX, c_ptrTo(X.replicand(here)), X.size:c_size_t * c_sizeof(X.eltType), 0);
+  Memcpy(dY, c_ptrTo(Y.replicand(here)), Y.size:c_size_t * c_sizeof(Y.eltType), 0);
+  Memcpy(dWcurr, c_ptrTo(Wcurr.replicand(here)), Wcurr.size:c_size_t * c_sizeof(Wcurr.eltType), 0);
   LaunchLR(dX, dY, dW, dWcurr, alpha, nSamples, nFeatures, lo, hi, N);
   DeviceSynchronize();
-  Memcpy(c_ptrTo(lW), dW, lW.size:size_t * c_sizeof(lW.eltType), 1);
+  Memcpy(c_ptrTo(lW), dW, lW.size:c_size_t * c_sizeof(lW.eltType), 1);
   Free(dX);
   Free(dY);
   Free(dW);

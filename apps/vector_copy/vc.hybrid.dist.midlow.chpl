@@ -6,8 +6,7 @@ use Time;
 use GPUIterator;
 use GPUAPI;
 use BlockDist;
-use SysCTypes;
-use CPtr;
+use CTypes;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -31,7 +30,7 @@ var B: [D] real(32);
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc LaunchVC(A: c_void_ptr, B: c_void_ptr, N: size_t);
+extern proc LaunchVC(A: c_void_ptr, B: c_void_ptr, N: c_size_t);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
@@ -46,11 +45,11 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   ref lB = B.localSlice(lo .. hi);
   if (verbose) { ProfilerStart(); }
   var dA, dB: c_void_ptr;
-  var size: size_t = (lA.size:size_t * c_sizeof(lA.eltType));
+  var size: c_size_t = (lA.size:c_size_t * c_sizeof(lA.eltType));
   Malloc(dA, size);
   Malloc(dB, size);
   Memcpy(dB, c_ptrTo(lB), size, 0);
-  LaunchVC(dA, dB, N: size_t);
+  LaunchVC(dA, dB, N: c_size_t);
   DeviceSynchronize();
   Memcpy(c_ptrTo(lA), dA, size, 1);
   Free(dA);

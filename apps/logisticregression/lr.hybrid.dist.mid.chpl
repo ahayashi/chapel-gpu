@@ -6,8 +6,7 @@ use ReplicatedDist;
 use GPUIterator;
 use GPUAPI;
 use BlockDist;
-use SysCTypes;
-use CPtr;
+use CTypes;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options

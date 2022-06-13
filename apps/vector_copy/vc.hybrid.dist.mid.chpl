@@ -6,8 +6,7 @@ use Time;
 use GPUIterator;
 use GPUAPI;
 use BlockDist;
-use SysCTypes;
-use CPtr;
+use CTypes;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -31,7 +30,7 @@ var B: [D] real(32);
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc LaunchVC(A: c_void_ptr, B: c_void_ptr, N: size_t);
+extern proc LaunchVC(A: c_void_ptr, B: c_void_ptr, N: c_size_t);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
@@ -48,7 +47,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   var dA = new GPUArray(lA);
   var dB = new GPUArray(lB);
   dB.toDevice();
-  LaunchVC(dA.dPtr(), dB.dPtr(), N: size_t);
+  LaunchVC(dA.dPtr(), dB.dPtr(), N: c_size_t);
   DeviceSynchronize();
   dA.fromDevice();
   if (verbose) { ProfilerStop(); }

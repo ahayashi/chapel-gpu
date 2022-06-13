@@ -6,8 +6,7 @@ use ReplicatedDist;
 use GPUIterator;
 use GPUAPI;
 use BlockDist;
-use SysCTypes;
-use CPtr;
+use CTypes;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -56,16 +55,16 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   var dA, dB, dC: c_void_ptr;
 
   //writeln("lA.size: ", lA.size, " B.size: ", B.size);
-  Malloc(dA, lA.size:size_t * c_sizeof(lA.eltType));
-  Malloc(dB, B.size:size_t  * c_sizeof(B.eltType));
-  Malloc(dC, lC.size:size_t * c_sizeof(lC.eltType));
+  Malloc(dA, lA.size:c_size_t * c_sizeof(lA.eltType));
+  Malloc(dB, B.size:c_size_t  * c_sizeof(B.eltType));
+  Malloc(dC, lC.size:c_size_t * c_sizeof(lC.eltType));
 
-  Memcpy(dA, c_ptrTo(lA), lA.size:size_t * c_sizeof(lA.eltType), 0);
-  Memcpy(dB, c_ptrTo(B.replicand(here)),  B.size:size_t  * c_sizeof(B.eltType),  0);
+  Memcpy(dA, c_ptrTo(lA), lA.size:c_size_t * c_sizeof(lA.eltType), 0);
+  Memcpy(dB, c_ptrTo(B.replicand(here)),  B.size:c_size_t  * c_sizeof(B.eltType),  0);
 
   LaunchMM(dA, dB, dC, n*n, 0, hi-lo, N, tiled);
   DeviceSynchronize();
-  Memcpy(c_ptrTo(lC), dC, lC.size:size_t * c_sizeof(lC.eltType), 1);
+  Memcpy(c_ptrTo(lC), dC, lC.size:c_size_t * c_sizeof(lC.eltType), 1);
 
   Free(dA);
   Free(dB);

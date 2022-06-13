@@ -1,7 +1,7 @@
 use GPUAPI;
-use SysCTypes;
+use CTypes;
 
-extern proc kernelLOW(a: [] c_ptr(int), b: [] size_t, n: int);
+extern proc kernelLOW(a: [] c_ptr(int), b: [] c_size_t, n: int);
 extern proc kernelMIDLOW(a: c_ptr(c_void_ptr), n: int);
 
 class C {
@@ -46,7 +46,7 @@ writeln("[LOW]");
 {
     init();
     ref ptrs = [c_ptrTo(Cs[0].x), c_ptrTo(Cs[1].x)];
-    ref sizes = [Cs[0].x.size:size_t*c_sizeof(int), Cs[1].x.size:size_t*c_sizeof(int)];
+    ref sizes = [Cs[0].x.size:c_size_t*c_sizeof(int), Cs[1].x.size:c_size_t*c_sizeof(int)];
     kernelLOW(ptrs, sizes, N);
     verify("LOW");
 }
@@ -58,18 +58,18 @@ writeln("[MIDLOW]");
   var dA: [0..#N] c_void_ptr;
   var dAs: c_ptr(c_void_ptr);
   for i in 0..#N {
-    const size = Cs[i].x.size:size_t*c_sizeof(int);
+    const size = Cs[i].x.size:c_size_t*c_sizeof(int);
     Malloc(dA[i], size);
     Memcpy(dA[i], c_ptrTo(Cs[i].x), size, 0);
   }
-  const size = N: size_t * c_sizeof(c_ptr(c_void_ptr));
+  const size = N: c_size_t * c_sizeof(c_ptr(c_void_ptr));
   Malloc(dAs, size);
   Memcpy(dAs, c_ptrTo(dA), size, 0);
 
   kernelMIDLOW(dAs, N);
   DeviceSynchronize();
   for i in 0..#N {
-    const size = Cs[i].x.size:size_t*c_sizeof(int);
+    const size = Cs[i].x.size:c_size_t*c_sizeof(int);
     Memcpy(c_ptrTo(Cs[i].x), dA[i], size, 1);
   }
   // Verification

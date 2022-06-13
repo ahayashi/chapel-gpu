@@ -45,7 +45,7 @@ At the MID-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation,
      var dA = new GPUArray(A);
      var dB = new GPUArray(B);
      dB.toDevice();
-     LaunchVC(dA.dPtr(), dB.dPtr(), N: size_t);
+     LaunchVC(dA.dPtr(), dB.dPtr(), N: c_size_t);
      dA.fromDevice();
      free(dA, dB);
    }
