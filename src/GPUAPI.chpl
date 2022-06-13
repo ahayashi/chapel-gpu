@@ -16,8 +16,7 @@
  */
 
 module GPUAPI {
-    use SysCTypes;
-    use CPtr;
+    use CTypes;
 
     config param debugGPUAPI = false;
 
@@ -31,50 +30,50 @@ module GPUAPI {
     extern proc DeviceSynchronize();
 
     // cudaMalloc
-    extern proc Malloc(ref devPtr: c_void_ptr, size: size_t);
-    extern proc MallocPtr(ref devPtr: c_ptr(c_void_ptr), size: size_t);
-    extern proc MallocPtrPtr(ref devPtr: c_ptr(c_ptr(c_void_ptr)), size: size_t);
-    inline proc Malloc(ref devPtr: c_ptr(c_void_ptr), size: size_t) { MallocPtr(devPtr, size); };
-    inline proc Malloc(ref devPtr: c_ptr(c_ptr(c_void_ptr)), size: size_t) { MallocPtrPtr(devPtr, size); };
+    extern proc Malloc(ref devPtr: c_void_ptr, size: c_size_t);
+    extern proc MallocPtr(ref devPtr: c_ptr(c_void_ptr), size: c_size_t);
+    extern proc MallocPtrPtr(ref devPtr: c_ptr(c_ptr(c_void_ptr)), size: c_size_t);
+    inline proc Malloc(ref devPtr: c_ptr(c_void_ptr), size: c_size_t) { MallocPtr(devPtr, size); };
+    inline proc Malloc(ref devPtr: c_ptr(c_ptr(c_void_ptr)), size: c_size_t) { MallocPtrPtr(devPtr, size); };
 
     // cudaMallocPitch
-    extern proc MallocPitch(ref devPtr: c_void_ptr, ref pitch: size_t, width: size_t, height: size_t);
+    extern proc MallocPitch(ref devPtr: c_void_ptr, ref pitch: c_size_t, width: c_size_t, height: c_size_t);
 
-    extern proc Memcpy(dst: c_void_ptr, src: c_void_ptr, count: size_t, kind: int);
-    extern proc Memcpy2D(dst: c_void_ptr, dpitch: size_t, src: c_void_ptr, spitch: size_t, width: size_t, height: size_t, kind: int);
+    extern proc Memcpy(dst: c_void_ptr, src: c_void_ptr, count: c_size_t, kind: int);
+    extern proc Memcpy2D(dst: c_void_ptr, dpitch: c_size_t, src: c_void_ptr, spitch: c_size_t, width: c_size_t, height: c_size_t, kind: int);
     extern proc Free(devPtr: c_void_ptr);
 
     class GPUArray {
       var devPtr: c_void_ptr;
       var hosPtr: c_void_ptr;
-      var size: size_t;
-      var sizeInBytes: size_t;
+      var size: c_size_t;
+      var sizeInBytes: c_size_t;
       var pitched: bool;
-      var hpitch: size_t;
-      var dpitch: size_t;
-      var height: size_t;
+      var hpitch: c_size_t;
+      var dpitch: c_size_t;
+      var height: c_size_t;
 
       proc init(ref arr, pitched=false) {
         // Low-level info
         this.devPtr = nil;
         this.hosPtr = c_ptrTo(arr);
         // size info
-        size = arr.size: size_t;
-        sizeInBytes = (((arr.size: size_t) * c_sizeof(arr.eltType)) : size_t);
+        size = arr.size: c_size_t;
+        sizeInBytes = (((arr.size: c_size_t) * c_sizeof(arr.eltType)) : c_size_t);
         this.pitched = pitched;
         this.complete();
         if (!pitched) {
             // allocation
             Malloc(devPtr, sizeInBytes);
             if (arr.rank == 2) {
-               this.hpitch = arr.domain.dim(1).size:size_t * c_sizeof(arr.eltType);
+               this.hpitch = arr.domain.dim(1).size:c_size_t * c_sizeof(arr.eltType);
                this.dpitch = this.hpitch;
             }
         } else if (arr.rank == 2) {
-            this.hpitch = arr.domain.dim(1).size:size_t * c_sizeof(arr.eltType);
+            this.hpitch = arr.domain.dim(1).size:c_size_t * c_sizeof(arr.eltType);
             // allocation
-            MallocPitch(devPtr, this.dpitch, this.hpitch, arr.domain.dim(0).size:size_t);
-            this.height = arr.domain.dim(0).size:size_t;
+            MallocPitch(devPtr, this.dpitch, this.hpitch, arr.domain.dim(0).size:c_size_t);
+            this.height = arr.domain.dim(0).size:c_size_t;
         } else {
             writeln("GPU Array allocation error: pitched=true only works with 2D array, but the given rank is ", arr.rank);
             exit();
@@ -141,9 +140,9 @@ module GPUAPI {
       var nRows: int;
       var hosPtrs: [0..#nRows] c_void_ptr;
       var devPtrs: [0..#nRows] c_void_ptr;
-      var elemSizes: [0..#nRows] size_t;
-      var size: size_t;
-      var sizeInBytes: size_t;
+      var elemSizes: [0..#nRows] c_size_t;
+      var size: c_size_t;
+      var sizeInBytes: c_size_t;
 
       // args: iterable
       // class C {
@@ -161,13 +160,13 @@ module GPUAPI {
         this.complete();
         var idx = 0;
         for i in args {
-          const elemSize = i.size:size_t * c_sizeof(i.eltType);
+          const elemSize = i.size:c_size_t * c_sizeof(i.eltType);
           Malloc(this.devPtrs[idx], elemSize);
           this.hosPtrs[idx] = c_ptrTo(i);
           this.elemSizes[idx] = elemSize;
           idx = idx + 1;
         }
-        Malloc(this.devPtr, nRows:size_t * c_sizeof(c_ptr(c_void_ptr)));
+        Malloc(this.devPtr, nRows:c_size_t * c_sizeof(c_ptr(c_void_ptr)));
       }
 
       // var dCs = new GPUJaggedArray(Cs[0].x, Cs[1].x, ...);
@@ -176,13 +175,13 @@ module GPUAPI {
         this.complete();
         var idx: int = 0;
         for arg in args {
-          const elemSize = arg.size: size_t * c_sizeof(arg.eltType);
+          const elemSize = arg.size: c_size_t * c_sizeof(arg.eltType);
           Malloc(this.devPtrs[idx], elemSize);
           this.hosPtrs[idx] = c_ptrTo(arg);
           this.elemSizes[idx] = elemSize;
           idx = idx + 1;
         }
-        Malloc(this.devPtr, nRows:size_t * c_sizeof(c_ptr(c_void_ptr)));
+        Malloc(this.devPtr, nRows:c_size_t * c_sizeof(c_ptr(c_void_ptr)));
       }
 
       proc deinit() {
@@ -196,7 +195,7 @@ module GPUAPI {
         for i in 0..#nRows {
           Memcpy(this.devPtrs[i], this.hosPtrs[i], elemSizes[i], 0);
         }
-        Memcpy(this.devPtr, c_ptrTo(this.devPtrs), nRows:size_t * c_sizeof(c_ptr(c_void_ptr)), 0);
+        Memcpy(this.devPtr, c_ptrTo(this.devPtrs), nRows:c_size_t * c_sizeof(c_ptr(c_void_ptr)), 0);
       }
 
       inline proc fromDevice() {

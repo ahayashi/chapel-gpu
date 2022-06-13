@@ -228,7 +228,7 @@ module GPUIterator {
              CPUPercent: int = 0
              )
        where tag == iterKind.leader
-       && isRectangularDom(D)
+       && D.isRectangular()
        && D.dist.type <= Block {
 
       if (debugGPUIterator) {
@@ -255,7 +255,7 @@ module GPUIterator {
              )
       where tag == iterKind.follower
       && followThis.size == 1
-      && isRectangularDom(D)
+      && D.isRectangular()
       && D.dist.type <= Block {
 
       // index-neutral
@@ -279,7 +279,7 @@ module GPUIterator {
              CPUPercent: int = 0
              )
       where tag == iterKind.standalone
-      && isRectangularDom(D)
+      && D.isRectangular()
       && D.dist.type <= Block {
 
       if (debugGPUIterator) {
@@ -305,7 +305,7 @@ module GPUIterator {
              GPUWrapper,
              CPUPercent: int = 0
              )
-      where isRectangularDom(D)
+      where D.isRectangular()
       && D.dist.type <= Block {
 
       if (debugGPUIterator) {

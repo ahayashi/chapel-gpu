@@ -7,8 +7,7 @@ use GPUIterator;
 use GPUAPI;
 use BlockDist;
 use SysBasic;
-use SysCTypes;
-use CPtr;
+use CTypes;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -34,7 +33,7 @@ var C: [D] real(32);
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc LaunchStream(A: c_void_ptr, B: c_void_ptr, C: c_void_ptr, alpha: c_float, N: size_t);
+extern proc LaunchStream(A: c_void_ptr, B: c_void_ptr, C: c_void_ptr, alpha: c_float, N: c_size_t);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
@@ -56,7 +55,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   var dC = new GPUArray(lC);
 
   toDevice(dB, dC);
-  LaunchStream(dA.dPtr(), dB.dPtr(), dC.dPtr(), alpha, N: size_t);
+  LaunchStream(dA.dPtr(), dB.dPtr(), dC.dPtr(), alpha, N: c_size_t);
   DeviceSynchronize();
   dA.fromDevice();
 

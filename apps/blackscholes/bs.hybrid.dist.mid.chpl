@@ -6,8 +6,7 @@ use Time;
 use GPUIterator;
 use GPUAPI;
 use BlockDist;
-use SysCTypes;
-use CPtr;
+use CTypes;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -32,7 +31,7 @@ var call: [D] real(32);
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc LaunchBS(drand: c_void_ptr, dput: c_void_ptr, dcall: c_void_ptr, N: size_t);
+extern proc LaunchBS(drand: c_void_ptr, dput: c_void_ptr, dcall: c_void_ptr, N: c_size_t);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
@@ -48,7 +47,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   var dput = new GPUArray(lput);
   var dcall = new GPUArray(lcall);
   toDevice(drand);
-  LaunchBS(drand.dPtr(), dput.dPtr(), dcall.dPtr(), N:size_t);
+  LaunchBS(drand.dPtr(), dput.dPtr(), dcall.dPtr(), N:c_size_t);
   DeviceSynchronize();
   fromDevice(dput, dcall);
   if (verbose) { ProfilerStop(); }
@@ -151,7 +150,7 @@ proc main() {
       var X = d1;
       var absX = abs(X);
       var t = one / (one + temp4 * absX);
-      var y = one - oneBySqrt2pi * Math.exp(-X * X / two) * t * (c1 + t * (c2 + t * (c3 + t * (c4 + t * c5))));
+      var y = one - oneBySqrt2pi * exp(-X * X / two) * t * (c1 + t * (c2 + t * (c3 + t * (c4 + t * c5))));
       if (X  < zero) {
 		phiD1 = one - y;
       } else {
@@ -159,7 +158,7 @@ proc main() {
       }
       // phiD2 = phi(d2)
       X = d2;
-      absX = Math.abs(X);
+      absX = abs(X);
       t = one / (one + temp4 * absX);
       y = one - oneBySqrt2pi * exp(-X * X / two) * t * (c1 + t * (c2 + t * (c3 + t * (c4 + t * c5))));
       if (X  < zero) {
@@ -172,7 +171,7 @@ proc main() {
 
       // phiD1 = phi(-d1);
       X = -d1;
-      absX = Math.abs(X);
+      absX = abs(X);
       t = one / (one + temp4 * absX);
       y = one - oneBySqrt2pi * exp(-X * X / two) * t * (c1 + t * (c2 + t * (c3 + t * (c4 + t * c5))));
       if (X  < zero) {
@@ -183,7 +182,7 @@ proc main() {
 
       // phiD2 = phi(-d2);
       X = -d2;
-      absX = Math.abs(X);
+      absX = abs(X);
       t = one / (one + temp4 * absX);
       y = one - oneBySqrt2pi * exp(-X * X / two) * t * (c1 + t * (c2 + t * (c3 + t * (c4 + t * c5))));
       if (X  < zero) {

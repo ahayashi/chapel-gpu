@@ -41,11 +41,11 @@ At the MID-LOW-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocat
 
    proc GPUCallBack(lo: int, hi: int, N: int) {
      var dA, dB: c_void_ptr;
-     var size: size_t = (lA.size:size_t * c_sizeof(lA.eltType));
+     var size: c_size_t = (lA.size:c_size_t * c_sizeof(lA.eltType));
      Malloc(dA, size);
      Malloc(dB, size);
      Memcpy(dB, c_ptrTo(lB), size, 0);
-     LaunchVC(dA, dB, N: size_t);
+     LaunchVC(dA, dB, N: c_size_t);
      DeviceSynchronize();
      Memcpy(c_ptrTo(lA), dA, size, 1);
      Free(dA);

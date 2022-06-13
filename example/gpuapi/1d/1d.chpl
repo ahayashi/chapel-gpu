@@ -1,6 +1,5 @@
 use GPUAPI;
-use SysCTypes;
-use CPtr;
+use CTypes;
 
 extern proc kernel(dA: c_void_ptr, n: int);
 
@@ -21,7 +20,7 @@ proc init() {
 init();
 
 var dA: c_void_ptr;
-var size: size_t = A.size:size_t * c_sizeof(A.eltType);
+var size: c_size_t = A.size:c_size_t * c_sizeof(A.eltType);
 Malloc(dA, size);
 Memcpy(dA, c_ptrTo(A), size, 0);
 kernel(dA, D.dim(0).size);

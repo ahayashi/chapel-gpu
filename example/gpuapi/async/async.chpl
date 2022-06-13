@@ -1,6 +1,5 @@
 use GPUAPI;
-use SysCTypes;
-use CPtr;
+use CTypes;
 use Futures;
 
 extern proc kernel(dA: c_void_ptr);
