@@ -5,7 +5,7 @@ Building Chapel-GPU
 Prerequisites
 ##############
 
-* Chapel: 1.25.0 or below. Detailed instructions for installing Chapel can be found: `here <https://chapel-lang.org/docs/usingchapel/QUICKSTART.html>`_.
+* Chapel: 1.27 (git). Detailed instructions for installing Chapel can be found: `here <https://chapel-lang.org/docs/usingchapel/QUICKSTART.html>`_.
 
 * GPU Compilers & Runtimes: ``GPUIterator`` and ``GPUAPI`` require either of the following GPU programing environments.
 
