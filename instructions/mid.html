@@ -224,7 +224,7 @@
   <span class="kd">var</span> <span class="nx">dA</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">A</span><span class="p">);</span>
   <span class="kd">var</span> <span class="nx">dB</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">GPUArray</span><span class="p">(</span><span class="nx">B</span><span class="p">);</span>
   <span class="nx">dB</span><span class="p">.</span><span class="nx">toDevice</span><span class="p">();</span>
-  <span class="nx">LaunchVC</span><span class="p">(</span><span class="nx">dA</span><span class="p">.</span><span class="nx">dPtr</span><span class="p">(),</span> <span class="nx">dB</span><span class="p">.</span><span class="nx">dPtr</span><span class="p">(),</span> <span class="nx">N</span><span class="p">:</span> <span class="nx">size_t</span><span class="p">);</span>
+  <span class="nx">LaunchVC</span><span class="p">(</span><span class="nx">dA</span><span class="p">.</span><span class="nx">dPtr</span><span class="p">(),</span> <span class="nx">dB</span><span class="p">.</span><span class="nx">dPtr</span><span class="p">(),</span> <span class="nx">N</span><span class="p">:</span> <span class="nx">c_size_t</span><span class="p">);</span>
   <span class="nx">dA</span><span class="p">.</span><span class="nx">fromDevice</span><span class="p">();</span>
   <span class="nx">free</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="nx">dB</span><span class="p">);</span>
 <span class="p">}</span>

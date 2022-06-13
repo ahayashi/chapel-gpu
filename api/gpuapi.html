@@ -186,7 +186,7 @@
 <dd><dl class="chpl method">
 <dt class="sig sig-object chpl" id="GPUArray.init">
 <em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">arr</span></em>, <em class="sig-param"><span class="pre">pitched=false</span></em><span class="sig-paren">)</span><a class="headerlink" href="#GPUArray.init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Allocates memory on the device. The allocation size is automatically computed by this module -i.e., <code class="docutils literal notranslate"><span class="pre">(arr.size:</span> <span class="pre">size_t)</span> <span class="pre">*</span> <span class="pre">c_sizeof(arr.eltType)</span></code>, which means the index space is linearlized when <code class="docutils literal notranslate"><span class="pre">arr</span></code> is multi-dimensional. Also, if <code class="docutils literal notranslate"><span class="pre">arr</span></code> is 2D and <code class="docutils literal notranslate"><span class="pre">pitched=true</span></code>, pitched allocation is performed and the host and device pitch can be obtained by doing <code class="docutils literal notranslate"><span class="pre">obj.hpitch</span></code> and <code class="docutils literal notranslate"><span class="pre">obj.dpitch</span></code>. Note that the allocated memory is automatically reclaimed when the object is deleted.</p>
+<dd><p>Allocates memory on the device. The allocation size is automatically computed by this module -i.e., <code class="docutils literal notranslate"><span class="pre">(arr.size:</span> <span class="pre">c_size_t)</span> <span class="pre">*</span> <span class="pre">c_sizeof(arr.eltType)</span></code>, which means the index space is linearlized when <code class="docutils literal notranslate"><span class="pre">arr</span></code> is multi-dimensional. Also, if <code class="docutils literal notranslate"><span class="pre">arr</span></code> is 2D and <code class="docutils literal notranslate"><span class="pre">pitched=true</span></code>, pitched allocation is performed and the host and device pitch can be obtained by doing <code class="docutils literal notranslate"><span class="pre">obj.hpitch</span></code> and <code class="docutils literal notranslate"><span class="pre">obj.dpitch</span></code>. Note that the allocated memory is automatically reclaimed when the object is deleted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ul class="simple">
@@ -347,13 +347,13 @@
 <h2>MID-LOW-level API Reference<a class="headerlink" href="#mid-low-level-api-reference" title="Permalink to this headline">¶</a></h2>
 <dl class="chpl method">
 <dt class="sig sig-object chpl" id="Malloc">
-<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Malloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">devPtr:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">size:</span> <span class="pre">size_t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Malloc" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Malloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">devPtr:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">size:</span> <span class="pre">c_size_t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Malloc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allocates memory on the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>devPtr</strong> : <cite>c_voidPtr</cite> – Pointer to the allocated device array</p></li>
-<li><p><strong>size</strong> : <cite>size_t</cite> – Allocation size in bytes</p></li>
+<li><p><strong>size</strong> : <cite>c_size_t</cite> – Allocation size in bytes</p></li>
 </ul>
 </dd>
 </dl>
@@ -362,7 +362,7 @@
 
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">dA</span><span class="p">:</span> <span class="nx">c_void_ptr</span><span class="p">;</span>
-<span class="hll">  <span class="nx">Malloc</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">size</span><span class="p">:</span> <span class="nx">size_t</span><span class="p">)</span> <span class="o">*</span> <span class="nx">c_sizeof</span><span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">eltType</span><span class="p">));</span>
+<span class="hll">  <span class="nx">Malloc</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">size</span><span class="p">:</span> <span class="nx">c_size_t</span><span class="p">)</span> <span class="o">*</span> <span class="nx">c_sizeof</span><span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">eltType</span><span class="p">));</span>
 </span>  <span class="o">..</span><span class="p">.</span>
 <span class="p">}</span>
 
@@ -377,7 +377,7 @@
   <span class="kd">var</span> <span class="nx">dA</span><span class="p">:</span> <span class="nx">c_void_ptr</span><span class="p">;</span>
   <span class="c1">// get the local portion of the distributed array</span>
   <span class="kd">var</span> <span class="nx">localA</span> <span class="o">=</span> <span class="nx">A</span><span class="p">.</span><span class="nx">localSlice</span><span class="p">(</span><span class="nx">lo</span><span class="o">..</span><span class="p">.</span><span class="nx">hi</span><span class="p">);</span>
-<span class="hll">  <span class="nx">Malloc</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="p">(</span><span class="nx">localA</span><span class="p">.</span><span class="nx">size</span><span class="p">:</span> <span class="nx">size_t</span><span class="p">)</span> <span class="o">*</span> <span class="nx">c_sizeof</span><span class="p">(</span><span class="nx">localA</span><span class="p">.</span><span class="nx">eltType</span><span class="p">));</span>
+<span class="hll">  <span class="nx">Malloc</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="p">(</span><span class="nx">localA</span><span class="p">.</span><span class="nx">size</span><span class="p">:</span> <span class="nx">c_size_t</span><span class="p">)</span> <span class="o">*</span> <span class="nx">c_sizeof</span><span class="p">(</span><span class="nx">localA</span><span class="p">.</span><span class="nx">eltType</span><span class="p">));</span>
 </span>  <span class="o">..</span><span class="p">.</span>
 <span class="p">}</span>
 
@@ -393,15 +393,15 @@
 
 <dl class="chpl method">
 <dt class="sig sig-object chpl" id="MallocPitch">
-<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">MallocPitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">devPtr:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">ref</span> <span class="pre">pitch:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">width:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">height:</span> <span class="pre">size_t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MallocPitch" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">MallocPitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">devPtr:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">ref</span> <span class="pre">pitch:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">width:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">height:</span> <span class="pre">c_size_t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MallocPitch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allocates pitched 2D memory on the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>devPtr</strong> : <cite>c_voidPtr</cite> – Pointer to the allocated pitched 2D device array</p></li>
-<li><p><strong>pitch</strong> : <cite>size_t</cite> – Pitch for allocation on the device, which is set by the runtime</p></li>
-<li><p><strong>width</strong> : <cite>size_t</cite> – The width of the original Chapel array (in bytes)</p></li>
-<li><p><strong>height</strong> : <cite>size_t</cite> – The number of rows (height)</p></li>
+<li><p><strong>pitch</strong> : <cite>c_size_t</cite> – Pitch for allocation on the device, which is set by the runtime</p></li>
+<li><p><strong>width</strong> : <cite>c_size_t</cite> – The width of the original Chapel array (in bytes)</p></li>
+<li><p><strong>height</strong> : <cite>c_size_t</cite> – The number of rows (height)</p></li>
 </ul>
 </dd>
 </dl>
@@ -413,14 +413,14 @@
 
 <dl class="chpl method">
 <dt class="sig sig-object chpl" id="Memcpy">
-<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Memcpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dst:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">count:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">kind:</span> <span class="pre">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Memcpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dst:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">count:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">kind:</span> <span class="pre">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transfers data between the host and the device</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dst</strong> : <cite>c_void_ptr</cite> – the desination address</p></li>
 <li><p><strong>src</strong> : <cite>c_void_ptr</cite> – the source address</p></li>
-<li><p><strong>count</strong> : <cite>size_t</cite> – size in bytes to be transferred</p></li>
+<li><p><strong>count</strong> : <cite>c_size_t</cite> – size in bytes to be transferred</p></li>
 <li><p><strong>kind</strong> : <cite>int</cite> – type of transfer (<code class="docutils literal notranslate"><span class="pre">0</span></code>: host-to-device, <code class="docutils literal notranslate"><span class="pre">1</span></code>: device-to-host)</p></li>
 </ul>
 </dd>
@@ -430,7 +430,7 @@
 
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">dA</span><span class="p">:</span> <span class="nx">c_void_ptr</span><span class="p">;</span>
-  <span class="nx">Malloc</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">size</span><span class="p">:</span> <span class="nx">size_t</span><span class="p">)</span> <span class="o">*</span> <span class="nx">c_sizeof</span><span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">eltType</span><span class="p">));</span>
+  <span class="nx">Malloc</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">size</span><span class="p">:</span> <span class="nx">c_size_t</span><span class="p">)</span> <span class="o">*</span> <span class="nx">c_sizeof</span><span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">eltType</span><span class="p">));</span>
 <span class="hll">  <span class="c1">// host-to-device</span>
 </span><span class="hll">  <span class="nx">Memcpy</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="nx">c_ptrTo</span><span class="p">(</span><span class="nx">A</span><span class="p">),</span> <span class="nx">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 </span><span class="hll">  <span class="c1">// device-to-host</span>
@@ -446,17 +446,17 @@
 
 <dl class="chpl method">
 <dt class="sig sig-object chpl" id="Memcpy2D">
-<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Memcpy2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dst:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">dpitch:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">spitch:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">width:</span> <span class="pre">size_t</span></em>, <em class="sig-param"><span class="pre">height:size_t</span></em>, <em class="sig-param"><span class="pre">kind:</span> <span class="pre">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy2D" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Memcpy2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dst:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">dpitch:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">spitch:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">width:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">height:c_size_t</span></em>, <em class="sig-param"><span class="pre">kind:</span> <span class="pre">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy2D" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transfers pitched 2D array between the host and the device</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dst</strong> : <cite>c_void_ptr</cite> – the desination address</p></li>
-<li><p><strong>dpitch</strong> : <cite>size_t</cite> – the pitch of destination memory</p></li>
+<li><p><strong>dpitch</strong> : <cite>c_size_t</cite> – the pitch of destination memory</p></li>
 <li><p><strong>src</strong> : <cite>c_void_ptr</cite> – the source address</p></li>
-<li><p><strong>spitch</strong> : <cite>size_t</cite> – the pitch of source memory</p></li>
-<li><p><strong>width</strong> : <cite>size_t</cite> – the width of 2D array to be transferred (in bytes)</p></li>
-<li><p><strong>height</strong> : <cite>size_t</cite> – the height of 2D array to be transferred (# of rows)</p></li>
+<li><p><strong>spitch</strong> : <cite>c_size_t</cite> – the pitch of source memory</p></li>
+<li><p><strong>width</strong> : <cite>c_size_t</cite> – the width of 2D array to be transferred (in bytes)</p></li>
+<li><p><strong>height</strong> : <cite>c_size_t</cite> – the height of 2D array to be transferred (# of rows)</p></li>
 <li><p><strong>kind</strong> : <cite>int</cite> – type of transfer (<code class="docutils literal notranslate"><span class="pre">0</span></code>: host-to-device, <code class="docutils literal notranslate"><span class="pre">1</span></code>: device-to-host)</p></li>
 </ul>
 </dd>
