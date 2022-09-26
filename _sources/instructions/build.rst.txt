@@ -5,12 +5,12 @@ Building Chapel-GPU
 Prerequisites
 ##############
 
-* Chapel: 1.27 (git). Detailed instructions for installing Chapel can be found: `here <https://chapel-lang.org/docs/usingchapel/QUICKSTART.html>`_.
+* Chapel: 1.28. Detailed instructions for installing Chapel can be found: `here <https://chapel-lang.org/docs/usingchapel/QUICKSTART.html>`_.
 
 * GPU Compilers & Runtimes: ``GPUIterator`` and ``GPUAPI`` require either of the following GPU programing environments.
 
    * NVIDIA CUDA: Tested with 10.2
-   * AMD HIP: Tested with 2.8
+   * AMD HIP: Tested with 4.1
    * Intel DPC++ (SYCL): Tested with 2021.3.0
    * OpenCL: Tested with 2.2 and 1.2
 
@@ -70,7 +70,7 @@ By default, the libraries are installed into :code:`chapel-gpu/install`. If you 
 .. note::
    **For CUDA Users**: If CUDA is not found, make sure :code:`nvcc` is in your path or tell :code:`cmake` the path to :code:`nvcc`. For example: :code:`cmake CMAKE_CUDA_COMPILER=path_to/nvcc ..`
 
-   **For AMD HIP Users**: Chapel-GPU relies on :code:`hipify-perl` to convert CUDA programs to HIP programs internally. If you are pretty sure HIP is installed on your system, but :code:`cmake` complains :code:`hipify-perl` is not found, consider updating the following line in :code:`CMakeLists.txt`: :code:`if(EXISTS "${HIP_ROOT_DIR}/hip/bin/hipify-perl")`
+   **For AMD HIP Users**: Chapel-GPU relies on :code:`hipify-perl` to convert CUDA programs to HIP programs internally. If you are pretty sure HIP is installed on your system, but :code:`cmake` complains :code:`hipify-perl` is not found, consider updating the following cmake command in :code:`CMakeLists.txt`: :code:`find_program(CHPL_GPU_HIPIFY_EXECUTABLE ...)`. For example, it would be a good idea to add other hint paths to :code:`PATHS` in addition to :code:`${HIP_ROOT_DIR}`. For more details please see `the CMake Documentation<https://cmake.org/cmake/help/latest/command/find_program.html>`_.
 
    **For DPC++ Users**: Chapel-GPU relies on :code:`dpct` to convert CUDA programs to DPC++ programs internally, which requires CUDA header files. If :code:`cmake` complains CUDA is not found, please set :code:`CUDA_HOME` approprietly.
 
