@@ -70,7 +70,7 @@ By default, the libraries are installed into :code:`chapel-gpu/install`. If you 
 .. note::
    **For CUDA Users**: If CUDA is not found, make sure :code:`nvcc` is in your path or tell :code:`cmake` the path to :code:`nvcc`. For example: :code:`cmake CMAKE_CUDA_COMPILER=path_to/nvcc ..`
 
-   **For AMD HIP Users**: Chapel-GPU relies on :code:`hipify-perl` to convert CUDA programs to HIP programs internally. If you are pretty sure HIP is installed on your system, but :code:`cmake` complains :code:`hipify-perl` is not found, consider updating the following cmake command in :code:`CMakeLists.txt`: :code:`find_program(CHPL_GPU_HIPIFY_EXECUTABLE ...)`. For example, it would be a good idea to add other hint paths to :code:`PATHS` in addition to :code:`${HIP_ROOT_DIR}`. For more details please see `the CMake Documentation<https://cmake.org/cmake/help/latest/command/find_program.html>`_.
+   **For AMD HIP Users**: Chapel-GPU relies on :code:`hipify-perl` to convert CUDA programs to HIP programs internally. If you are pretty sure HIP is installed on your system, but :code:`cmake` complains :code:`hipify-perl` is not found, consider updating the following cmake command in :code:`CMakeLists.txt`: :code:`find_program(CHPL_GPU_HIPIFY_EXECUTABLE ...)`. For example, it would be a good idea to add other hint paths to :code:`PATHS` in addition to :code:`${HIP_ROOT_DIR}`. For more details please see `the CMake Documentation <https://cmake.org/cmake/help/latest/command/find_program.html>`_.
 
    **For DPC++ Users**: Chapel-GPU relies on :code:`dpct` to convert CUDA programs to DPC++ programs internally, which requires CUDA header files. If :code:`cmake` complains CUDA is not found, please set :code:`CUDA_HOME` approprietly.
 
