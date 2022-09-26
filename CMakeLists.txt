@@ -31,17 +31,24 @@ if(CMAKE_CUDA_COMPILER)
 endif()
 
 if(HIP_FOUND)
-  if(EXISTS "${HIP_ROOT_DIR}/hip/bin/hipify-perl")
+  find_program(
+    CHPL_GPU_HIPIFY_EXECUTABLE
+    NAMES hipify-perl
+    PATHS
+    ${HIP_ROOT_DIR}
+    PATH_SUFFIXES bin
+    NO_DEFAULT_PATH)
+  if(CHPL_GPU_HIPIFY_EXECUTABLE)
     message(STATUS "Found HIP: " ${HIP_VERSION})
-    message(STATUS "Found HIPIFY: " ${HIP_ROOT_DIR}/hip/bin/hipify-perl)
+    message(STATUS "Found HIPIFY: " ${CHPL_GPU_HIPIFY_EXECUTABLE})
     add_custom_command(
       OUTPUT GPUAPI.hip.cc
-      COMMAND ${HIP_ROOT_DIR}/hip/bin/hipify-perl ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.cu > GPUAPI.hip.cc
+      COMMAND ${CHPL_GPU_HIPIFY_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.cu > GPUAPI.hip.cc
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/GPUAPI.cu
       COMMENT "Convering GPUAPI.cu to GPUAPI.hip.cc"
       )
-    set(CMAKE_CXX_COMPILER "${HIP_ROOT_DIR}/hip/bin/hipcc")
+    set(CMAKE_CXX_COMPILER ${HIP_HIPCC_EXECUTABLE})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fno-gpu-rdc -fPIC")
     hip_add_library(GPUAPIHIP SHARED GPUAPI.hip.cc)
     hip_add_library(GPUAPIHIP_static STATIC GPUAPI.hip.cc)

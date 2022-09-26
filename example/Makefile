@@ -6,7 +6,7 @@ CHPL_GPU_CMAKE_PATH=$(CHPL_GPU_HOME)/share/cmake/ChapelGPUAPI
 # CUDA
 CUDA_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPICUDA_static -L./build -lvc.cuda -L$(CUDA_ROOT_DIR)/lib -lcudart
 # HIP
-HIP_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPIHIP_static -L./build -lvc.hip -L$(HIP_ROOT_DIR)/lib -lhip_hcc
+HIP_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPIHIP_static -L./build -lvc.hip -L$(HIP_ROOT_DIR)/lib -lamdhip64
 # DPC++
 DPCPP_LIBS=$(CHPL_GPU_LIB_PATH) -lGPUAPIDPCPP_static $(DBLAS_LIB)
 DPCPP_FLAGS=-DTHREADS_PER_BLOCK=256 $(DBLAS_FLAG)

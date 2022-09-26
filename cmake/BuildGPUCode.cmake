@@ -32,15 +32,22 @@ if(CMAKE_CUDA_COMPILER)
 endif()
 
 if(HIP_FOUND)
-  if(EXISTS "${HIP_ROOT_DIR}/hip/bin/hipify-perl")
+  find_program(
+    CHPL_GPU_HIPIFY_EXECUTABLE
+    NAMES hipify-perl
+    PATHS
+    ${HIP_ROOT_DIR}
+    PATH_SUFFIXES bin
+    NO_DEFAULT_PATH)
+  if(CHPL_GPU_HIPIFY_EXECUTABLE)
     message(STATUS "Found HIP: " ${HIP_VERSION})
-    message(STATUS "Found HIPIFY: " ${HIP_ROOT_DIR}/hip/bin/hipify-perl)
-    set(CMAKE_CXX_COMPILER "${HIP_ROOT_DIR}/hip/bin/hipcc")
+    message(STATUS "Found HIPIFY: " ${CHPL_GPU_HIPIFY_EXECUTABLE})
+    set(CMAKE_CXX_COMPILER ${HIP_HIPCC_EXECUTABLE})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fno-gpu-rdc -fPIC")
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${APP}.cu")
       add_custom_command(
         OUTPUT ${APP}.hip.cc
-        COMMAND ${HIP_ROOT_DIR}/hip/bin/hipify-perl ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.cu > ${APP}.hip.cc
+        COMMAND ${CHPL_GPU_HIPIFY_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.cu > ${APP}.hip.cc
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.cu
         COMMENT "Convering .cu to .hip.cc"
@@ -50,7 +57,7 @@ if(HIP_FOUND)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${APP}.kernel.cu")
       add_custom_command(
         OUTPUT ${APP}.kernel.hip.cc
-        COMMAND ${HIP_ROOT_DIR}/hip/bin/hipify-perl ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.kernel.cu > ${APP}.kernel.hip.cc
+        COMMAND ${CHPL_GPU_HIPIFY_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.kernel.cu > ${APP}.kernel.hip.cc
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${APP}.kernel.cu
         COMMENT "Convering .cu to .hip.cc"
