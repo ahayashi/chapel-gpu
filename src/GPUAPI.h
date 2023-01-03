@@ -6,9 +6,9 @@ extern "C" {
 void GetDeviceCount(int*);
 void GetDevice(int*);
 void SetDevice(int);
-void ProfilerStart();
-void ProfilerStop();
-void DeviceSynchronize();
+void ProfilerStart(void);
+void ProfilerStop(void);
+void DeviceSynchronize(void);
 void Malloc(void**, size_t);
 void MallocPtr(void***, size_t);
 void MallocPtrPtr(void****, size_t);
