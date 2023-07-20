@@ -1,7 +1,7 @@
 # from https://github.com/chapel-lang/chapel/blob/main/third-party/chpl-venv/chpldoc-requirements.txt
 Jinja2==3.0.1
 MarkupSafe==2.0.1
-Pygments==2.9.0
+Pygments==2.15.0
 Sphinx==4.0.2
 docutils==0.16.0
 sphinx-rtd-theme==0.5.2
