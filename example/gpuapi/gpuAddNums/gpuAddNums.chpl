@@ -1,4 +1,5 @@
 extern {
+  #include <stdio.h>
   #include <cuda.h>
   #include <assert.h>
 
@@ -14,8 +15,6 @@ extern {
     CUcontext   context;
     CUfunction  function;
     int         devCount;
-
-    double X;
 
     checkCudaErrors(cuInit(0));
     checkCudaErrors(cuDeviceGetCount(&devCount));
