@@ -12,14 +12,16 @@ for i in D {
 }
 V = A + 1;
 
-var F = async(lambda () {
-        writeln("GPU Ctrl Thread");
-        var dA = new GPUArray(A);
-        dA.toDevice();
-        kernel(dA.dPtr());
-        dA.fromDevice();
-        return 1;
-    });
+proc runKernel() {
+    writeln("GPU Ctrl Thread");
+    var dA = new GPUArray(A);
+    dA.toDevice();
+    kernel(dA.dPtr());
+    dA.fromDevice();
+    return 1;
+}
+
+var F = async(runKernel);
 
 writeln("CPU Task here");
 if (F.get() == 1) {
