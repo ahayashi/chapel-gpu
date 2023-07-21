@@ -39,10 +39,10 @@ proc printResults(execTimes) {
 proc printLocaleInfo() {
   for loc in Locales {
     writeln(loc, " info: ");
-    const numSublocs = loc.getChildCount();
+    const numSublocs = loc.gpus.size;
     if (numSublocs != 0) {
       for sublocID in 0..#numSublocs {
-        const subloc = loc.getChild(sublocID);
+        const subloc = loc.gpus[sublocID];
         writeln("\t Subloc: ", sublocID);
         writeln("\t Name: ", subloc);
         writeln("\t maxTaskPar: ", subloc.maxTaskPar);
@@ -82,9 +82,9 @@ proc main() {
       rand(i) = (i: real(32) / n): real(32);
 	}
 
-	const startTime = getCurrentTime();
+	const startTime = timeSinceEpoch().totalSeconds();
 	bsCUDA(rand, put, call, 0, n-1, n);
-	execTimes(trial) = getCurrentTime() - startTime;
+	execTimes(trial) = timeSinceEpoch().totalSeconds() - startTime;
 	if (output) {
       writeln(call);
       writeln(put);
