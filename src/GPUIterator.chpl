@@ -46,7 +46,7 @@ module GPUIterator {
     }
 
     inline proc computeChunk(r: range, myChunk, numChunks)
-      where r.stridable == false {
+      where r.strides==strideKind.one {
 
       const numElems = r.size;
       const elemsPerChunk = numElems/numChunks;
