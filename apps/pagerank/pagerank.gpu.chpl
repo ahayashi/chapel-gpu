@@ -72,13 +72,13 @@ proc main() {
 	    used_links += 1;
 	}
 	
-	const startTime = getCurrentTime();
+	const startTime = timeSinceEpoch().totalSeconds();
 	var link_weights: [1..nLinks] real(32);	
 	for ite in 1..nIters {
 	    prCUDA1(ranks, links, link_counts, link_weights, nDocs, nLinks, 0, nLinks-1, nLinks);
 	    prCUDA2(ranks, links, link_weights, nDocs, nLinks, 0, nDocs-1, nDocs);
 	}
-	execTimes(trial) = getCurrentTime() - startTime;
+	execTimes(trial) = timeSinceEpoch().totalSeconds() - startTime;
 	if (output) {
 	    writeln(ranks);
 	}

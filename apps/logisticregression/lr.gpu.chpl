@@ -44,13 +44,13 @@ proc printResults(execTimes) {
 proc printLocaleInfo() {
   for loc in Locales {
     writeln(loc, " info: ");
-    const numSublocs = loc.getChildCount();
-    if (numSublocs != 0) {
-      for sublocID in 0..#numSublocs {
-        const subloc = loc.getChild(sublocID);
-        writeln("\t Subloc: ", sublocID);
-        writeln("\t Name: ", subloc);
-        writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+    const numGPUs = loc.gpus.size;
+    if (numGPUs != 0) {
+      for gpuID in 0..#numGPUs {
+        const gpu = loc.gpus[gpuID];
+        writeln("\t Subloc: ", gpuID);
+        writeln("\t Name: ", gpu);
+        writeln("\t maxTaskPar: ", gpu.maxTaskPar);
       }
     } else {
       writeln("\t Name: ", loc);
@@ -102,12 +102,12 @@ proc main() {
       }
     }
 
-	const startTime = getCurrentTime();
+	const startTime = timeSinceEpoch().totalSeconds();
 	for ite in 1..nIters {
       lrCUDA1(W, Wcurr, 0, nFeatures-1, nFeatures);
       lrCUDA2(X, Y, W, Wcurr, alpha, nSamples, nFeatures, 1, nFeatures, nFeatures);
 	}
-	execTimes(trial) = getCurrentTime() - startTime;
+	execTimes(trial) = timeSinceEpoch().totalSeconds() - startTime;
 	if (output) {
       writeln(W);
 	}

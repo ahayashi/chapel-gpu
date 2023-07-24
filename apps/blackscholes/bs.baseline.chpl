@@ -1,4 +1,5 @@
 use Time;
+use Math;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Runtime Options
@@ -34,13 +35,13 @@ proc printResults(execTimes) {
 proc printLocaleInfo() {
   for loc in Locales {
     writeln(loc, " info: ");
-    const numSublocs = loc.getChildCount();
-    if (numSublocs != 0) {
-      for sublocID in 0..#numSublocs {
-        const subloc = loc.getChild(sublocID);
-        writeln("\t Subloc: ", sublocID);
-        writeln("\t Name: ", subloc);
-        writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+    const numGPUs = loc.gpus.size;
+    if (numGPUs != 0) {
+      for gpuID in 0..#numGPUs {
+        const gpu = loc.gpus[gpuID];
+        writeln("\t Subloc: ", gpuID);
+        writeln("\t Name: ", gpu);
+        writeln("\t maxTaskPar: ", gpu.maxTaskPar);
       }
     } else {
       writeln("\t Name: ", loc);
@@ -77,7 +78,7 @@ proc main() {
       rand(i) = (i: real(32) / n): real(32);
 	}
 
-	const startTime = getCurrentTime();
+	const startTime = timeSinceEpoch().totalSeconds();
 	forall i in 1..n  {
       var c1 = 0.319381530: real(32);
       var c2 = -0.356563782: real(32);
@@ -156,7 +157,7 @@ proc main() {
 
       put(i) = KexpMinusRT * phiD2 - S * phiD1;
 	}
-	execTimes(trial) = getCurrentTime() - startTime;
+	execTimes(trial) = timeSinceEpoch().totalSeconds() - startTime;
 	if (output) {
       writeln(call);
       writeln(put);
