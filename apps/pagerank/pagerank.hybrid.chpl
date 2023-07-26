@@ -103,7 +103,7 @@ proc main() {
 	    exit();
 	}
 	
-	const startTime = getCurrentTime();
+	const startTime = timeSinceEpoch().totalSeconds();
 	for ite in 1..nIters {
 	    forall i in GPU(1..nLinks, CUDAWrapper1, CPUratio1) {
 		link_weights(i) = (ranks(links(i, 1)) / link_counts(links(i, 1))): real(32);
@@ -118,7 +118,7 @@ proc main() {
 		ranks(i) = new_rank;
 	    }
 	}	
-	execTimes(trial) = getCurrentTime() - startTime;
+	execTimes(trial) = timeSinceEpoch().totalSeconds() - startTime;
 	if (output) {
 	    writeln(ranks);
 	}

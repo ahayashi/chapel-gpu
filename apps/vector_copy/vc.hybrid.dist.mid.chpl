@@ -69,13 +69,13 @@ proc printResults(execTimes) {
 proc printLocaleInfo() {
   for loc in Locales {
     writeln(loc, " info: ");
-    const numSublocs = loc.getChildCount();
-    if (numSublocs != 0) {
-      for sublocID in 0..#numSublocs {
-        const subloc = loc.getChild(sublocID);
-        writeln("\t Subloc: ", sublocID);
-        writeln("\t Name: ", subloc);
-        writeln("\t maxTaskPar: ", subloc.maxTaskPar);
+    const numGPUs = loc.gpus.size;
+    if (numGPUs != 0) {
+      for gpuID in 0..#numGPUs {
+        const gpu = loc.gpus[gpuID];
+        writeln("\t Subloc: ", gpuID);
+        writeln("\t Name: ", gpu);
+        writeln("\t maxTaskPar: ", gpu.maxTaskPar);
       }
     } else {
       writeln("\t Name: ", loc);
@@ -104,11 +104,11 @@ proc main() {
       B(i) = i: real(32);
 	}
 
-	const startTime = getCurrentTime();
+	const startTime = timeSinceEpoch().totalSeconds();
 	forall i in GPU(D, CUDAWrapper, CPUratio) {
       A(i) = B(i);
 	}
-	execTimes(trial) = getCurrentTime() - startTime;
+	execTimes(trial) = timeSinceEpoch().totalSeconds() - startTime;
 	if (output) {
       writeln(A);
       for i in 1..n {
