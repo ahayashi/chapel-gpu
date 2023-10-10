@@ -256,7 +256,7 @@ module GPUIterator {
       where tag == iterKind.follower
       && followThis.size == 1
       && D.isRectangular()
-      && isSubtype(D.dist.type, blockDist) {
+      && isSubtype(D.distribution.type, blockDist) {
 
       // index-neutral
       const (followInds,) = followThis;
