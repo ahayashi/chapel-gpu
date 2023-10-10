@@ -2,7 +2,7 @@ use GPUAPI;
 use CTypes;
 
 extern proc kernelLOW(a: [] c_ptr(int), b: [] c_size_t, n: int);
-extern proc kernelMIDLOW(a: c_ptr(c_void_ptr), n: int);
+extern proc kernelMIDLOW(a: c_ptr(c_ptr(void)), n: int);
 
 class C {
   var n: int;
@@ -14,7 +14,7 @@ var Cs = [new C(256), new C(512)];
 var Vs = [new C(256), new C(512)];
 const N = Cs.size;
 
-proc init() {
+proc initialize() {
   for e in Cs {
     for i in e.x.domain {
       e.x[i] = i;
@@ -44,7 +44,7 @@ proc verify(prefix) {
 // LOW
 writeln("[LOW]");
 {
-    init();
+    initialize();
     ref ptrs = [c_ptrTo(Cs[0].x), c_ptrTo(Cs[1].x)];
     ref sizes = [Cs[0].x.size:c_size_t*c_sizeof(int), Cs[1].x.size:c_size_t*c_sizeof(int)];
     kernelLOW(ptrs, sizes, N);
@@ -54,15 +54,15 @@ writeln("[LOW]");
 // MIDLOW
 writeln("[MIDLOW]");
 {
-  init();
-  var dA: [0..#N] c_void_ptr;
-  var dAs: c_ptr(c_void_ptr);
+  initialize();
+  var dA: [0..#N] c_ptr(void);
+  var dAs: c_ptr(c_ptr(void));
   for i in 0..#N {
     const size = Cs[i].x.size:c_size_t*c_sizeof(int);
     Malloc(dA[i], size);
     Memcpy(dA[i], c_ptrTo(Cs[i].x), size, 0);
   }
-  const size = N: c_size_t * c_sizeof(c_ptr(c_void_ptr));
+  const size = N: c_size_t * c_sizeof(c_ptr(c_ptr(void)));
   Malloc(dAs, size);
   Memcpy(dAs, c_ptrTo(dA), size, 0);
 
@@ -79,7 +79,7 @@ writeln("[MIDLOW]");
 // MID
 writeln("[MID: multiple args]");
 {
-    init();
+    initialize();
     var dAs = new GPUJaggedArray(Cs[0].x, Cs[1].x);
     dAs.toDevice();
     kernelMIDLOW(dAs.dPtr(), N);
@@ -90,7 +90,7 @@ writeln("[MID: multiple args]");
 
 writeln("[MID: promoted]");
 {
-    init();
+    initialize();
     var dAs = new GPUJaggedArray(Cs.x);
     dAs.toDevice();
     kernelMIDLOW(dAs.dPtr(), N);

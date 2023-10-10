@@ -25,8 +25,8 @@ config param verbose = false;
 // TODO: Explore the possiblity of declaring the arrays and CUDAWrapper
 //       in the main proc (e.g., by using lambdas)
 const S = {1..n, 1..n};
-const RS = S dmapped Replicated();
-var D: domain(1) dmapped Block(boundingBox = {1..n*n}) = {1..n*n};
+const RS = S dmapped replicatedDist();
+var D: domain(1) dmapped blockDist(boundingBox = {1..n*n}) = {1..n*n};
 
 var A: [D] real(32);
 var B: [RS] real(32);
@@ -35,7 +35,7 @@ var C: [D] real(32);
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc LaunchMM(A: c_void_ptr, B: c_void_ptr, C: c_void_ptr, N: int, lo:int, hi:int, GPUN: int, tiled: int);
+extern proc LaunchMM(A: c_ptr(void), B: c_ptr(void), C: c_ptr(void), N: int, lo:int, hi:int, GPUN: int, tiled: int);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)

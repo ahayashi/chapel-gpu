@@ -28,25 +28,25 @@ config const reduction = false;
 // TODO: Explore the possiblity of declaring the arrays and CUDAWrapper
 //       in the main proc (e.g., by using lambdas)
 const Space1 = {1..nSamples, 1..nFeatures};
-const ReplicatedSpace1 = Space1 dmapped Replicated();
+const ReplicatedSpace1 = Space1 dmapped replicatedDist();
 var X: [ReplicatedSpace1] real(32);
 
 const Space2 = {1..nSamples};
-const ReplicatedSpace2 = Space2 dmapped Replicated();
+const ReplicatedSpace2 = Space2 dmapped replicatedDist();
 var Y: [ReplicatedSpace2] real(32);
 
 const Space3 = {1..nFeatures};
-const ReplicatedSpace3 = Space3 dmapped Replicated();
+const ReplicatedSpace3 = Space3 dmapped replicatedDist();
 var Wcurr: [ReplicatedSpace3] real(32);
 
-var D: domain(1) dmapped Block(boundingBox = {1..nFeatures}) = {1..nFeatures};
+var D: domain(1) dmapped blockDist(boundingBox = {1..nFeatures}) = {1..nFeatures};
 var W: [D] real(32);
 var alpha = 0.1 : real(32);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc LaunchLR(X: c_void_ptr, Y: c_void_ptr, W: c_void_ptr, Wcurr: c_void_ptr, alpha: real(32), nSamples: int, nFeatures: int, lo: int, hi: int, N: int);
+extern proc LaunchLR(X: c_ptr(void), Y: c_ptr(void), W: c_ptr(void), Wcurr: c_ptr(void), alpha: real(32), nSamples: int, nFeatures: int, lo: int, hi: int, N: int);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
@@ -56,7 +56,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   }
   ref lW = W.localSlice(lo .. hi);
   if (verbose) { ProfilerStart(); }
-  var dX, dY, dWcurr, dW: c_void_ptr;
+  var dX, dY, dWcurr, dW: c_ptr(void);
   Malloc(dX, X.size:c_size_t * c_sizeof(X.eltType));
   Malloc(dY, Y.size:c_size_t * c_sizeof(Y.eltType));
   Malloc(dWcurr, Wcurr.size:c_size_t * c_sizeof(Wcurr.eltType));

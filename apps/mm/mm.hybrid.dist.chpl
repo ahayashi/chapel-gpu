@@ -23,8 +23,8 @@ config param verbose = false;
 // TODO: Explore the possiblity of declaring the arrays and CUDAWrapper
 //       in the main proc (e.g., by using lambdas)
 const S = {1..n, 1..n};
-const RS = S dmapped Replicated();
-var D: domain(1) dmapped Block(boundingBox = {1..n*n}) = {1..n*n};
+const RS = S dmapped replicatedDist();
+var D: domain(1) dmapped blockDist(boundingBox = {1..n*n}) = {1..n*n};
 
 var A: [D] real(32);
 var B: [RS] real(32);

@@ -24,7 +24,7 @@ config param verbose = false;
 // For now, these arrays are global so the arrays can be seen from CUDAWrapper
 // TODO: Explore the possiblity of declaring the arrays and CUDAWrapper
 //       in the main proc (e.g., by using lambdas)
-var D: domain(1) dmapped Block(boundingBox = {1..n}) = {1..n};
+var D: domain(1) dmapped blockDist(boundingBox = {1..n}) = {1..n};
 var rand: [D] real(32);
 var put: [D] real(32);
 var call: [D] real(32);
@@ -32,7 +32,7 @@ var call: [D] real(32);
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc LaunchBS(drand: c_void_ptr, dput: c_void_ptr, dcall: c_void_ptr, N: c_size_t);
+extern proc LaunchBS(drand: c_ptr(void), dput: c_ptr(void), dcall: c_ptr(void), N: c_size_t);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)
@@ -44,7 +44,7 @@ proc CUDAWrapper(lo: int, hi: int, N: int) {
   ref lput = put.localSlice(lo .. hi);
   ref lcall = call.localSlice(lo .. hi);
   if (verbose) { ProfilerStart(); }
-  var drand, dput, dcall: c_void_ptr;
+  var drand, dput, dcall: c_ptr(void);
   var size: c_size_t = (lrand.size:c_size_t * c_sizeof(lrand.eltType));
   Malloc(drand, size);
   Malloc(dput, size);

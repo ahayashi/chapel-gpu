@@ -2,7 +2,7 @@ use GPUAPI;
 use CTypes;
 use Futures;
 
-extern proc kernel(dA: c_void_ptr);
+extern proc kernel(dA: c_ptr(void));
 
 var D = {0..127};
 var A: [D] int;

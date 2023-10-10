@@ -239,7 +239,7 @@ In the multi-locale scenario, you are supposed to update ``vc.hybrid.chpl`` slig
       :emphasize-lines: 2-4
 
       config const n = 32: int;
-      var D: domain(1) dmapped Block(boundingBox = {1..n}) = {1..n};
+      var D: domain(1) dmapped blockDist(boundingBox = {1..n}) = {1..n};
       var A: [D] real(32);
       var B: [D] real(32);
       // var A: [1..n] real(32); /* single locale version */

@@ -23,14 +23,14 @@ config param verbose = false;
 // For now, these arrays are global so the arrays can be seen from CUDAWrapper
 // TODO: Explore the possiblity of declaring the arrays and CUDAWrapper
 //       in the main proc (e.g., by using lambdas)
-var D: domain(1) dmapped Block(boundingBox = {1..n}) = {1..n};
+var D: domain(1) dmapped blockDist(boundingBox = {1..n}) = {1..n};
 var A: [D] real(32);
 var B: [D] real(32);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// C Interoperability
 ////////////////////////////////////////////////////////////////////////////////
-extern proc LaunchVC(A: c_void_ptr, B: c_void_ptr, N: c_size_t);
+extern proc LaunchVC(A: c_ptr(void), B: c_ptr(void), N: c_size_t);
 
 // CUDAWrapper is called from GPUIterator
 // to invoke a specific CUDA program (using C interoperability)

@@ -15,7 +15,7 @@ The GPUAPI module provides Chapel-level GPU API. The use of the API assumes case
 
 * `MID-LOW-level`: Provides wrapper functions for raw GPU API functions
 
-  * Example: ``var ga: c_void_ptr = Malloc(sizeInBytes);``
+  * Example: ``var ga: c_ptr(void) = Malloc(sizeInBytes);``
 
 
 
