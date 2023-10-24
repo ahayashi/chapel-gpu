@@ -1,14 +1,14 @@
 use GPUAPI;
 use CTypes;
 
-extern proc kernel(dA: c_void_ptr, nRows: c_size_t, nCols: c_size_t, dpitch: c_size_t);
+extern proc kernel(dA: c_ptr(void), nRows: c_size_t, nCols: c_size_t, dpitch: c_size_t);
 
 var D = {0..8, 0..8};
 var A: [D] int;
 var V: [D] int; // for verification
 
 // initialization proc
-proc init() {
+proc initialize() {
     for (i, j) in D {
         A[i, j] = (i+1)*10 + j;
     }
@@ -16,9 +16,9 @@ proc init() {
 }
 
 // MID-LOW
-init();
+initialize();
 
-var dA: c_void_ptr;
+var dA: c_ptr(void);
 var hpitch: c_size_t = D.dim(1).size:c_size_t * c_sizeof(A.eltType);
 var dpitch: c_size_t;
 
@@ -39,7 +39,7 @@ if (A.equals(V)) {
 }
 
 // MID (not pitched)
-init();
+initialize();
 var dA2 = new GPUArray(A);
 writeln("MID (pitch=false) pitch on the host:", dA2.hpitch);
 writeln("MID (pitch=false) pitch on the device: ", dA2.dpitch);
@@ -61,7 +61,7 @@ if (A.equals(V)) {
 }
 
 // MID (pitched)
-init();
+initialize();
 var dA3 = new GPUArray(A, true);
 writeln("MID (pitch=true) pitch on the host:", dA3.hpitch);
 writeln("MID (pitch=true) pitch on the device: ", dA3.dpitch);

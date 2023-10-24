@@ -223,13 +223,13 @@ module GPUIterator {
 
     // leader (block distributed domains)
     iter GPU(param tag: iterKind,
-             D: domain,
+             D: domain(?),
              GPUWrapper,
              CPUPercent: int = 0
              )
        where tag == iterKind.leader
        && D.isRectangular()
-       && isSubtype(D.dist.type, Block) {
+       && isSubtype(D.distribution.type, blockDist) {
 
       if (debugGPUIterator) {
         writeln("[DEBUG GPUITERATOR] GPUIterator (leader, block distributed)");
@@ -248,7 +248,7 @@ module GPUIterator {
 
     // follower (block distributed domains)
     iter GPU(param tag: iterKind,
-             D: domain,
+             D: domain(?),
              GPUWrapper,
              CPUPercent: int = 0,
              followThis
@@ -256,7 +256,7 @@ module GPUIterator {
       where tag == iterKind.follower
       && followThis.size == 1
       && D.isRectangular()
-      && isSubtype(D.dist.type, Block) {
+      && isSubtype(D.distribution.type, blockDist) {
 
       // index-neutral
       const (followInds,) = followThis;
@@ -274,13 +274,13 @@ module GPUIterator {
 
     // standalone (block distributed domains)
     iter GPU(param tag: iterKind,
-             D: domain,
+             D: domain(?),
              GPUWrapper,
              CPUPercent: int = 0
              )
       where tag == iterKind.standalone
       && D.isRectangular()
-      && isSubtype(D.dist.type, Block) {
+      && isSubtype(D.distribution.type, blockDist) {
 
       if (debugGPUIterator) {
         writeln("[DEBUG GPUITERATOR] GPUIterator (standalone distributed)");
@@ -301,12 +301,12 @@ module GPUIterator {
     }
 
     // serial iterator (block distributed domains)
-    iter GPU(D: domain,
+    iter GPU(D: domain(?),
              GPUWrapper,
              CPUPercent: int = 0
              )
       where D.isRectangular()
-      && isSubtype(D.dist.type, Block) {
+      && isSubtype(D.distribution.type, blockDist) {
 
       if (debugGPUIterator) {
         writeln("[DEBUG GPUITERATOR] GPUIterator (serial distributed)");
