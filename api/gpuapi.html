@@ -209,7 +209,7 @@
 
 <span class="c1">// Example 2: Distributed array</span>
 <span class="k">use</span> <span class="nx">BlockDist</span><span class="p">;</span>
-<span class="kd">var</span> <span class="nx">D</span><span class="p">:</span> <span class="k">domain</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">dmapped</span> <span class="nx">Block</span><span class="p">(</span><span class="nx">boundingBox</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">})</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">};</span>
+<span class="kd">var</span> <span class="nx">D</span><span class="p">:</span> <span class="k">domain</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">dmapped</span> <span class="nx">blockDist</span><span class="p">(</span><span class="nx">boundingBox</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">})</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">};</span>
 <span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="nx">D</span><span class="p">]</span> <span class="kt">int</span><span class="p">;</span>
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">n</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// get the local portion of the distributed array</span>
@@ -271,28 +271,28 @@
 
 <dl class="chpl method">
 <dt class="sig sig-object chpl" id="GPUArray.dPtr">
-<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">dPtr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="pre">:</span> <span class="pre">c_void_ptr</span><a class="headerlink" href="#GPUArray.dPtr" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">dPtr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="pre">:</span> <span class="pre">c_ptr(void)</span><a class="headerlink" href="#GPUArray.dPtr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a pointer to the allocated device memory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>pointer to the allocated device memory</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><cite>c_void_ptr</cite></p>
+<dd class="field-even"><p><cite>c_ptr(void)</cite></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="chpl method">
 <dt class="sig sig-object chpl" id="GPUArray.hPtr">
-<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">hPtr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="pre">:</span> <span class="pre">c_void_ptr</span><a class="headerlink" href="#GPUArray.hPtr" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">hPtr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="pre">:</span> <span class="pre">c_ptr(void)</span><a class="headerlink" href="#GPUArray.hPtr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a pointer to the head of the Chapel array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>pointer to the head of the Chapel array</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><cite>c_void_ptr</cite></p>
+<dd class="field-even"><p><cite>c_ptr(void)</cite></p>
 </dd>
 </dl>
 </dd></dl>
@@ -347,7 +347,7 @@
 <h2>MID-LOW-level API Reference<a class="headerlink" href="#mid-low-level-api-reference" title="Permalink to this headline">¶</a></h2>
 <dl class="chpl method">
 <dt class="sig sig-object chpl" id="Malloc">
-<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Malloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">devPtr:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">size:</span> <span class="pre">c_size_t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Malloc" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Malloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">devPtr:</span> <span class="pre">c_ptr(void)</span></em>, <em class="sig-param"><span class="pre">size:</span> <span class="pre">c_size_t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Malloc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allocates memory on the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
@@ -361,7 +361,7 @@
 <span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">int</span><span class="p">;</span>
 
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">dA</span><span class="p">:</span> <span class="nx">c_void_ptr</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">dA</span><span class="p">:</span> <span class="nx">c_ptr</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
 <span class="hll">  <span class="nx">Malloc</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">size</span><span class="p">:</span> <span class="nx">c_size_t</span><span class="p">)</span> <span class="o">*</span> <span class="nx">c_sizeof</span><span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">eltType</span><span class="p">));</span>
 </span>  <span class="o">..</span><span class="p">.</span>
 <span class="p">}</span>
@@ -371,10 +371,10 @@
 
 <span class="c1">// Example 2: Distributed array</span>
 <span class="k">use</span> <span class="nx">BlockDist</span><span class="p">;</span>
-<span class="kd">var</span> <span class="nx">D</span><span class="p">:</span> <span class="k">domain</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">dmapped</span> <span class="nx">Block</span><span class="p">(</span><span class="nx">boundingBox</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">})</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">};</span>
+<span class="kd">var</span> <span class="nx">D</span><span class="p">:</span> <span class="k">domain</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">dmapped</span> <span class="nx">blockDist</span><span class="p">(</span><span class="nx">boundingBox</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">})</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">};</span>
 <span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="nx">D</span><span class="p">]</span> <span class="kt">int</span><span class="p">;</span>
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">n</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">dA</span><span class="p">:</span> <span class="nx">c_void_ptr</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">dA</span><span class="p">:</span> <span class="nx">c_ptr</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
   <span class="c1">// get the local portion of the distributed array</span>
   <span class="kd">var</span> <span class="nx">localA</span> <span class="o">=</span> <span class="nx">A</span><span class="p">.</span><span class="nx">localSlice</span><span class="p">(</span><span class="nx">lo</span><span class="o">..</span><span class="p">.</span><span class="nx">hi</span><span class="p">);</span>
 <span class="hll">  <span class="nx">Malloc</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="p">(</span><span class="nx">localA</span><span class="p">.</span><span class="nx">size</span><span class="p">:</span> <span class="nx">c_size_t</span><span class="p">)</span> <span class="o">*</span> <span class="nx">c_sizeof</span><span class="p">(</span><span class="nx">localA</span><span class="p">.</span><span class="nx">eltType</span><span class="p">));</span>
@@ -393,7 +393,7 @@
 
 <dl class="chpl method">
 <dt class="sig sig-object chpl" id="MallocPitch">
-<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">MallocPitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">devPtr:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">ref</span> <span class="pre">pitch:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">width:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">height:</span> <span class="pre">c_size_t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MallocPitch" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">MallocPitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">ref</span> <span class="pre">devPtr:</span> <span class="pre">c_ptr(void)</span></em>, <em class="sig-param"><span class="pre">ref</span> <span class="pre">pitch:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">width:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">height:</span> <span class="pre">c_size_t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#MallocPitch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allocates pitched 2D memory on the device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
@@ -413,13 +413,13 @@
 
 <dl class="chpl method">
 <dt class="sig sig-object chpl" id="Memcpy">
-<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Memcpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dst:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">count:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">kind:</span> <span class="pre">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Memcpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dst:</span> <span class="pre">c_ptr(void)</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">c_ptr(void)</span></em>, <em class="sig-param"><span class="pre">count:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">kind:</span> <span class="pre">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transfers data between the host and the device</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dst</strong> : <cite>c_void_ptr</cite> – the desination address</p></li>
-<li><p><strong>src</strong> : <cite>c_void_ptr</cite> – the source address</p></li>
+<li><p><strong>dst</strong> : <cite>c_ptr(void)</cite> – the desination address</p></li>
+<li><p><strong>src</strong> : <cite>c_ptr(void)</cite> – the source address</p></li>
 <li><p><strong>count</strong> : <cite>c_size_t</cite> – size in bytes to be transferred</p></li>
 <li><p><strong>kind</strong> : <cite>int</cite> – type of transfer (<code class="docutils literal notranslate"><span class="pre">0</span></code>: host-to-device, <code class="docutils literal notranslate"><span class="pre">1</span></code>: device-to-host)</p></li>
 </ul>
@@ -429,7 +429,7 @@
 <span class="kd">var</span> <span class="nx">A</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="nx">n</span><span class="p">]</span> <span class="kt">int</span><span class="p">;</span>
 
 <span class="k">proc</span> <span class="nf">GPUCallBack</span><span class="p">(</span><span class="nx">lo</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">hi</span><span class="p">:</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">N</span><span class="p">:</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">dA</span><span class="p">:</span> <span class="nx">c_void_ptr</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">dA</span><span class="p">:</span> <span class="nx">c_ptr</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
   <span class="nx">Malloc</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">size</span><span class="p">:</span> <span class="nx">c_size_t</span><span class="p">)</span> <span class="o">*</span> <span class="nx">c_sizeof</span><span class="p">(</span><span class="nx">A</span><span class="p">.</span><span class="nx">eltType</span><span class="p">));</span>
 <span class="hll">  <span class="c1">// host-to-device</span>
 </span><span class="hll">  <span class="nx">Memcpy</span><span class="p">(</span><span class="nx">dA</span><span class="p">,</span> <span class="nx">c_ptrTo</span><span class="p">(</span><span class="nx">A</span><span class="p">),</span> <span class="nx">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
@@ -446,14 +446,14 @@
 
 <dl class="chpl method">
 <dt class="sig sig-object chpl" id="Memcpy2D">
-<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Memcpy2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dst:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">dpitch:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">c_void_ptr</span></em>, <em class="sig-param"><span class="pre">spitch:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">width:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">height:c_size_t</span></em>, <em class="sig-param"><span class="pre">kind:</span> <span class="pre">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy2D" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Memcpy2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dst:</span> <span class="pre">c_ptr(void)</span></em>, <em class="sig-param"><span class="pre">dpitch:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">src:</span> <span class="pre">c_ptr(void)</span></em>, <em class="sig-param"><span class="pre">spitch:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">width:</span> <span class="pre">c_size_t</span></em>, <em class="sig-param"><span class="pre">height:c_size_t</span></em>, <em class="sig-param"><span class="pre">kind:</span> <span class="pre">int</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Memcpy2D" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transfers pitched 2D array between the host and the device</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dst</strong> : <cite>c_void_ptr</cite> – the desination address</p></li>
+<li><p><strong>dst</strong> : <cite>c_ptr(void)</cite> – the desination address</p></li>
 <li><p><strong>dpitch</strong> : <cite>c_size_t</cite> – the pitch of destination memory</p></li>
-<li><p><strong>src</strong> : <cite>c_void_ptr</cite> – the source address</p></li>
+<li><p><strong>src</strong> : <cite>c_ptr(void)</cite> – the source address</p></li>
 <li><p><strong>spitch</strong> : <cite>c_size_t</cite> – the pitch of source memory</p></li>
 <li><p><strong>width</strong> : <cite>c_size_t</cite> – the width of 2D array to be transferred (in bytes)</p></li>
 <li><p><strong>height</strong> : <cite>c_size_t</cite> – the height of 2D array to be transferred (# of rows)</p></li>
@@ -469,11 +469,11 @@
 
 <dl class="chpl method">
 <dt class="sig sig-object chpl" id="Free">
-<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">devPtr:</span> <span class="pre">c_void_ptr</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Free" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">proc</span> </em><span class="sig-name descname"><span class="pre">Free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">devPtr:</span> <span class="pre">c_ptr(void)</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Free" title="Permalink to this definition">¶</a></dt>
 <dd><p>Frees memory on the device</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
-<dd class="field-odd"><p><strong>devPtr</strong> : <cite>c_void_ptr</cite> – Device pointer to memory to be freed.</p>
+<dd class="field-odd"><p><strong>devPtr</strong> : <cite>c_ptr(void)</cite> – Device pointer to memory to be freed.</p>
 </dd>
 </dl>
 </dd></dl>

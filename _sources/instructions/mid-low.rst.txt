@@ -34,13 +34,13 @@ The biggest motivation for introducing ``MID-LOW`` and ``MID`` -level GPU API is
      }
    }
 
-At the MID-LOW-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation, 2) device synchronization, and 3) data transfer can be written in Chapel. However, it's worth noting that this level of abstraction only provides thin wrapper functions for the CUDA/HIP/OpenCL-level API functions, which requires you to directly manipulate C types like ``c_void_ptr`` and so on. The MID-LOW is helpful particularly when you want to fine-tune the use of GPU API, but still want to stick with Chapel. Here is an example program written with the MID-LOW-level API:
+At the MID-LOW-level, most of the CUDA/HIP/OpenCL-level 1) device memory allocation, 2) device synchronization, and 3) data transfer can be written in Chapel. However, it's worth noting that this level of abstraction only provides thin wrapper functions for the CUDA/HIP/OpenCL-level API functions, which requires you to directly manipulate C types like ``c_ptr(void)`` and so on. The MID-LOW is helpful particularly when you want to fine-tune the use of GPU API, but still want to stick with Chapel. Here is an example program written with the MID-LOW-level API:
 
 .. code-block:: chapel
    :caption: vc.hybrid.chpl
 
    proc GPUCallBack(lo: int, hi: int, N: int) {
-     var dA, dB: c_void_ptr;
+     var dA, dB: c_ptr(void);
      var size: c_size_t = (lA.size:c_size_t * c_sizeof(lA.eltType));
      Malloc(dA, size);
      Malloc(dB, size);

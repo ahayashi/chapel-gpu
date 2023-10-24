@@ -33,7 +33,7 @@ MID-level API Reference
 
          // Example 2: Distributed array
          use BlockDist;
-         var D: domain(1) dmapped Block(boundingBox = {1..n}) = {1..n};
+         var D: domain(1) dmapped blockDist(boundingBox = {1..n}) = {1..n};
          var A: [D] int;
          proc GPUCallBack(lo: int, hi: int, n: int) {
            // get the local portion of the distributed array
@@ -86,19 +86,19 @@ MID-level API Reference
            dA.free();
          }
 
-   .. method:: dPtr(): c_void_ptr
+   .. method:: dPtr(): c_ptr(void)
 
       Returns a pointer to the allocated device memory.
 
       :returns: pointer to the allocated device memory
-      :rtype: `c_void_ptr`
+      :rtype: `c_ptr(void)`
 
-   .. method:: hPtr(): c_void_ptr
+   .. method:: hPtr(): c_ptr(void)
 
       Returns a pointer to the head of the Chapel array.
 
       :returns: pointer to the head of the Chapel array
-      :rtype: `c_void_ptr`
+      :rtype: `c_ptr(void)`
 
 
 .. method:: toDevice(args: GPUArray ...?n)
@@ -136,7 +136,7 @@ MID-level API Reference
 MID-LOW-level API Reference
 ############################
 
-.. method:: Malloc(ref devPtr: c_void_ptr, size: c_size_t)
+.. method:: Malloc(ref devPtr: c_ptr(void), size: c_size_t)
 
    Allocates memory on the device.
 
@@ -153,7 +153,7 @@ MID-LOW-level API Reference
       var A: [1..n] int;
 
       proc GPUCallBack(lo: int, hi: int, N: int) {
-        var dA: c_void_ptr;
+        var dA: c_ptr(void);
         Malloc(dA, (A.size: c_size_t) * c_sizeof(A.eltType));
         ...
       }
@@ -163,10 +163,10 @@ MID-LOW-level API Reference
 
       // Example 2: Distributed array
       use BlockDist;
-      var D: domain(1) dmapped Block(boundingBox = {1..n}) = {1..n};
+      var D: domain(1) dmapped blockDist(boundingBox = {1..n}) = {1..n};
       var A: [D] int;
       proc GPUCallBack(lo: int, hi: int, n: int) {
-        var dA: c_void_ptr;
+        var dA: c_ptr(void);
         // get the local portion of the distributed array
         var localA = A.localSlice(lo...hi);
         Malloc(dA, (localA.size: c_size_t) * c_sizeof(localA.eltType));
@@ -180,7 +180,7 @@ MID-LOW-level API Reference
 
 
 
-.. method:: MallocPitch(ref devPtr: c_void_ptr, ref pitch: c_size_t, width: c_size_t, height: c_size_t)
+.. method:: MallocPitch(ref devPtr: c_ptr(void), ref pitch: c_size_t, width: c_size_t, height: c_size_t)
 
    Allocates pitched 2D memory on the device.
 
@@ -198,15 +198,15 @@ MID-LOW-level API Reference
 
    .. note:: A working example can be found `here <https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/pitched2d/pitched2d.chpl>`_. The detailed descirption of the underlying CUDA API can be found `here <https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g32bd7a39135594788a542ae72217775c>`_.
 
-.. method:: Memcpy(dst: c_void_ptr, src: c_void_ptr, count: c_size_t, kind: int)
+.. method:: Memcpy(dst: c_ptr(void), src: c_ptr(void), count: c_size_t, kind: int)
 
    Transfers data between the host and the device
 
    :arg dst: the desination address
-   :type dst: `c_void_ptr`
+   :type dst: `c_ptr(void)`
 
    :arg src: the source address
-   :type src: `c_void_ptr`
+   :type src: `c_ptr(void)`
 
    :arg count: size in bytes to be transferred
    :type count: `c_size_t`
@@ -221,7 +221,7 @@ MID-LOW-level API Reference
       var A: [1..n] int;
 
       proc GPUCallBack(lo: int, hi: int, N: int) {
-        var dA: c_void_ptr;
+        var dA: c_ptr(void);
         Malloc(dA, (A.size: c_size_t) * c_sizeof(A.eltType));
         // host-to-device
         Memcpy(dA, c_ptrTo(A), size, 0);
@@ -231,18 +231,18 @@ MID-LOW-level API Reference
 
    .. note:: ``c_ptrTo(A)`` returns a pointer to the Chapel rectangular array ``A``. For more details, see `this document <https://chapel-lang.org/docs/builtins/CPtr.html#CPtr.c_ptrTo>`_.
 
-.. method:: Memcpy2D(dst: c_void_ptr, dpitch: c_size_t, src: c_void_ptr, spitch: c_size_t, width: c_size_t, height:c_size_t, kind: int)
+.. method:: Memcpy2D(dst: c_ptr(void), dpitch: c_size_t, src: c_ptr(void), spitch: c_size_t, width: c_size_t, height:c_size_t, kind: int)
 
    Transfers pitched 2D array between the host and the device
 
    :arg dst: the desination address
-   :type dst: `c_void_ptr`
+   :type dst: `c_ptr(void)`
 
    :arg dpitch: the pitch of destination memory
    :type dpitch: `c_size_t`
 
    :arg src: the source address
-   :type src: `c_void_ptr`
+   :type src: `c_ptr(void)`
 
    :arg spitch: the pitch of source memory
    :type spitch: `c_size_t`
@@ -258,12 +258,12 @@ MID-LOW-level API Reference
 
    .. note:: A working example can be found `here <https://github.com/ahayashi/chapel-gpu/blob/master/example/gpuapi/pitched2d/pitched2d.chpl>`_. The detailed descirption of the underlying CUDA API can be found `here <https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g3a58270f6775efe56c65ac47843e7cee>`_.
 
-.. method:: Free(devPtr: c_void_ptr)
+.. method:: Free(devPtr: c_ptr(void))
 
    Frees memory on the device
 
    :arg devPtr: Device pointer to memory to be freed.
-   :type devPtr: `c_void_ptr`
+   :type devPtr: `c_ptr(void)`
 
 .. method:: GetDeviceCount(ref count: int(32))
 

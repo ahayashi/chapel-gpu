@@ -18,7 +18,7 @@ This document describes the following two Chapel modules that facilitate GPU pro
 
     * `MID-LOW-level`: Provides wrapper functions for raw GPU API functions
 
-       * Example: :chapel:`var ga: c_void_ptr = Malloc(sizeInBytes);`
+       * Example: :chapel:`var ga: c_ptr(void) = Malloc(sizeInBytes);`
 
 
 Also, in this document, for categorization purposes, the term `LOW-level` is referred to a GPUIterator only version, where the GPUIterator is only used for invoking raw GPU programs in which there is no Chapel-level abstraction.
